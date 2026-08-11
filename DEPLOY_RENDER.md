@@ -101,14 +101,16 @@ render blueprints validate render.yaml --workspace <WORKSPACE_ID>
 3. 首次创建时填写 `sync: false` 的值：
    - `AUTH_PASSWORD_SCRYPT`：上一步生成的完整 scrypt 摘要；
    - `AUTH_TEACHER_NAME`：部署主体显示名；
-   - `AUTH_TEACHER_PHONE`：私有系统所有者手机号，不要填写公开演示手机号。
+   - `AUTH_TEACHER_PHONE`：系统所有者手机号。若比赛部署刻意复用内置演示手机号，
+     该手机号在 `AUTH_MODE=password` 下会优先按所有者摘要认证并获得所有者权限；
+     因此绝不能再把对应密码公开在登录页、仓库说明或答辩截图中。
 4. `AUTH_SESSION_SECRET` 与 `CREDENTIAL_VAULT_MASTER_KEY` 由 Blueprint 的 `generateValue: true` 分别生成；不要手工替换、复制到仓库或在应用界面展示。
 5. 确认实例为 `starter`、单实例、持久盘名 `poetic-realm-data`、挂载路径 `/var/data`、初始容量 `1 GB`。Starter 或更高付费实例（Starter+）是持久盘的最低部署边界；持久盘和实例会产生费用，容量可增加但不能缩小。
 6. 创建并等待 Build、Deploy 和 `/api/health` 三项均成功。
 
 Render 会自动提供 `RENDER_EXTERNAL_URL=https://<service>.onrender.com`。应用只把这个精确 HTTPS Origin 加入 CORS、CSRF 和 WebSocket 白名单，**不要手动覆盖该变量**。
 
-云端模型凭据的唯一持久权威是 `/var/data/provider-credentials.v1.json` 加密保险柜。系统所有者登录后在“系统设置 → 模型凭据”录入或轮换 DeepSeek、MiMo、DashScope 密钥以及 Wan Workspace 地址，保存后立即生效，无需重启。浏览器和 GET 接口只接收掩码；保险柜使用独立主密钥和 AES-256-GCM 完整性保护。公开演示账号只能体验合成数据，无法查看掩码、保存凭据或发起付费连通测试。
+云端模型凭据的唯一持久权威是 `/var/data/provider-credentials.v1.json` 加密保险柜。系统所有者登录后在“系统设置 → 模型凭据”录入或轮换 DeepSeek、MiMo、DashScope 密钥以及 Wan Workspace 地址，保存后立即生效，无需重启。浏览器和 GET 接口只接收掩码；保险柜使用独立主密钥和 AES-256-GCM 完整性保护。被认证为 `demo` 的账号只能体验合成数据，无法查看掩码、保存凭据或发起付费连通测试；与所有者手机号相同的账号在正式密码模式下按所有者身份认证，不属于该只读边界。
 
 Blueprint 不再要求供应商密钥，因此首次部署可在零模型凭据下启动。缺少某项时对应能力必须展示诚实降级；不得伪造 URL 或密钥。具备真实值后由所有者在应用设置页补齐，并逐项执行 provider canary。
 

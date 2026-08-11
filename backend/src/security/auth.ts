@@ -208,6 +208,26 @@ export class AuthService {
         const failureKey = `${source}:${createHmac('sha256', this.secret).update(input.phone).digest('base64url')}`
         this.assertNotLocked(failureKey)
 
+        // 正式 password 模式下，显式配置的系统所有者手机号是唯一权威身份。
+        // 即使它与内置演示档案使用同一手机号，也必须优先按所有者摘要验证，
+        // 且失败后不能回落到 demo 密码，否则一个手机号会对应两套权限身份。
+        const ownerPhoneSelected = this.mode === 'password'
+            && safeEqual(input.phone, this.options.teacherPhone ?? '')
+        if (ownerPhoneSelected) {
+            const ownerMatches = await verifyScryptPassword(input.password, this.options.passwordScrypt)
+            if (!ownerMatches) {
+                this.recordFailure(failureKey)
+                throw new LoginRejectedError(401, '教师账号或凭据无效')
+            }
+            this.failures.delete(failureKey)
+            return {
+                id: this.options.teacherId,
+                name: this.options.teacherName,
+                role: 'teacher',
+                accountType: 'owner',
+            }
+        }
+
         const demoAccount = DEMO_TEACHERS.find((item) => safeEqual(item.phone, input.phone))
         const demoMatches = demoAccount
             ? await verifyScryptPassword(input.password, demoAccount.passwordScrypt)
@@ -222,20 +242,8 @@ export class AuthService {
             }
         }
 
-        const ownerMatches = this.mode === 'password'
-            && safeEqual(input.phone, this.options.teacherPhone ?? '')
-            && await verifyScryptPassword(input.password, this.options.passwordScrypt)
-        if (!ownerMatches) {
-            this.recordFailure(failureKey)
-            throw new LoginRejectedError(401, '教师账号或凭据无效')
-        }
-        this.failures.delete(failureKey)
-        return {
-            id: this.options.teacherId,
-            name: this.options.teacherName,
-            role: 'teacher',
-            accountType: 'owner',
-        }
+        this.recordFailure(failureKey)
+        throw new LoginRejectedError(401, '教师账号或凭据无效')
     }
 
     issue(user: AuthUser): { token: string; session: AuthenticatedSession } {

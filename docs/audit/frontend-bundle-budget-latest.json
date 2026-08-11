@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-11T08:11:43.153Z",
+  "generatedAt": "2026-08-11T08:36:56.662Z",
   "measurement": "dist/index.html 中 module script 与 modulepreload 的真实文件，逐文件 gzip level 9 后求和",
   "budgetBytes": 120000,
-  "gzipBytes": 95036,
-  "gzipKBDecimal": 95.036,
-  "gzipKiB": 92.809,
-  "headroomBytes": 24964,
+  "gzipBytes": 95034,
+  "gzipKBDecimal": 95.034,
+  "gzipKiB": 92.807,
+  "headroomBytes": 24966,
   "forbiddenPreloads": [],
   "forbiddenProductionArtifacts": [],
   "deferredChunks": [
@@ -20,7 +20,7 @@
     },
     {
       "label": "富 Markdown 渲染器",
-      "file": "Markdown-DJlaj3YU.js",
+      "file": "Markdown-B2LxEQtE.js",
       "rawBytes": 334246,
       "gzipBytes": 101532,
       "budgetBytes": 110000,
@@ -31,9 +31,9 @@
   "deferredChunkViolations": [],
   "files": [
     {
-      "ref": "/assets/index-DC6uf5Yd.js",
+      "ref": "/assets/index-CIyVTYiZ.js",
       "rawBytes": 100197,
-      "gzipBytes": 32690
+      "gzipBytes": 32688
     },
     {
       "ref": "/assets/app-runtime-reErVGuh.js",

@@ -78,6 +78,14 @@ async function login(app: FastifyInstance, phone = DEMO_PHONE, extra: Record<str
     }
 }
 
+function passwordHash(password: string): string {
+    const salt = randomBytes(16)
+    const expected = scryptSync(password, salt, 32, {
+        N: 16_384, r: 8, p: 1, maxmem: 128 * 1024 * 1024,
+    })
+    return `scrypt$16384$8$1$${salt.toString('base64url')}$${expected.toString('base64url')}`
+}
+
 describe('server authentication boundary', () => {
     it('拒绝弱显式会话密钥、越界 TTL 和缺失密码摘要', () => {
         expect(() => new AuthService(options({ sessionSecret: 'too-short' }))).toThrow(/32/)
@@ -153,6 +161,24 @@ describe('server authentication boundary', () => {
         const setCookie = accepted.response.headers['set-cookie']
         expect(String(setCookie)).toContain('HttpOnly')
         expect(String(setCookie)).toContain('SameSite=Strict')
+    })
+
+    it('正式密码模式下同手机号的显式所有者优先于内置演示身份且不回落权限', async () => {
+        const app = await build(new AuthService(options({
+            mode: 'password',
+            teacherName: '曹老师',
+            teacherPhone: DEMO_PHONE,
+            passwordScrypt: passwordHash('owner-only-password'),
+        })))
+
+        const demoFallback = await login(app)
+        expect(demoFallback.response.statusCode).toBe(401)
+
+        const owner = await login(app, DEMO_PHONE, { password: 'owner-only-password' })
+        expect(owner.response.statusCode).toBe(200)
+        expect(owner.body.user).toEqual({
+            id: 'teacher-001', name: '曹老师', role: 'teacher', accountType: 'owner',
+        })
     })
 
     it('有效 HttpOnly 会话可访问业务接口，签名篡改会失败关闭', async () => {

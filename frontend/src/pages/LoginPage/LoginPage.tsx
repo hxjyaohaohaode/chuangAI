@@ -196,8 +196,8 @@ export default function LoginPage() {
                     {demoAccount && (
                         <aside className="pr-login-demo" aria-label="演示账号提示">
                             <div>
-                                <strong>合成数据演示账号</strong>
-                                <span>只用于体验，不可修改模型密钥</span>
+                                <strong>演示部署快捷入口</strong>
+                                <span>输入对应密码后进入；权限由部署配置决定</span>
                             </div>
                             <button type="button" onClick={() => setPhone(demoAccount.phone)}>
                                 填入演示手机号
