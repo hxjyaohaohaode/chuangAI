@@ -5,7 +5,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const excludedDirectoryNames = new Set(['node_modules', 'coverage', 'audit-artifacts', 'graphify-out'])
+const excludedDirectoryNames = new Set(['.git', 'node_modules', 'coverage', 'audit-artifacts', 'graphify-out'])
 const excludedRelativeDirectories = [
     'data',
     'backend/data',

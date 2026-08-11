@@ -1,14 +1,15 @@
 {
-  "generatedAt": "2026-08-11T06:18:49.593Z",
+  "generatedAt": "2026-08-11T06:33:15.602Z",
   "status": "passed_with_local_sensitive_exclusions",
   "summary": {
-    "releaseCandidateFiles": 1472,
+    "releaseCandidateFiles": 1439,
     "privateFiles": 44,
     "releaseSecretFindings": 0,
     "localSensitiveFindings": 3,
     "links": 0
   },
   "excludedDirectories": [
+    ".git",
     "node_modules",
     "coverage",
     "audit-artifacts",
