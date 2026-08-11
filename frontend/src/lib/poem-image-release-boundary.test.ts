@@ -1,16 +1,20 @@
 import { describe, expect, it } from 'vitest'
+import { existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { GENERATED_POEM_IMAGE_BY_ID, releasedStarmapImagePath } from './poem-generated-images'
 import { CULTURE_SCENES, getPoemImage, getPreferredPoeticImageUrl, POEM_IMAGES } from './poem-images'
 
 describe('poem image release boundary', () => {
-    it('only exposes the 22 reviewed and packaged starmap images', () => {
+    it('packages one unique WebP for every one of the 148 production poem IDs', () => {
         const entries = Object.entries(GENERATED_POEM_IMAGE_BY_ID)
 
-        expect(entries).toHaveLength(22)
-        expect(new Set(entries.map(([, imagePath]) => imagePath)).size).toBe(22)
+        expect(entries).toHaveLength(148)
+        expect(new Set(entries.map(([, imagePath]) => imagePath)).size).toBe(148)
         for (const [, imagePath] of entries) {
             expect(imagePath).toMatch(/^\/images\/generated\/starmap\/tongbian-[\w-]+\.webp$/)
             expect(imagePath).not.toContain('/uploads/')
+            const publicFile = fileURLToPath(new URL(`../../public${imagePath}`, import.meta.url))
+            expect(existsSync(publicFile), `缺少随包位图 ${imagePath}`).toBe(true)
         }
         expect(GENERATED_POEM_IMAGE_BY_ID['tongbian-007']).toBe('/images/generated/starmap/tongbian-007-v2.webp')
         expect(GENERATED_POEM_IMAGE_BY_ID['tongbian-011']).toBe('/images/generated/starmap/tongbian-011-v2.webp')

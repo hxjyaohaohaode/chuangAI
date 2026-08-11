@@ -84,6 +84,7 @@ export const config = {
 
     // 演示模式：跳过 API 密钥校验
     demoMode: env.DEMO_MODE === 'true',
+    seedLearningDemo: env.SEED_LEARNING_DEMO === 'true',
 
     // 仅供“容器内部非回环监听 + 宿主机回环端口映射”的受控场景使用。
     // 它允许 demo 认证模式存在于受控容器网络内，裸机/公网部署不得开启。
@@ -152,17 +153,13 @@ export function validateAuthConfiguration(): void {
 // ─────────────────────────────────────────────────────────────
 
 /**
- * 启动期校验 DeepSeek / MiMo API 密钥是否已配置
+ * 启动期报告 DeepSeek / MiMo API 密钥状态。
  *
- * 在 server.ts 的 listen 之前调用。若任一密钥为空且未开启演示模式，
- * 抛出明确错误以避免服务启动后首次调用 AI 即 401。
- *
- * 演示模式（DEMO_MODE=true）下跳过校验，便于无密钥环境联调。
+ * 凭据产品契约是“先登录，再由设置页写入加密保险柜”。因此无密钥绝不能
+ * 阻止服务启动，否则首次部署连登录页和设置页都到不了。各 AI 路由在真正
+ * 调用前各自失败关闭；数据、教学和设置功能仍可正常使用。
  */
 export function validateApiKeys(): void {
-    // Render 的模型凭据由登录后的所有者写入持久盘加密保险柜；首次部署必须先能
-    // 启动，才能完成这一步。具体 AI 路由在未配置时已有明确降级响应。
-    if (config.isRender) return
     if (config.demoMode) {
         console.warn('[config] 演示模式已开启（DEMO_MODE=true），跳过 API 密钥校验。AI 调用将无法正常工作。')
         return
@@ -177,9 +174,9 @@ export function validateApiKeys(): void {
     }
 
     if (missing.length > 0) {
-        throw new Error(
-            `启动失败：缺少 API 密钥 [${missing.join(', ')}]。` +
-            '请检查 .env 文件，或设置 DEMO_MODE=true 以演示模式启动。',
+        console.warn(
+            `[config] 尚未配置 ${missing.join(', ')}；服务继续启动。` +
+            '请以系统所有者登录后在“设置 → 模型密钥”中配置，加密保存后立即生效。',
         )
     }
 }

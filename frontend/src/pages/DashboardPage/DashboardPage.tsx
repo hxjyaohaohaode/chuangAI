@@ -31,7 +31,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import '@/components/ui/icons-extended'
-import { GlassCard, SectionErrorBoundary, Icon, AnchorMiniMap } from '@/components/ui'
+import { GlassCard, SectionErrorBoundary, Icon } from '@/components/ui'
 import { Counter } from '@/components/ui/Counter'
 import { TextPressure } from '@/components/ui/TextPressure'
 import { toast } from '@/stores/toast'
@@ -335,8 +335,6 @@ function DashboardHome() {
 
     return (
         <>
-            {/* v5.0 Task 4：右侧悬浮锚点迷你地图，自动扫描下方 data-anchor 章节 */}
-            <AnchorMiniMap />
 
             {stats.dataProvenance?.containsSyntheticData && (
                 <div className="pr-dashboard-provenance" role="status" aria-label="演示数据披露">

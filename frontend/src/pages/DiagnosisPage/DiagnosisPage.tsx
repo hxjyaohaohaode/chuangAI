@@ -26,7 +26,7 @@
 import { useEffect, useCallback, useRef, type KeyboardEvent } from 'react'
 import '@/components/ui/icons-extended'
 import { useSearchParams } from 'react-router-dom'
-import { Card, Combobox, Icon, VariableProximity, AnchorMiniMap, type ComboboxOption } from '@/components/ui'
+import { Card, Combobox, Icon, VariableProximity, type ComboboxOption } from '@/components/ui'
 import { StreamText } from '@/components/ui/StreamText'
 import { Radar } from '@/components/ui/Radar'
 import { toast } from '@/stores/toast'
@@ -209,9 +209,6 @@ export default function DiagnosisPage() {
 
     return (
         <div className="pr-diagnosis pr-v5-enter-diagnosis">
-            {/* v5.0 Task 4：右侧悬浮锚点迷你地图，自动扫描下方 data-anchor 章节 */}
-            <AnchorMiniMap />
-
             {/* v5.0 Hero：认知热力意象 —— 扫描动画
              * spec v7 Phase 6：集成 VariableProximity（标题字重跟随鼠标）+ StreamText（副标题流式输出） */}
             <section

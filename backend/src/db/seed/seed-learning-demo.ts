@@ -38,6 +38,8 @@
  */
 
 import { db, initDatabase } from '../index.js'
+import { syntheticStudentName } from './synthetic-roster.js'
+import { pathToFileURL } from 'node:url'
 
 // ─────────────────────────────────────────────────────────────
 // 常量
@@ -65,9 +67,6 @@ const TARGET_CLASSES = ['class-001', 'class-002', 'class-003'] as const
 
 /** 每个班覆盖的教学诗篇数量（按 tongbian 序号取前 N 首） */
 const POEMS_PER_CLASS = 12
-
-/** 脱敏姓氏首字母表（循环使用） */
-const SURNAMES = ['Li', 'Wang', 'Zhang', 'Liu', 'Chen', 'Yang', 'Huang', 'Zhao', 'Wu', 'Zhou'] as const
 
 /** 认知风格（循环分配） */
 const COGNITIVE_STYLES = ['visual', 'auditory', 'kinesthetic'] as const
@@ -183,6 +182,13 @@ export function seedLearningDemo(): SeedStats {
             (id, class_id, name, anonymous_name, grade, cognitive_style, engagement_score, created_at, updated_at, metadata)
         VALUES (@id, @classId, @name, @anonymousName, @grade, @cognitiveStyle, @engagementScore, @createdAt, @now, @metadata)
     `)
+    const updateStudentEngagement = db.prepare(`
+        UPDATE students
+           SET engagement_score = @engagementScore,
+               updated_at = @now
+         WHERE id = @studentId
+           AND metadata LIKE '%"seedSource":"roster-demo-v2"%'
+    `)
     const insertLesson = db.prepare(`
         INSERT OR IGNORE INTO lessons
             (id, class_id, poem_id, teacher_id, scheduled_at, started_at, ended_at, status, mode, created_at, updated_at, metadata)
@@ -217,7 +223,7 @@ export function seedLearningDemo(): SeedStats {
     `)
 
     const run = db.transaction(() => {
-        for (const classId of TARGET_CLASSES) {
+        for (const [classIndex, classId] of TARGET_CLASSES.entries()) {
             const cls = db
                 .prepare('SELECT id, name, grade, teacher_id AS teacherId, student_count AS studentCount FROM classes WHERE id = ?')
                 .get(classId) as
@@ -235,14 +241,14 @@ export function seedLearningDemo(): SeedStats {
             const need = Math.max(0, cls.studentCount - existing.length)
             for (let i = 0; i < need; i++) {
                 const seq = existing.length + i + 1
-                const surname = SURNAMES[(seq - 1) % SURNAMES.length] as string
                 const num = String(seq).padStart(2, '0')
+                const displayName = syntheticStudentName(classIndex * 40 + seq - 1)
                 insertStudent.run({
                     id: `${classId}-stu-${num}`,
                     classId,
-                    // name 与 anonymous_name 一致：演示库不存放任何可还原的真实姓名
-                    name: `S${num}-${surname}`,
-                    anonymousName: `S${num}-${surname}`,
+                    // 固定虚构姓名既便于教师演示，也不会映射到真实儿童身份。
+                    name: displayName,
+                    anonymousName: displayName,
                     grade: cls.grade,
                     cognitiveStyle: COGNITIVE_STYLES[(seq - 1) % COGNITIVE_STYLES.length] as string,
                     engagementScore: Math.round(clamp(gaussian(rng, 72, 12), 40, 99)),
@@ -306,6 +312,11 @@ export function seedLearningDemo(): SeedStats {
                 const attendance = clamp(0.62 + rng() * 0.38, 0.62, 1)
                 // 投入度：影响单节课实际作答的题量（有人只做完前两阶就下课了）
                 const diligence = clamp(gaussian(rng, 0.82, 0.16), 0.35, 1)
+                updateStudentEngagement.run({
+                    studentId: stu.id,
+                    engagementScore: Math.round(clamp(ability * 0.56 + attendance * 24 + diligence * 20, 35, 98)),
+                    now,
+                })
 
                 poems.forEach((poem, poemIdx) => {
                     const lessonId = lessonIdByPoem.get(poem.id) as string
@@ -440,19 +451,25 @@ export function clearLearningDemo(): { answers: number; mastery: number; events:
 // CLI 入口
 // ─────────────────────────────────────────────────────────────
 
-const isClear = process.argv.includes('--clear')
+const isDirectExecution = Boolean(
+    process.argv[1]
+    && import.meta.url === pathToFileURL(process.argv[1]).href,
+)
 
-if (isClear) {
-    const r = clearLearningDemo()
-    console.log('[seed:learning] 已清除演示学情：', r)
-} else {
-    const r = seedLearningDemo()
-    console.log('[seed:learning] 已写入演示学情：')
-    console.log(`  新增学生      ${r.studentsCreated}`)
-    console.log(`  课时          ${r.lessons}`)
-    console.log(`  作答记录      ${r.answers}`)
-    console.log(`  六阶掌握度    ${r.mastery}`)
-    console.log(`  学情事件      ${r.events}`)
-    console.log(`  暗物质注入点  ${r.darkMatterInjected.map((d) => `${d.classId}/${d.poemId}/${d.bloomLevel}`).join('，')}`)
-    console.log('  全部记录已标记 seedSource=learning-demo-v1，可用 npm run seed:learning:clear 撤销')
+if (isDirectExecution) {
+    const isClear = process.argv.includes('--clear')
+    if (isClear) {
+        const r = clearLearningDemo()
+        console.log('[seed:learning] 已清除演示学情：', r)
+    } else {
+        const r = seedLearningDemo()
+        console.log('[seed:learning] 已写入演示学情：')
+        console.log(`  新增学生      ${r.studentsCreated}`)
+        console.log(`  课时          ${r.lessons}`)
+        console.log(`  作答记录      ${r.answers}`)
+        console.log(`  六阶掌握度    ${r.mastery}`)
+        console.log(`  学情事件      ${r.events}`)
+        console.log(`  暗物质注入点  ${r.darkMatterInjected.map((d) => `${d.classId}/${d.poemId}/${d.bloomLevel}`).join('，')}`)
+        console.log('  全部记录已标记 seedSource=learning-demo-v1，可用 npm run seed:learning:clear 撤销')
+    }
 }

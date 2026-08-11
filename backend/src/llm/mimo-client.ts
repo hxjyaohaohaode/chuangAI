@@ -27,7 +27,7 @@ import type {
     ToolCall,
 } from './types.js'
 import { isSupportedModelImageReference } from '../security/image-reference-policy.js'
-import { readBoundedTtsAudioResponse } from '../security/remote-audio-response.js'
+import { decodeBoundedTtsAudioData } from '../security/remote-audio-response.js'
 import { inspectAudioBytes, type InspectedAudio } from '../security/audio-upload-policy.js'
 
 // ─────────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ export interface MimoTtsParams {
     /** 语速 0.5-2.0 */
     speed?: number
     /** 输出格式 */
-    responseFormat?: 'mp3' | 'wav' | 'opus'
+    responseFormat?: 'mp3' | 'wav'
     /** 中断信号 */
     signal?: AbortSignal
     /** 调用元数据 */
@@ -285,7 +285,8 @@ export class MiMoClient {
     /**
      * 语音合成
      *
-     * 调用 /audio/speech 端点，返回二进制音频
+     * 官方契约：POST /v1/chat/completions，目标文本必须放在 assistant 消息中，
+     * 音频由 choices[0].message.audio.data 以 base64 返回。
      * mimo-v2.5-tts 限时免费
      */
     async tts(params: MimoTtsParams): Promise<{
@@ -296,21 +297,33 @@ export class MiMoClient {
         this.assertConfigured()
         const startTime = Date.now()
 
-        // 构建 TTS 请求参数
-        // OpenAI SDK 的 voice/model 字段为枚举类型，需类型断言以传入 MiMo 特有值
+        const format = params.responseFormat ?? 'mp3'
+        const voice = normalizeMimoVoice(params.voice)
+        const styleInstruction = buildMimoTtsStyleInstruction(params.speed)
         const ttsBody = {
             model: params.model,
-            input: params.text,
-            voice: params.voice ?? 'alloy',
-            response_format: params.responseFormat ?? 'mp3',
-            ...(params.speed !== undefined ? { speed: params.speed } : {}),
-        } as OpenAI.Audio.Speech.SpeechCreateParams
+            messages: [
+                ...(styleInstruction
+                    ? [{ role: 'user' as const, content: styleInstruction }]
+                    : []),
+                { role: 'assistant' as const, content: params.text },
+            ],
+            audio: { format, voice },
+        }
 
         const requestOptions = this.buildRequestOptions(params.signal)
 
-        const response = await this.client.audio.speech.create(ttsBody, requestOptions)
-        const format = params.responseFormat ?? 'mp3'
-        const audio = await readBoundedTtsAudioResponse(response, format)
+        const response = await this.client.chat.completions.create(
+            ttsBody as unknown as ChatCompletionCreateParamsNonStreaming,
+            requestOptions,
+        )
+        const audioData = (response.choices[0]?.message as unknown as {
+            audio?: { data?: unknown } | null
+        } | undefined)?.audio?.data
+        if (typeof audioData !== 'string') {
+            throw new Error('MiMo TTS 响应缺少 choices[0].message.audio.data')
+        }
+        const audio = decodeBoundedTtsAudioData(audioData, format)
 
         const latencyMs = Date.now() - startTime
         // TTS 限时免费，durationMs 仅用于观测（基于文本长度粗略估算）
@@ -331,8 +344,8 @@ export class MiMoClient {
     /**
      * 语音识别
      *
-     * 调用 /audio/transcriptions 端点（multipart 上传）
-     * 使用 verbose_json 格式以获取音频时长（用于计费）
+     * 官方契约：POST /v1/chat/completions，音频以 data URI 放进
+     * user.content[].input_audio.data，时长读取 usage.seconds。
      *
      * 计费：0.5 元/小时音频 = 0.5/3600 元/秒
      */
@@ -349,45 +362,44 @@ export class MiMoClient {
             params.audioFilename,
         )
 
-        // 使用 OpenAI.toFile 将 Buffer 转为可上传的 File 对象
-        // 文件名与 MIME 均由字节魔数得出，禁止把 WAV/WebM/OGG 伪装成 MP3。
-        const file = await OpenAI.toFile(
-            resolvedAudio.buffer,
-            `audio.${resolvedAudio.inspected.extension}`,
-            { type: resolvedAudio.inspected.contentType },
-        )
-
-        // 使用 verbose_json 以获取 duration 字段
+        if (resolvedAudio.inspected.extension !== 'mp3' && resolvedAudio.inspected.extension !== 'wav') {
+            throw new Error('MiMo ASR 官方接口仅接受 MP3 或 WAV 音频')
+        }
+        const encodedAudio = resolvedAudio.buffer.toString('base64')
+        const maxEncodedAudioBytes = 10 * 1024 * 1024
+        if (Buffer.byteLength(encodedAudio, 'ascii') > maxEncodedAudioBytes) {
+            throw new Error(`MiMo ASR base64 音频不得超过 ${maxEncodedAudioBytes} 字节`)
+        }
+        const dataUri = `data:${resolvedAudio.inspected.contentType};base64,${encodedAudio}`
         const asrBody = {
             model: params.model,
-            file,
-            response_format: 'verbose_json' as const,
-            ...(params.language ? { language: params.language } : {}),
-            ...(params.prompt ? { prompt: params.prompt } : {}),
+            messages: [{
+                role: 'user' as const,
+                content: [{
+                    type: 'input_audio',
+                    input_audio: { data: dataUri },
+                }],
+            }],
+            asr_options: { language: params.language ?? 'auto' },
         }
 
         const requestOptions = this.buildRequestOptions(params.signal)
 
-        const transcription = await this.client.audio.transcriptions.create(
-            asrBody,
+        const completion = await this.client.chat.completions.create(
+            asrBody as unknown as ChatCompletionCreateParamsNonStreaming,
             requestOptions,
         )
-
-        // verbose_json 格式返回 TranscriptionVerbose
-        const verbose = transcription as OpenAI.Audio.Transcriptions.TranscriptionVerbose
-        const text = verbose.text ?? ''
-        // duration 是字符串形式（如 "5.23"），转为秒
-        const durationSec = parseFloat(verbose.duration ?? '0') || 0
-
-        // 置信度：基于 segments 的平均 logprob 估算（若可用）
-        let confidence: number | undefined
-        if (verbose.segments && verbose.segments.length > 0) {
-            const avgLogprob = verbose.segments.reduce((sum, s) => sum + s.avg_logprob, 0) / verbose.segments.length
-            // logprob 范围约 -1 到 0，转为 0-1 置信度
-            confidence = Math.max(0, Math.min(1, 1 + avgLogprob))
+        const content = completion.choices[0]?.message.content
+        const text = typeof content === 'string' ? content.trim() : ''
+        if (!text) {
+            throw new Error('MiMo ASR 响应缺少识别文本')
         }
+        const seconds = (completion.usage as unknown as { seconds?: unknown } | undefined)?.seconds
+        const durationSec = typeof seconds === 'number' && Number.isFinite(seconds) && seconds >= 0
+            ? seconds
+            : 0
 
-        return { text, durationSec, confidence }
+        return { text, durationSec }
     }
 
     // ─────────────────────────────────────────────────────────
@@ -564,7 +576,9 @@ export class MiMoClient {
         declaredMimeType?: string,
         declaredFilename?: string,
     ): Promise<{ buffer: Buffer; inspected: InspectedAudio }> {
-        const MAX_AUDIO_BYTES = 10 * 1024 * 1024
+        // 官方上限按 base64 编码后的数据计算，因此原始音频先限制在 7.5 MiB，
+        // 并在构造 data URI 前再次核对实际编码长度。
+        const MAX_AUDIO_BYTES = Math.floor((10 * 1024 * 1024) * 3 / 4)
         let resolved: Buffer
         let dataUriMimeType: string | undefined
         if (Buffer.isBuffer(audio)) {
@@ -618,6 +632,25 @@ export class MiMoClient {
             throw new Error('拒绝非受控图片引用：MiMo 只接受魔数匹配的内联图片或 DashScope OSS 白名单地址')
         }
     }
+}
+
+function normalizeMimoVoice(value: string | undefined): string {
+    const voice = value?.trim()
+    if (!voice || voice === 'alloy' || voice === 'default') {
+        return 'mimo_default'
+    }
+    if (!/^[A-Za-z0-9_-]{1,128}$/u.test(voice)) {
+        throw new Error('MiMo TTS 音色 ID 格式无效')
+    }
+    return voice
+}
+
+function buildMimoTtsStyleInstruction(speed: number | undefined): string | undefined {
+    if (speed === undefined || speed === 1) return undefined
+    if (!Number.isFinite(speed) || speed < 0.5 || speed > 2) {
+        throw new Error('MiMo TTS 语速必须为 0.5-2.0')
+    }
+    return `请以约 ${speed.toFixed(2)} 倍语速，清晰、自然地朗读下一条 assistant 消息。`
 }
 
 function normalizeMime(value: string): string {

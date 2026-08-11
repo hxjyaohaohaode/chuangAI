@@ -158,7 +158,6 @@ describe('DeepSeekClient SDK contract', () => {
 describe('MiMoClient SDK contract', () => {
     beforeEach(() => {
         vi.clearAllMocks()
-        sdk.toFile.mockResolvedValue({ name: 'audio.mp3' })
     })
 
     it('fails before text, audio and file SDK boundaries when the API key is missing', async () => {
@@ -250,17 +249,20 @@ describe('MiMoClient SDK contract', () => {
         ])
     })
 
-    it('handles TTS and ASR buffer/base64 inputs, rejects URL fetching, with bounded confidence', async () => {
+    it('uses the official chat-completions contracts for TTS and ASR', async () => {
         const wav = Uint8Array.from([
             0x52, 0x49, 0x46, 0x46, 0x04, 0x00, 0x00, 0x00,
             0x57, 0x41, 0x56, 0x45,
         ])
-        sdk.speechCreate.mockResolvedValue(new Response(wav, {
-            headers: { 'content-type': 'audio/wav' },
-        }))
-        sdk.transcriptionCreate.mockResolvedValue({
-            text: '床前明月光', duration: '5.5', segments: [{ avg_logprob: -0.1 }, { avg_logprob: -2 }],
-        })
+        sdk.chatCreate
+            .mockResolvedValueOnce({
+                choices: [{ message: { content: '', audio: { data: Buffer.from(wav).toString('base64') } } }],
+                usage: { prompt_tokens: 10, completion_tokens: 20 },
+            })
+            .mockResolvedValue({
+                choices: [{ message: { content: '床前明月光' } }],
+                usage: { prompt_tokens: 30, completion_tokens: 6, seconds: 5.5 },
+            })
         const client = new MiMoClient('key', 'https://mimo.test/v1')
         const tts = await client.tts({
             model: 'mimo-v2.5-tts', text: '床前明月光', voice: 'alloy', speed: 1.1, responseFormat: 'wav',
@@ -274,7 +276,7 @@ describe('MiMoClient SDK contract', () => {
         const fromBuffer = await client.asr({
             model: 'mimo-v2.5-asr', audio: mp3, language: 'zh', prompt: '古诗朗读',
         })
-        expect(fromBuffer).toEqual({ text: '床前明月光', durationSec: 5.5, confidence: 0 })
+        expect(fromBuffer).toEqual({ text: '床前明月光', durationSec: 5.5 })
 
         await client.asr({ model: 'mimo-v2.5-asr', audio: `data:audio/mp3;base64,${mp3Base64}` })
         await client.asr({ model: 'mimo-v2.5-asr', audio: mp3Base64 })
@@ -288,35 +290,54 @@ describe('MiMoClient SDK contract', () => {
             model: 'mimo-v2.5-asr', audio: Buffer.alloc(0),
         })).rejects.toThrow('ASR 音频大小必须为')
         await expect(client.asr({
-            model: 'mimo-v2.5-asr', audio: Buffer.alloc(10 * 1024 * 1024 + 1),
+            model: 'mimo-v2.5-asr', audio: Buffer.alloc(Math.floor(10 * 1024 * 1024 * 3 / 4) + 1),
         })).rejects.toThrow('ASR 音频大小必须为')
-        expect(sdk.toFile).toHaveBeenCalledTimes(3)
-        expect(sdk.toFile).toHaveBeenNthCalledWith(1, mp3, 'audio.mp3', { type: 'audio/mpeg' })
+
+        const ttsBody = sdk.chatCreate.mock.calls[0]?.[0]
+        expect(ttsBody).toEqual({
+            model: 'mimo-v2.5-tts',
+            messages: [
+                { role: 'user', content: '请以约 1.10 倍语速，清晰、自然地朗读下一条 assistant 消息。' },
+                { role: 'assistant', content: '床前明月光' },
+            ],
+            audio: { format: 'wav', voice: 'mimo_default' },
+        })
+        const asrBody = sdk.chatCreate.mock.calls[1]?.[0]
+        expect(asrBody).toEqual({
+            model: 'mimo-v2.5-asr',
+            messages: [{
+                role: 'user',
+                content: [{
+                    type: 'input_audio',
+                    input_audio: { data: `data:audio/mpeg;base64,${mp3Base64}` },
+                }],
+            }],
+            asr_options: { language: 'zh' },
+        })
+        expect(asrBody).not.toHaveProperty('prompt')
+        expect(sdk.speechCreate).not.toHaveBeenCalled()
+        expect(sdk.transcriptionCreate).not.toHaveBeenCalled()
+        expect(sdk.toFile).not.toHaveBeenCalled()
     })
 
-    it('ASR 以魔数生成匹配的 MP3/WAV/WebM/OGG 文件名与 MIME', async () => {
-        sdk.transcriptionCreate.mockResolvedValue({ text: 'ok', duration: '1' })
+    it('ASR 只接受官方支持的 MP3/WAV，并拒绝 WebM/OGG', async () => {
+        sdk.chatCreate.mockResolvedValue({
+            choices: [{ message: { content: 'ok' } }],
+            usage: { seconds: 1 },
+        })
         const client = new MiMoClient('key', 'https://mimo.test/v1')
-        const samples = [
+        const accepted = [
             {
                 bytes: Buffer.from('ID30000', 'ascii'), filename: 'recording.mp3',
-                mime: 'audio/mp3', safeName: 'audio.mp3', safeMime: 'audio/mpeg',
+                mime: 'audio/mp3', canonicalMime: 'audio/mpeg',
             },
             {
                 bytes: Buffer.from('RIFF0000WAVEfmt ', 'ascii'), filename: 'recording.wav',
-                mime: 'audio/x-wav', safeName: 'audio.wav', safeMime: 'audio/wav',
-            },
-            {
-                bytes: Buffer.from([0x1a, 0x45, 0xdf, 0xa3, 0x01]), filename: 'recording.webm',
-                mime: 'audio/webm; codecs=opus', safeName: 'audio.webm', safeMime: 'audio/webm',
-            },
-            {
-                bytes: Buffer.from('OggS0000', 'ascii'), filename: 'recording.ogg',
-                mime: 'audio/ogg', safeName: 'audio.ogg', safeMime: 'audio/ogg',
+                mime: 'audio/x-wav', canonicalMime: 'audio/wav',
             },
         ] as const
 
-        for (const sample of samples) {
+        for (const sample of accepted) {
             await client.asr({
                 model: 'mimo-v2.5-asr',
                 audio: sample.bytes,
@@ -324,13 +345,28 @@ describe('MiMoClient SDK contract', () => {
                 audioMimeType: sample.mime,
             })
         }
-
-        expect(sdk.toFile).toHaveBeenCalledTimes(samples.length)
-        samples.forEach((sample, index) => {
-            expect(sdk.toFile).toHaveBeenNthCalledWith(
-                index + 1, sample.bytes, sample.safeName, { type: sample.safeMime },
+        accepted.forEach((sample, index) => {
+            const body = sdk.chatCreate.mock.calls[index]?.[0] as {
+                messages: Array<{ content: Array<{ input_audio: { data: string } }> }>
+            }
+            expect(body.messages[0]?.content[0]?.input_audio.data).toBe(
+                `data:${sample.canonicalMime};base64,${sample.bytes.toString('base64')}`,
             )
         })
+
+        await expect(client.asr({
+            model: 'mimo-v2.5-asr',
+            audio: Buffer.from([0x1a, 0x45, 0xdf, 0xa3, 0x01]),
+            audioFilename: 'recording.webm',
+            audioMimeType: 'audio/webm; codecs=opus',
+        })).rejects.toThrow('仅接受 MP3 或 WAV')
+        await expect(client.asr({
+            model: 'mimo-v2.5-asr',
+            audio: Buffer.from('OggS0000', 'ascii'),
+            audioFilename: 'recording.ogg',
+            audioMimeType: 'audio/ogg',
+        })).rejects.toThrow('仅接受 MP3 或 WAV')
+        expect(sdk.chatCreate).toHaveBeenCalledTimes(2)
     })
 
     it('ASR 对 MIME/扩展名冲突与未知魔数失败关闭，且不触达供应商', async () => {
@@ -354,7 +390,27 @@ describe('MiMoClient SDK contract', () => {
             model: 'mimo-v2.5-asr', audio: wav, audioFilename: '../recording.wav',
         })).rejects.toThrow('不得包含路径')
 
+        expect(sdk.chatCreate).not.toHaveBeenCalled()
         expect(sdk.toFile).not.toHaveBeenCalled()
         expect(sdk.transcriptionCreate).not.toHaveBeenCalled()
+    })
+
+    it('TTS 对缺失、非法或伪造 base64 音频响应失败关闭', async () => {
+        const client = new MiMoClient('key', 'https://mimo.test/v1')
+        sdk.chatCreate.mockResolvedValueOnce({ choices: [{ message: { content: '' } }] })
+        await expect(client.tts({ model: 'mimo-v2.5-tts', text: '朗读' }))
+            .rejects.toThrow('缺少 choices[0].message.audio.data')
+
+        sdk.chatCreate.mockResolvedValueOnce({
+            choices: [{ message: { audio: { data: 'not-base64%' } } }],
+        })
+        await expect(client.tts({ model: 'mimo-v2.5-tts', text: '朗读' }))
+            .rejects.toThrow('不是合法且受限的 base64')
+
+        sdk.chatCreate.mockResolvedValueOnce({
+            choices: [{ message: { audio: { data: Buffer.from('not-mp3').toString('base64') } } }],
+        })
+        await expect(client.tts({ model: 'mimo-v2.5-tts', text: '朗读' }))
+            .rejects.toThrow('魔数与请求格式 mp3 不一致')
     })
 })

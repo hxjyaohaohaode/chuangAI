@@ -1,12 +1,10 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-import { ApiError } from '@/lib/errors'
 import type { ModelCredentialStatus } from '@/lib/types'
 import {
     canEditModelCredentials,
     CredentialManagementNotice,
     CredentialProviderCard,
-    isExternallyManagedCredentialError,
 } from './ModelCredentials'
 
 const PROVIDER: ModelCredentialStatus = {
@@ -25,18 +23,10 @@ const EMPTY_DRAFT = {
     result: null,
 }
 
-describe('ModelCredentials Render management guard', () => {
+describe('ModelCredentials encrypted-vault management guard', () => {
     it('fails closed unless the server explicitly grants local or encrypted-vault mutation', () => {
         expect(canEditModelCredentials(undefined)).toBe(false)
         expect(canEditModelCredentials(null)).toBe(false)
-        expect(canEditModelCredentials({
-            mutable: false,
-            managedBy: 'render-dashboard',
-        })).toBe(false)
-        expect(canEditModelCredentials({
-            mutable: true,
-            managedBy: 'render-dashboard',
-        })).toBe(false)
         expect(canEditModelCredentials({
             mutable: true,
             managedBy: 'local-env',
@@ -47,11 +37,11 @@ describe('ModelCredentials Render management guard', () => {
         })).toBe(true)
     })
 
-    it('renders Render instructions without any API-key input or save action', () => {
+    it('renders demo-account instructions without any API-key input or save action', () => {
         const notice = renderToStaticMarkup(
             <CredentialManagementNotice management={{
                 mutable: false,
-                managedBy: 'render-dashboard',
+                managedBy: 'encrypted-vault',
             }} />,
         )
         const card = renderToStaticMarkup(
@@ -65,8 +55,8 @@ describe('ModelCredentials Render management guard', () => {
             />,
         )
 
-        expect(notice).toContain('Render Environment')
-        expect(notice).toContain('https://dashboard.render.com/')
+        expect(notice).toContain('演示账号为只读体验')
+        expect(notice).not.toContain('dashboard.render.com')
         expect(card).not.toContain('type="password"')
         expect(card).not.toContain('API Key')
         expect(card).not.toContain('>保存<')
@@ -111,11 +101,5 @@ describe('ModelCredentials Render management guard', () => {
         expect(card).toContain('type="url"')
         expect(card).toContain('Workspace HTTPS 地址')
         expect(card).not.toContain('测试连通')
-    })
-
-    it('recognizes the authoritative 409 as externally managed and not a success', () => {
-        expect(isExternallyManagedCredentialError(new ApiError(409, 'Conflict'))).toBe(true)
-        expect(isExternallyManagedCredentialError(new ApiError(500, 'Server Error'))).toBe(false)
-        expect(isExternallyManagedCredentialError(new Error('Conflict'))).toBe(false)
     })
 })

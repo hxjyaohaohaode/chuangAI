@@ -28,7 +28,7 @@ export interface TtsInput {
     /** 语速 0.5-2.0（可选，默认 1.0） */
     speed?: number
     /** 输出格式（可选，默认 mp3） */
-    format?: 'mp3' | 'wav' | 'opus'
+    format?: 'mp3' | 'wav'
 }
 
 export interface TtsOutput {

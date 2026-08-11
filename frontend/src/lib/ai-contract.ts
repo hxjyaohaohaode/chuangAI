@@ -118,24 +118,15 @@ function parseGeneratedImage(value: unknown, index: number): AiGeneratedImage {
     const aiGenerated = booleanField(record, 'aiGenerated', path)
     const demo = booleanField(record, 'demo', path)
     const degraded = booleanField(record, 'degraded', path)
-    assertProvenance(
-        degraded ? 'degraded' : 'ok',
-        model,
-        requestedModel,
-        aiGenerated,
-        demo,
-        degraded,
-        'wan2.7-image',
-        path,
-    )
-    if (aiGenerated && !PROTECTED_GENERATED_IMAGE_URL.test(url)) {
+    if (model !== 'wan2.7-image' || requestedModel !== 'wan2.7-image'
+        || aiGenerated !== true || demo !== false || degraded !== false) {
+        throw new TypeError(`${path} 只允许真实 wan2.7-image 成功结果，禁止占位图和伪降级成功`)
+    }
+    if (!PROTECTED_GENERATED_IMAGE_URL.test(url)) {
         throw new TypeError(`${path}.url 必须是服务端校验并落盘的 WebP，禁止把 SVG 或外链冒充 Wan 产物`)
     }
-    if (aiGenerated && thumbUrl && !PROTECTED_GENERATED_IMAGE_URL.test(thumbUrl)) {
+    if (thumbUrl && !PROTECTED_GENERATED_IMAGE_URL.test(thumbUrl)) {
         throw new TypeError(`${path}.thumbUrl 必须是服务端保护的 WebP 地址`)
-    }
-    if (!aiGenerated && !/^data:image\/svg\+xml;(?:base64|utf8),/u.test(url)) {
-        throw new TypeError(`${path}.url 必须是明确的本地 SVG 占位图`)
     }
 
     return {
@@ -149,9 +140,9 @@ function parseGeneratedImage(value: unknown, index: number): AiGeneratedImage {
         requestedModel: 'wan2.7-image',
         createdAt,
         cached,
-        aiGenerated,
-        demo,
-        degraded,
+        aiGenerated: true,
+        demo: false,
+        degraded: false,
     }
 }
 
@@ -169,17 +160,13 @@ export function parseAiImageGenerateResponse(value: unknown): AiImageGenerateRes
     const aiGenerated = booleanField(record, 'aiGenerated', path)
     const demo = booleanField(record, 'demo', path)
     const degraded = booleanField(record, 'degraded', path)
-    assertProvenance(
-        record.status,
-        model,
-        requestedModel,
-        aiGenerated,
-        demo,
-        degraded,
-        'wan2.7-image',
-        path,
-    )
-    const reason = degradationReason(record, degraded, demo, path)
+    if (record.status !== 'ok' || model !== 'wan2.7-image' || requestedModel !== 'wan2.7-image'
+        || aiGenerated !== true || demo !== false || degraded !== false) {
+        throw new TypeError(`${path} 只允许真实 wan2.7-image 成功响应；不可用时必须返回非 2xx 错误`)
+    }
+    if (record.degradationReason !== undefined) {
+        throw new TypeError(`${path}.degradationReason 不允许出现在生图成功响应`)
+    }
     const image = images[0]
     if (!image || image.model !== model || image.aiGenerated !== aiGenerated
         || image.demo !== demo || image.degraded !== degraded) {
@@ -187,15 +174,14 @@ export function parseAiImageGenerateResponse(value: unknown): AiImageGenerateRes
     }
 
     return {
-        status: degraded ? 'degraded' : 'ok',
+        status: 'ok',
         images,
         model,
         requestedModel: 'wan2.7-image',
         ...(requestId ? { requestId } : {}),
-        aiGenerated,
-        demo,
-        degraded,
-        ...(reason ? { degradationReason: reason } : {}),
+        aiGenerated: true,
+        demo: false,
+        degraded: false,
     }
 }
 

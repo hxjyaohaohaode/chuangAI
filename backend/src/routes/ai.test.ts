@@ -170,7 +170,7 @@ describe('Wan2.7 official configuration boundary', () => {
         )).toMatch(/端点路径/)
     })
 
-    it('returns an honest local demo image without claiming Wan generated it', async () => {
+    it('rejects dynamic image generation in demo mode without returning an SVG placeholder', async () => {
         const app = await buildApp()
         try {
             const response = await app.inject({
@@ -180,26 +180,16 @@ describe('Wan2.7 official configuration boundary', () => {
             })
             const body = response.json()
 
-            expect(response.statusCode).toBe(200)
+            expect(response.statusCode).toBe(503)
             expect(body).toMatchObject({
-                status: 'degraded',
-                model: 'local-placeholder',
+                status: 'error',
+                error: 'IMAGE_GENERATION_UNAVAILABLE',
                 requestedModel: 'wan2.7-image',
-                aiGenerated: false,
                 demo: true,
-                degraded: true,
                 degradationReason: 'demo-mode',
             })
-            expect(body.images[0]).toMatchObject({
-                model: 'local-placeholder',
-                requestedModel: 'wan2.7-image',
-                aiGenerated: false,
-                demo: true,
-                degraded: true,
-            })
-            const svg = Buffer.from(body.images[0].url.split(',')[1], 'base64').toString('utf8')
-            expect(svg).toContain('本地演示占位图')
-            expect(svg).toContain('未调用 wan2.7-image')
+            expect(body.images).toBeUndefined()
+            expect(JSON.stringify(body)).not.toContain('svg')
             expect(mocks.getOrCreateImage).not.toHaveBeenCalled()
         } finally {
             await app.close()
@@ -216,10 +206,11 @@ describe('Wan2.7 official configuration boundary', () => {
                 url: '/api/ai/image-generate',
                 payload: { prompt: '月夜水墨画', n: 1 },
             })
+            expect(response.statusCode).toBe(503)
             expect(response.json()).toMatchObject({
-                status: 'degraded',
+                status: 'error',
+                error: 'IMAGE_GENERATION_UNAVAILABLE',
                 degradationReason: 'provider-noncompliant',
-                aiGenerated: false,
                 demo: false,
             })
             expect(mocks.getOrCreateImage).not.toHaveBeenCalled()
@@ -239,10 +230,11 @@ describe('Wan2.7 official configuration boundary', () => {
                 url: '/api/ai/image-generate',
                 payload: { prompt: '月夜水墨画', n: 1 },
             })
+            expect(response.statusCode).toBe(503)
             expect(response.json()).toMatchObject({
-                status: 'degraded',
+                status: 'error',
+                error: 'IMAGE_GENERATION_UNAVAILABLE',
                 degradationReason: 'provider-unavailable',
-                aiGenerated: false,
                 demo: false,
             })
             expect(mocks.getOrCreateImage).not.toHaveBeenCalled()
@@ -266,11 +258,11 @@ describe('Wan2.7 official configuration boundary', () => {
                 url: '/api/ai/image-generate',
                 payload: { prompt: '月夜水墨画', n: 1 },
             })
+            expect(response.statusCode).toBe(502)
             expect(response.json()).toMatchObject({
-                status: 'degraded',
-                model: 'local-placeholder',
+                status: 'error',
+                error: 'IMAGE_GENERATION_UNAVAILABLE',
                 degradationReason: 'provider-noncompliant',
-                aiGenerated: false,
             })
         } finally {
             await app.close()

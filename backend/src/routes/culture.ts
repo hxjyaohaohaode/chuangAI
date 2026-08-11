@@ -85,8 +85,8 @@ export interface CultureImage {
     orientation: 'landscape' | 'portrait'
     aiGenerated: boolean
     /** 图片真实来源，供前端水印与答辩证据追溯 */
-    source: 'wan2.7' | 'local-illustration'
-    /** 生成模型；本地插画无此字段 */
+    source: 'wan2.7' | 'wan2.7-packaged'
+    /** 生成模型 */
     model?: string
     /** 云端请求 ID，仅用于问题追踪，不含凭据 */
     generationRequestId?: string
@@ -308,14 +308,13 @@ export const cultureRoutes: FastifyPluginAsync = async (app: FastifyInstance) =>
             return reply.send({ status: 'ok', ...resp, cached: true })
         }
 
-        // DEMO 是可离线复现的演示档，不应在页面首次渲染时发起会随供应商、
-        // 网络或配额波动的创意/生图调用。返回与当前诗篇一一对应的本地 SVG，
-        // 并通过每张图片的 source/aiGenerated 如实标记其不是 AI 生成内容。
+        // DEMO 不应在首屏发起随供应商、网络或配额波动的生图调用。
+        // 只返回当前诗篇一一对应、随包固化的 Wan WebP；不生成 SVG 或跨诗借图。
         if (config.demoMode) {
             const images = generateLocalImageGallery(poem)
             cacheImageGallery(poemId, images)
-            const resp: ImageGalleryResponse = { poemId, images, aiGenerated: false }
-            return reply.send({ status: 'ok', ...resp, cached: false, source: 'local-demo' })
+            const resp: ImageGalleryResponse = { poemId, images, aiGenerated: images.some((image) => image.aiGenerated) }
+            return reply.send({ status: 'ok', ...resp, cached: false, source: 'packaged-demo' })
         }
 
         try {
@@ -326,14 +325,13 @@ export const cultureRoutes: FastifyPluginAsync = async (app: FastifyInstance) =>
             req.log.info({ poemId, count: images.length }, '[culture] 图片库已生成')
             return reply.send({ status: 'ok', ...resp, cached: false })
         } catch (err) {
-            // LIVE 模式保留 AI 增强，但其所有前置描述任务均失败时仍须交付
-            // 同诗篇、可追溯、明确标记的本地场景；不能把外部服务抖动放大为
-            // 页面级 502，也不能借用其他诗篇或把本地结果冒充成 AI 图。
+            // LIVE 模式失败时只交付同诗篇、可追溯的随包 WebP；没有就返回空图库，
+            // 不能跨诗借图、生成 SVG 或把一张图复制成四张。
             const images = generateLocalImageGallery(poem)
             cacheImageGallery(poemId, images)
-            req.log.warn({ err, poemId, count: images.length }, '[culture] AI 图片库生成失败，已降级为本地教学插画')
-            const resp: ImageGalleryResponse = { poemId, images, aiGenerated: false }
-            return reply.send({ status: 'ok', ...resp, cached: false, source: 'local-fallback' })
+            req.log.warn({ err, poemId, count: images.length }, '[culture] 在线图片库生成失败，已使用同诗篇随包 WebP')
+            const resp: ImageGalleryResponse = { poemId, images, aiGenerated: images.some((image) => image.aiGenerated) }
+            return reply.send({ status: 'ok', ...resp, cached: false, source: 'packaged-fallback' })
         }
     })
 
@@ -698,7 +696,7 @@ async function generateImageGallery(
 ): Promise<CultureImage[]> {
     void req // 参数保留以维持调用方签名兼容
     const poemNode = buildPoemNode(poem)
-    // 一次性生成 4 张本地 SVG 场景图（替代外部文生图 API）
+    // 仅保留当前诗篇唯一对应的随包 WebP；不得跨诗借图或复制凑满四张。
     const localScenes = generateLocalScenes(poem.id, poemNode)
     const gradeLevel = inferGradeLevel(poem)
     const ctx = buildAgentContext(`img-${poem.id}`)
@@ -769,7 +767,7 @@ async function generateImageGallery(
     const imageResults = await Promise.allSettled(
         imageEntries.map(async (entry, idx) => {
             // 优先调用 Wan2.7；未配置或生成失败时，明确降级为本地教学插画。
-            const scene = localScenes[idx % localScenes.length] ?? localScenes[0]
+            const scene = idx === 0 ? localScenes[0] : undefined
 
             // ── 生成 + 立即落盘 ──
             //
@@ -835,9 +833,9 @@ async function generateImageGallery(
                     : undefined,
                 relatedVerse: entry.relatedVerse,
                 orientation: entry.orientation,
-                aiGenerated: wanResult !== null,
-                source: wanResult ? 'wan2.7' : 'local-illustration',
-                model: wanResult?.model,
+                aiGenerated: wanResult !== null || scene?.aiGenerated === true,
+                source: wanResult ? 'wan2.7' : 'wan2.7-packaged',
+                model: wanResult?.model ?? scene?.model,
                 generationRequestId: wanResult?.requestId,
                 createdAt: Date.now(),
             }
@@ -845,8 +843,10 @@ async function generateImageGallery(
         }),
     )
 
+    const seenImageUrls = new Set<string>()
     imageResults.forEach((r) => {
-        if (r.status === 'fulfilled') {
+        if (r.status === 'fulfilled' && !seenImageUrls.has(r.value.imageUrl)) {
+            seenImageUrls.add(r.value.imageUrl)
             images.push(r.value)
         }
     })
@@ -859,8 +859,8 @@ async function generateImageGallery(
 }
 
 /**
- * 本地图库是“读取可用性”兜底，不是 AI 结果。它仅使用当前诗篇的题名、作者、
- * 朝代、意象和诗句生成 SVG，因此无网络、无供应商、无跨诗借图依赖。
+ * 离线图库只提供当前诗篇唯一对应的随包 Wan WebP。没有图片就返回空列表；
+ * 不生成 SVG、不跨诗借图、不复制一张图凑成四张。
  */
 function generateLocalImageGallery(
     poem: NonNullable<ReturnType<typeof fetchPoem>>,
@@ -875,8 +875,9 @@ function generateLocalImageGallery(
         culturalMeaning: scene.culturalMeaning,
         relatedVerse: scene.relatedVerse,
         orientation: scene.orientation,
-        aiGenerated: false,
-        source: 'local-illustration' as const,
+        aiGenerated: scene.aiGenerated,
+        source: 'wan2.7-packaged' as const,
+        model: scene.model,
         createdAt: scene.createdAt,
     }))
 }

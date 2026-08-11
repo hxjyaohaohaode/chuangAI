@@ -530,7 +530,7 @@ async function fetchTtsAudio(req: AiTtsRequest): Promise<AiTtsResponse> {
             },
             body: JSON.stringify({
                 text: req.text,
-                voice: req.voice ?? 'alloy',
+                voice: req.voice ?? 'mimo_default',
                 speed: req.speed ?? 1.0,
                 responseFormat: req.responseFormat ?? 'mp3',
                 poemId: req.poemId,
@@ -4763,51 +4763,12 @@ export const api = {
          *
          * 设计要点：
          *  - 不走 fetchJSON（响应体含 URL 列表，需要严格类型）
-         *  - DEMO 模式返回占位 SVG（保证页面流程完整）
+         *  - 只有真实 Wan WebP 才成功；离线/演示/供应商失败明确报错并由界面保留原图
          *  - 超时 125s（覆盖后端 90s 推理 + 30s 安全下载及传输余量）
          * ============================================================ */
         imageGenerate: async (req: AiImageGenerateRequest): Promise<AiImageGenerateResponse> => {
             if (isDemoMode()) {
-                // DEMO 模式只返回明确标注的本地占位图，绝不冒充 Wan 产物。
-                const orientation = req.orientation ?? 'landscape'
-                const w = orientation === 'landscape' ? 800 : 600
-                const h = orientation === 'landscape' ? 600 : 800
-                const createdAt = Date.now()
-                return parseAiImageGenerateResponse({
-                    status: 'degraded',
-                    images: [{
-                        id: `demo-img-${createdAt}`,
-                        url: `data:image/svg+xml;utf8,${encodeURIComponent(
-                            `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-                            <defs>
-                                <linearGradient id="demo-gradient" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0%" stop-color="rgb(245,241,236)"/>
-                                    <stop offset="100%" stop-color="rgb(197,133,59)" stop-opacity="0.3"/>
-                                </linearGradient>
-                            </defs>
-                            <rect width="${w}" height="${h}" fill="url(#demo-gradient)"/>
-                            <text x="50%" y="48%" font-family="serif" font-size="36" fill="rgb(107,98,88)" text-anchor="middle" dominant-baseline="middle">本地演示占位图</text>
-                            <text x="50%" y="60%" font-family="serif" font-size="18" fill="rgb(152,98,39)" text-anchor="middle" dominant-baseline="middle">未调用 wan2.7-image</text>
-                        </svg>`,
-                        )}`,
-                        prompt: req.prompt,
-                        verse: req.verse,
-                        orientation,
-                        model: 'local-placeholder',
-                        requestedModel: 'wan2.7-image',
-                        createdAt,
-                        cached: false,
-                        aiGenerated: false,
-                        demo: true,
-                        degraded: true,
-                    }],
-                    model: 'local-placeholder',
-                    requestedModel: 'wan2.7-image',
-                    aiGenerated: false,
-                    demo: true,
-                    degraded: true,
-                    degradationReason: 'demo-mode',
-                })
+                throw new Error('当前离线演示未启用动态生图，已保留诗库中的同诗实图')
             }
 
             // 后端最长包含 90s 模型推理 + 30s 受控图片下载，前端需略留传输余量。

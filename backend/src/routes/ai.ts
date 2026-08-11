@@ -118,7 +118,7 @@ const ttsBodySchema = z.object({
     text: z.string().trim().min(1, '合成文本不能为空').max(4000, '文本长度不能超过 4000'),
     voice: z.string().trim().max(50).optional(),
     speed: z.number().min(0.5).max(2.0).optional(),
-    responseFormat: z.enum(['mp3', 'wav', 'opus']).default('mp3'),
+    responseFormat: z.enum(['mp3', 'wav']).default('mp3'),
 })
 
 /** POST /chat 请求体 */
@@ -216,22 +216,21 @@ interface GeneratedImageResponse {
     requestedModel: typeof WAN_IMAGE_MODEL
     createdAt: number
     cached: boolean
-    aiGenerated: boolean
-    demo: boolean
-    degraded: boolean
+    aiGenerated: true
+    demo: false
+    degraded: false
 }
 
 /** 文生图响应 */
 interface ImageGenerateResponse {
-    status: 'ok' | 'degraded'
+    status: 'ok'
     images: GeneratedImageResponse[]
     model: string
     requestedModel: typeof WAN_IMAGE_MODEL
     requestId?: string
-    aiGenerated: boolean
-    demo: boolean
-    degraded: boolean
-    degradationReason?: AiDegradationReason
+    aiGenerated: true
+    demo: false
+    degraded: false
 }
 
 /** ASR 响应 */
@@ -279,44 +278,28 @@ export const aiRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         if (!body) return
         const { prompt, orientation = 'landscape', verse } = body
 
-        // DEMO 模式只能返回明确标注的本地占位图，绝不能把 SVG 写成 Wan 产物。
+        // 生图没有“本地占位成功”这一状态：只有真实 Wan WebP 才能返回 200。
+        // 演示账号仍可使用随包的同诗实图；动态生图不可用时必须明确失败，
+        // 不能再把 SVG 伪装成一张“生成结果”。
         if (config.demoMode) {
-            return reply.send(buildPlaceholderImageResponse(
-                prompt,
-                orientation,
-                verse,
-                'demo-mode',
-                true,
-            ))
+            return sendImageGenerationUnavailable(reply, 'demo-mode', true, 503)
         }
 
         // 密钥可能在设置页热更新，不能依赖启动时的 config.wanImage.enabled 快照。
-        // WorkspaceId 无法安全猜测；端点或密钥缺失时只返回明确标记的本地占位图。
+        // WorkspaceId 无法安全猜测；端点或密钥缺失时明确失败，禁止造占位图。
         const wanApiKey = getKey('dashscope')
         const wanBaseUrl = getWanImageBaseUrl()
         if (!wanBaseUrl || !wanApiKey) {
-            return reply.send(buildPlaceholderImageResponse(
-                prompt,
-                orientation,
-                verse,
-                'provider-unavailable',
-                false,
-            ))
+            return sendImageGenerationUnavailable(reply, 'provider-unavailable', false, 503)
         }
 
         // 项目官方文件规定 Wan2.7 必须走 Workspace MaaS 北京同步端点，且模型固定
         // wan2.7-image。当前环境若仍指向全球 DashScope 或 pro 变体，路由失败关闭，
-        // 只给诚实的本地占位图，避免“能出图但违反参赛规则”的隐性事故。
+        // 直接失败关闭，避免“能出图但违反参赛规则”的隐性事故。
         const complianceIssue = getWanConfigComplianceIssue(config.wanImage.model, wanBaseUrl)
         if (complianceIssue) {
             req.log.error({ complianceIssue }, 'Wan2.7 配置不符合项目官方模型规则，已拒绝外呼')
-            return reply.send(buildPlaceholderImageResponse(
-                prompt,
-                orientation,
-                verse,
-                'provider-noncompliant',
-                false,
-            ))
+            return sendImageGenerationUnavailable(reply, 'provider-noncompliant', false, 503)
         }
 
         try {
@@ -326,13 +309,7 @@ export const aiRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
             // 落盘后对外只给本地静态路径，长期有效且可离线演示。
             const result = await getOrCreateImage(prompt, orientation)
             if (!result) {
-                return reply.send(buildPlaceholderImageResponse(
-                    prompt,
-                    orientation,
-                    verse,
-                    'provider-failed',
-                    false,
-                ))
+                return sendImageGenerationUnavailable(reply, 'provider-failed', false, 502)
             }
             if (result.model !== WAN_IMAGE_MODEL || !isProtectedGeneratedImageUrl(result.url)) {
                 req.log.error(
@@ -343,13 +320,7 @@ export const aiRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
                     },
                     '生图服务返回了非官方模型或未校验地址，已拒绝冒充成功',
                 )
-                return reply.send(buildPlaceholderImageResponse(
-                    prompt,
-                    orientation,
-                    verse,
-                    'provider-noncompliant',
-                    false,
-                ))
+                return sendImageGenerationUnavailable(reply, 'provider-noncompliant', false, 502)
             }
 
             const createdAt = Date.now()
@@ -378,14 +349,8 @@ export const aiRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
             }
             return reply.send(response)
         } catch (err) {
-            req.log.error({ err }, '文生图调用异常，已返回明确标记的本地降级图')
-            return reply.send(buildPlaceholderImageResponse(
-                prompt,
-                orientation,
-                verse,
-                'provider-failed',
-                false,
-            ))
+            req.log.error({ err }, '文生图调用异常，已失败关闭且未生成占位图')
+            return sendImageGenerationUnavailable(reply, 'provider-failed', false, 502)
         }
     })
 
@@ -761,37 +726,27 @@ export function getWanConfigComplianceIssue(model: string, baseUrl: string): str
     }
 }
 
-function buildPlaceholderImageResponse(
-    prompt: string,
-    orientation: 'landscape' | 'portrait',
-    verse: string | undefined,
+function sendImageGenerationUnavailable(
+    reply: FastifyReply,
     degradationReason: AiDegradationReason,
     demo: boolean,
-): ImageGenerateResponse {
-    const image: GeneratedImageResponse = {
-        id: `local-${randomUUID()}`,
-        url: generatePlaceholderImage(prompt, orientation),
-        prompt,
-        ...(verse ? { verse } : {}),
-        orientation,
-        model: LOCAL_PLACEHOLDER_MODEL,
+    statusCode: 502 | 503,
+) {
+    const message = degradationReason === 'demo-mode'
+        ? '当前演示环境未启用动态生图，已保留诗库中的同诗实图'
+        : degradationReason === 'provider-unavailable'
+            ? '动态生图尚未配置，请在模型设置中配置 Wan2.7 后重试'
+            : degradationReason === 'provider-noncompliant'
+                ? 'Wan2.7 请求地址或模型配置不符合官方接口要求，已拒绝生成'
+                : '动态生图暂时失败，已保留原有图片，请稍后重试'
+    return reply.code(statusCode).send({
+        status: 'error',
+        error: 'IMAGE_GENERATION_UNAVAILABLE',
+        message,
         requestedModel: WAN_IMAGE_MODEL,
-        createdAt: Date.now(),
-        cached: false,
-        aiGenerated: false,
         demo,
-        degraded: true,
-    }
-    return {
-        status: 'degraded',
-        images: [image],
-        model: LOCAL_PLACEHOLDER_MODEL,
-        requestedModel: WAN_IMAGE_MODEL,
-        aiGenerated: false,
-        demo,
-        degraded: true,
         degradationReason,
-    }
+    })
 }
 
 function isMultipartLimitError(error: unknown): boolean {
@@ -991,26 +946,6 @@ async function sendDemoSSE(
             raw.end()
         }
     }
-}
-
-/** 生成占位 SVG 图（DEMO 模式或 Wan 调用失败时降级使用） */
-function generatePlaceholderImage(prompt: string, orientation: 'landscape' | 'portrait'): string {
-    const width = orientation === 'portrait' ? 768 : 1024
-    const height = orientation === 'portrait' ? 1024 : 768
-    const safePrompt = prompt.slice(0, 80).replace(/[&<>"']/g, (character) => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&apos;',
-    })[character] ?? '')
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-<rect width="100%" height="100%" fill="#F5F1EC"/>
-<text x="50%" y="45%" font-family="Noto Sans SC, sans-serif" font-size="32" fill="#6B6258" text-anchor="middle" dominant-baseline="middle">本地演示占位图</text>
-<text x="50%" y="51%" font-family="Noto Sans SC, sans-serif" font-size="17" fill="#9E968C" text-anchor="middle" dominant-baseline="middle">未调用 wan2.7-image</text>
-<text x="50%" y="55%" font-family="Noto Sans SC, sans-serif" font-size="18" fill="#9E968C" text-anchor="middle" dominant-baseline="middle">${safePrompt}</text>
-</svg>`
-    return `data:image/svg+xml;base64,${Buffer.from(svg, 'utf-8').toString('base64')}`
 }
 
 /** 生成合法的 PCM WAV 静音音频，仅供明确标注的 DEMO 模式占位。 */

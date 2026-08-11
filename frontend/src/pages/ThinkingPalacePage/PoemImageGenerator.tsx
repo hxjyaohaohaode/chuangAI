@@ -511,8 +511,6 @@ export function PoemImageGenerator({ poem }: PoemImageGeneratorProps) {
             )
             return {
                 images: responses.flatMap((response) => response.images),
-                degraded: responses.some((response) => response.degraded),
-                demo: responses.some((response) => response.demo),
             }
         },
         onMutate: (request) => {
@@ -522,17 +520,10 @@ export function PoemImageGenerator({ poem }: PoemImageGeneratorProps) {
             if (!isCurrentImageGeneration(request.token)) return
             completeProgressAnimation(request.token)
             setScopedImages({ contextKey: request.token.contextKey, images: data.images })
-            if (data.degraded) {
-                toast.warning({
-                    title: data.demo ? '当前为演示占位图' : '生图服务已降级',
-                    message: `展示 ${data.images.length} 张本地占位图；未调用 wan2.7-image，不能作为真实 AI 生图成果。`,
-                })
-            } else {
-                toast.success({
-                    title: '生成完成',
-                    message: `已由 wan2.7-image 生成 ${data.images.length} 张诗境插画`,
-                })
-            }
+            toast.success({
+                title: '生成完成',
+                message: `已由 wan2.7-image 生成 ${data.images.length} 张诗境插画`,
+            })
         },
         onError: (err: unknown, request) => {
             if (!isCurrentImageGeneration(request.token)) return

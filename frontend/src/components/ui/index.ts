@@ -131,12 +131,6 @@ export { GlassCard, type GlassCardProps } from './GlassCard'
 // 按路径直接引入，让 highlight.js 落到对应路由 chunk。
 //   import { CodeStream } from '@/components/ui/CodeStream'
 
-// 辅助导航类组件
-// AnchorMiniMap —— 右侧悬浮锚点迷你地图（position: fixed 辅助导航组件，允许保留 fixed）
-// 自动扫描页面内 [data-anchor] 元素生成目录，IntersectionObserver 高亮当前章节
-// 滚动时高亮 + 点击平滑滚动 + hover 展开 + localStorage 持久化 + 移动端不渲染
-export { AnchorMiniMap, type AnchorMiniMapProps } from './AnchorMiniMap'
-
 /* ── 路由专用动效组件：**刻意不从本 barrel 导出** ──
  *
  * ScrollReveal / StreamText / MasonryGrid / MagicBento / PixelTransition /

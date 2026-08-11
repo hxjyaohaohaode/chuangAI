@@ -83,7 +83,7 @@ const MAX_COOKIE_HEADER_LENGTH = 8_192
 export const DEMO_TEACHERS: readonly (AuthUser & { phone: string; passwordScrypt: string; classLabel: string })[] = [
     {
         id: 'teacher-001',
-        name: '演示教师',
+        name: '曹老师',
         role: 'teacher',
         accountType: 'demo',
         phone: '13177091153',

@@ -15,7 +15,7 @@
  *
  * 覆盖范围：
  * - background           ✓ 6 首诗四区文化背景包
- * - images               ✓ 复用 CULTURE_SCENES 4 张静态文化场景图（poemId 标注）
+ * - images               ✓ 每首 DEMO 诗只使用自身 ID 对应的随包 WebP
  * - image（单图详情）    ✓ 从 images 列表中按 ID 查找
  * - imagery              ✓ 6 首 DEMO 诗中出现的常见意象（明月/孤舟）+ 通用回退
  * - immersiveStart       ✓ 启动投屏返回 running 状态
@@ -43,7 +43,6 @@ import type {
     ImmersiveState,
     StartImmersiveBody,
 } from './types'
-import { CULTURE_SCENES } from './poem-images'
 import { releasedStarmapImagePath } from './poem-generated-images'
 
 /* ============================================================
@@ -139,47 +138,81 @@ const DEMO_BACKGROUND_MAP: Record<string, CultureBackground> = {
 }
 
 /* ============================================================
- * 二、文化文物图片库（复用 CULTURE_SCENES 静态资源）
+ * 二、文化文物图片库（逐诗唯一随包 WebP）
  * ------------------------------------------------------------
  * 设计说明：
- * - DEMO 模式无文生图服务，使用 CULTURE_SCENES 4 张静态文化场景图
- * - 每张图按 CultureImage 结构封装，并如实标记为本地教学插画
- * - poemId 标注归属诗（DEMO 模式下所有诗共享同一图库，便于评委预览）
+ * - DEMO 模式不发起付费生图，只读取当前诗篇已经随包固化的 Wan WebP
+ * - 不共享其他诗篇的图，不复制一张图凑数量，不使用 SVG 占位
  * ============================================================ */
 
 /** 缓存的 DEMO 图片库（按 poemId 索引，避免重复构建） */
 const DEMO_IMAGES_CACHE: Map<string, CultureImage[]> = new Map()
 
-/** 为指定诗构建 DEMO 图片库（基于 CULTURE_SCENES 静态资源） */
+const DEMO_POEM_IMAGES: Readonly<Record<string, {
+    starmapId: string
+    title: string
+    description: string
+    verse: string
+}>> = {
+    'poem-jingyesi': {
+        starmapId: 'tongbian-003', title: '静夜思·诗境图',
+        description: '月夜客舍中，诗人举头望月、低头思乡的专属诗境。',
+        verse: '床前明月光，疑是地上霜。',
+    },
+    'poem-chunxiao': {
+        starmapId: 'tongbian-002', title: '春晓·诗境图',
+        description: '春晨鸟鸣、风雨初歇与落花相映的专属诗境。',
+        verse: '春眠不觉晓，处处闻啼鸟。',
+    },
+    'poem-wanglushanpubu': {
+        starmapId: 'tongbian-006', title: '望庐山瀑布·诗境图',
+        description: '香炉峰紫烟与瀑布飞流直下的专属诗境。',
+        verse: '飞流直下三千尺，疑是银河落九天。',
+    },
+    'poem-dengguanquelou': {
+        starmapId: 'tongbian-005', title: '登鹳雀楼·诗境图',
+        description: '白日依山、黄河奔流与登楼远眺的专属诗境。',
+        verse: '白日依山尽，黄河入海流。',
+    },
+    'poem-cuncao': {
+        starmapId: 'tongbian-018', title: '草·诗境图',
+        description: '古原芳草经历枯荣、野火与春风后复生的专属诗境。',
+        verse: '野火烧不尽，春风吹又生。',
+    },
+    'poem-jiangxue': {
+        starmapId: 'tongbian-007', title: '江雪·诗境图',
+        description: '千山雪寂、孤舟蓑笠翁独钓寒江的专属诗境。',
+        verse: '孤舟蓑笠翁，独钓寒江雪。',
+    },
+}
+
+/** 为指定诗构建 DEMO 图片库；未知 ID 返回空数组，绝不借用静夜思图片。 */
 function buildDemoImagesForPoem(poemId: string): CultureImage[] {
     const cached = DEMO_IMAGES_CACHE.get(poemId)
     if (cached) return cached
 
+    const spec = DEMO_POEM_IMAGES[poemId]
+    if (!spec) return []
     const now = Date.now()
-    const images: CultureImage[] = CULTURE_SCENES.map((scene, index) => ({
-        id: `demo-img-${poemId}-${scene.id}`,
+    const images: CultureImage[] = [{
+        id: `demo-img-${poemId}-${spec.starmapId}`,
         poemId,
-        title: scene.title,
-        imageUrl: scene.imagePath,
-        description: scene.description,
-        culturalMeaning: scene.description,
+        title: spec.title,
+        imageUrl: releasedStarmapImagePath(spec.starmapId),
+        description: spec.description,
+        culturalMeaning: '该图为当前诗篇的随包 Wan 生成图；课堂文化解释仍以教材原文和可靠史料为准。',
         perspectives: {
             color_composition: '水墨淡彩，以青绿为主色调，留白处凸显意境深远',
-            emotion_atmosphere: index === 0
-                ? '离愁别绪，渭城朝雨中蕴含送别之情'
-                : index === 1
-                  ? '依依惜别，柳枝轻摇传递不舍之意'
-                  : index === 2
-                    ? '清幽雅致，松下抚琴显文人风骨'
-                    : '静谧深沉，书斋夜读映文人志向',
-            cultural_symbols: scene.relatedVerse,
+            emotion_atmosphere: spec.description,
+            cultural_symbols: spec.verse,
         },
-        relatedVerse: scene.relatedVerse,
+        relatedVerse: spec.verse,
         orientation: 'landscape' as const,
-        aiGenerated: false,
-        source: 'local-illustration',
+        aiGenerated: true,
+        source: 'wan2.7-packaged',
+        model: 'wan2.7-image',
         createdAt: now,
-    }))
+    }]
 
     DEMO_IMAGES_CACHE.set(poemId, images)
     return images
@@ -392,7 +425,7 @@ export function getDemoCultureBackground(poemId: string): CultureBackgroundRespo
  * 获取文化文物图片库（DEMO 降级）
  *
  * 与后端 GET /api/culture/poems/:poemId/images 返回结构对齐
- * 基于 CULTURE_SCENES 静态资源构建，所有诗共享同一图库
+ * 每首诗只返回自身的随包图；未知诗篇返回空图库。
  */
 export function getDemoCultureImages(poemId: string): CultureImagesResponse {
     return {
@@ -426,21 +459,7 @@ export function getDemoCultureImageDetail(imageId: string): CultureImageDetailRe
             return { image: found, cached: true }
         }
     }
-    // 回退：返回第一首诗的第一张图（保证页面有内容）
-    const fallbackImages = buildDemoImagesForPoem('poem-jingyesi')
-    const fallbackImage = fallbackImages[0] ?? {
-        id: 'demo-img-emergency-jingyesi',
-        poemId: 'poem-jingyesi',
-        title: '静夜思教学插画',
-        imageUrl: releasedStarmapImagePath('tongbian-003'),
-        description: '本地离线兜底插画：月夜思乡场景。',
-        culturalMeaning: '用于模型与图片库均不可用时维持课堂讲解，不代表真实生成结果。',
-        orientation: 'landscape' as const,
-        aiGenerated: false,
-        source: 'local-illustration' as const,
-        createdAt: Date.now(),
-    }
-    return { image: fallbackImage, cached: true }
+    throw new Error(`DEMO 图片不存在：${imageId}`)
 }
 
 /**

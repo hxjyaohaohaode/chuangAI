@@ -22,10 +22,10 @@
  * 结论文案 + 供应商原始 detail（折叠展示）。
  */
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { toast } from '@/stores/toast'
-import { ApiError, getDisplayError } from '@/lib/errors'
+import { getDisplayError } from '@/lib/errors'
 import { api } from '@/lib/api'
 import type {
     ModelCredentialManagement,
@@ -44,11 +44,6 @@ interface DraftState {
 
 const EMPTY_DRAFT: DraftState = { value: '', saving: false, testing: false, result: null }
 
-const RENDER_MANAGEMENT: ModelCredentialManagement = {
-    mutable: false,
-    managedBy: 'render-dashboard',
-}
-
 /**
  * 只有后端明确声明“本地环境可变”时才允许浏览器提交密钥。
  * 缺字段、未知组合与请求失败都按只读处理，避免部署契约漂移时意外暴露写入口。
@@ -60,11 +55,6 @@ export function canEditModelCredentials(
         && (management.managedBy === 'local-env' || management.managedBy === 'encrypted-vault')
 }
 
-/** 保存端点的 409 在该专用契约中表示部署平台已经接管密钥。 */
-export function isExternallyManagedCredentialError(error: unknown): boolean {
-    return error instanceof ApiError && error.status === 409
-}
-
 interface CredentialManagementNoticeProps {
     management: ModelCredentialManagement | null | undefined
 }
@@ -73,33 +63,17 @@ interface CredentialManagementNoticeProps {
 export function CredentialManagementNotice({ management }: CredentialManagementNoticeProps) {
     if (canEditModelCredentials(management)) return null
 
-    const renderManaged = management?.mutable === false
-        && management.managedBy === 'render-dashboard'
-
     return (
         <section className="pr-cred-item" role="note" aria-label="模型密钥管理位置">
             <header className="pr-cred-item-head">
                 <span className="pr-cred-item-name">
-                    {renderManaged ? '模型密钥由 Render Environment 托管' : '演示账号为只读体验'}
+                    演示账号为只读体验
                 </span>
                 <span className="pr-cred-item-state is-set">只读</span>
             </header>
             <p className="pr-cred-item-powers">
-                {renderManaged
-                    ? '请前往 Render Dashboard → 对应服务 → Environment 修改密钥；本页面不会接收或保存密钥明文。'
-                    : '请使用系统所有者账号登录后管理模型凭据；公开演示账号不会接触密钥掩码或付费连通测试。'}
+                请使用系统所有者账号登录后管理模型凭据；公开演示账号不会接触密钥掩码或付费连通测试。
             </p>
-            {renderManaged && (
-                <a
-                    className="pr-cred-item-console"
-                    href="https://dashboard.render.com/"
-                    target="_blank"
-                    rel="noreferrer noopener"
-                >
-                    <span>打开 Render Dashboard</span>
-                    <Icon name="arrow-square-out" size={11} />
-                </a>
-            )}
         </section>
     )
 }
@@ -210,37 +184,18 @@ export const ModelCredentials = memo(function ModelCredentials() {
     const [management, setManagement] = useState<ModelCredentialManagement | null>(null)
     const [loading, setLoading] = useState(true)
     const [drafts, setDrafts] = useState<Record<string, DraftState>>({})
-    // 一旦本页面观察到 Render 托管，任何较早发出但较晚返回的 GET 都不得
-    // 重新开启写入口。ref 在整页重载时自然重置，恰好对应重新取权威状态。
-    const renderReadOnlyLocked = useRef(false)
 
-    const load = useCallback(async (forceRenderReadOnly = false) => {
+    const load = useCallback(async () => {
         setLoading(true)
         try {
             const res = await api.settings.listCredentials()
-            // PUT 已经明确返回 409 后，本次页面生命周期内不接受可能陈旧的 GET
-            // 将写入口重新打开；重新加载整页后再以新的服务端状态为准。
-            if (forceRenderReadOnly
-                || (res.management.mutable === false
-                    && res.management.managedBy === 'render-dashboard')) {
-                renderReadOnlyLocked.current = true
-            }
-            const nextManagement = renderReadOnlyLocked.current
-                ? RENDER_MANAGEMENT
-                : res.management
             setProviders(res.providers)
-            setManagement(nextManagement)
-            if (!canEditModelCredentials(nextManagement)) {
-                // 服务端切到外部托管后，不让尚未提交的明文继续滞留在组件状态中。
+            setManagement(res.management)
+            if (!canEditModelCredentials(res.management)) {
                 setDrafts({})
             }
         } catch (err) {
-            // 已确认的 Render 托管结论可以保留；其余旧的可写状态一律撤销。
-            setManagement((current) => (
-                current?.mutable === false && current.managedBy === 'render-dashboard'
-                    ? current
-                    : null
-            ))
+            setManagement(null)
             setDrafts({})
             toast.error({ title: '读取模型配置失败', message: getDisplayError(err, '请稍后重试') })
         } finally {
@@ -266,9 +221,7 @@ export const ModelCredentials = memo(function ModelCredentials() {
             if (!canEditModelCredentials(management)) {
                 toast.warning({
                     title: '模型密钥为只读',
-                    message: management?.managedBy === 'render-dashboard'
-                        ? '请前往 Render Environment 修改密钥'
-                        : '服务端尚未授权浏览器修改密钥',
+                    message: '请使用系统所有者账号登录后修改模型凭据',
                 })
                 return
             }
@@ -284,18 +237,6 @@ export const ModelCredentials = memo(function ModelCredentials() {
                 patchDraft(id, { value: '', saving: false, result: null })
                 await load()
             } catch (err) {
-                if (isExternallyManagedCredentialError(err)) {
-                    // 部署策略可能在页面打开后发生变化：立即失败关闭、清空明文并刷新权威状态。
-                    renderReadOnlyLocked.current = true
-                    setManagement(RENDER_MANAGEMENT)
-                    setDrafts({})
-                    toast.warning({
-                        title: '密钥已由 Render 接管',
-                        message: '本次未保存，请前往 Render Environment 修改',
-                    })
-                    await load(true)
-                    return
-                }
                 patchDraft(id, { saving: false })
                 toast.error({ title: '保存失败', message: getDisplayError(err, '请稍后重试') })
             }
@@ -350,7 +291,7 @@ export const ModelCredentials = memo(function ModelCredentials() {
                     ? (management?.managedBy === 'encrypted-vault'
                         ? '凭据经认证加密后保存在持久盘保险柜，浏览器不留存明文；修改后立即生效。'
                         : '凭据保存在服务端并持久化到 .env，浏览器不留存明文；此处仅回显掩码。')
-                    : '密钥仅由部署环境读取；本页不接收、不保存明文，仅回显服务端提供的掩码。'}
+                    : '演示账号不能接触模型密钥；请使用系统所有者账号登录。'}
             </p>
         </div>
     )

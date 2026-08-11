@@ -28,6 +28,8 @@ services:
         value: /var/data/poetic-realm.db
       - key: DEMO_MODE
         value: "false"
+      - key: SEED_LEARNING_DEMO
+        value: "true"
       - key: ALLOW_UNAUTHENTICATED_NON_LOOPBACK
         value: "false"
       - key: AUTH_MODE
@@ -41,10 +43,10 @@ services:
       - key: CREDENTIAL_VAULT_MASTER_KEY
         generateValue: true
       - key: AUTH_PASSWORD_SCRYPT
-        sync: false
+        value: "scrypt$16384$8$1$xE1QJPQtPxD7uTMsvy-jYg$Ol3joviyOl1ng1DiPNDVLdtkAZ0hSdEAZd9TEGyUPjwNIrHBWJ-O0Ffus9EisWX4g3kyCvLVOWIa8J6cYIq02A"
       - key: AUTH_TEACHER_ID
         value: teacher-001
       - key: AUTH_TEACHER_NAME
-        sync: false
+        value: 曹老师
       - key: AUTH_TEACHER_PHONE
-        sync: false
+        value: "13177091153"

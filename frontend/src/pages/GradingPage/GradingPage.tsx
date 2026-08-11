@@ -19,7 +19,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react'
-import { Button, Combobox, Icon, Badge, AnchorMiniMap, type ComboboxOption } from '@/components/ui'
+import { Button, Combobox, Icon, Badge, type ComboboxOption } from '@/components/ui'
 import { GlowBorder } from '@/components/ui/GlowBorder'
 import { api } from '@/lib/api'
 import { useSearchParams } from 'react-router-dom'
@@ -239,8 +239,6 @@ export default function GradingPage() {
 
     return (
         <div className="pr-grading pr-v5-enter-grading">
-            {/* v5.0 Task 4：右侧悬浮锚点迷你地图，自动扫描下方 data-anchor 章节 */}
-            <AnchorMiniMap />
             {/* Hero 区：批改流水线意象 —— 试卷堆叠 + 阶段统计 */}
             <section className="pr-grading-hero" aria-labelledby="pr-grading-hero-title" data-anchor data-anchor-label="批改台">
                 <div className="pr-grading-hero-stack" aria-hidden="true">

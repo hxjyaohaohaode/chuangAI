@@ -21,6 +21,7 @@ import { dbLogger } from '../lib/logger/index.js'
 import { prepareDatabasePath } from './database-path.js'
 // 种子数据（冷启动写入，保证所有依赖数据库的功能可用）
 import { SEED_CLASS_DEMO } from './seed/seed-class-demo.js'
+import { syntheticStudentName } from './seed/synthetic-roster.js'
 import { SEED_POEMS_FULL } from '../services/knowledge-graph/seed-poems-full.js'
 
 /** DB 层 logger 单例 */
@@ -657,20 +658,28 @@ export function seedDatabase(): void {
 
     // ── 2. 写入与班级声明人数一致的脱敏名册 ──
     const insertStudent = db.prepare(`
-        INSERT OR IGNORE INTO students (id, class_id, name, anonymous_name, grade, cognitive_style, engagement_score, created_at, updated_at, metadata)
+        INSERT INTO students (id, class_id, name, anonymous_name, grade, cognitive_style, engagement_score, created_at, updated_at, metadata)
         VALUES (@id, @classId, @name, @anonymousName, @grade, @cognitiveStyle, @engagementScore, @createdAt, @updatedAt, @metadata)
+        ON CONFLICT(id) DO UPDATE SET
+            class_id = excluded.class_id,
+            name = excluded.name,
+            anonymous_name = excluded.anonymous_name,
+            grade = excluded.grade,
+            cognitive_style = excluded.cognitive_style,
+            updated_at = excluded.updated_at,
+            metadata = excluded.metadata
     `)
     const insertStudentTx = db.transaction(() => {
-        const surnames = ['Li', 'Wang', 'Zhang', 'Liu', 'Chen', 'Yang', 'Huang', 'Zhao', 'Wu', 'Zhou']
         const styles = ['visual', 'auditory', 'kinesthetic']
         const rosterCreatedAt = now - 120 * 86_400_000
         const metadata = JSON.stringify({ seedSource: 'roster-demo-v2' })
+        let globalRosterIndex = 0
 
         for (const classRow of classRows) {
             for (let index = 0; index < classRow.studentCount; index += 1) {
                 const sequence = index + 1
                 const number = String(sequence).padStart(2, '0')
-                const anonymousName = `S${number}-${surnames[index % surnames.length]}`
+                const displayName = syntheticStudentName(globalRosterIndex)
                 // class-001 前五个 ID 沿用历史值，避免升级已有演示库时复制学生；
                 // 其余 ID 与 seed-learning-demo.ts 完全一致。
                 const id = classRow.id === 'class-001' && index < 5
@@ -679,8 +688,8 @@ export function seedDatabase(): void {
                 insertStudent.run({
                     id,
                     classId: classRow.id,
-                    name: anonymousName,
-                    anonymousName,
+                    name: displayName,
+                    anonymousName: displayName,
                     grade: classRow.grade,
                     cognitiveStyle: styles[index % styles.length],
                     // 名册只用于保证班级选择与人数闭环，不得凭空制造“学生参与度”。
@@ -690,6 +699,7 @@ export function seedDatabase(): void {
                     updatedAt: now,
                     metadata,
                 })
+                globalRosterIndex += 1
             }
         }
     })

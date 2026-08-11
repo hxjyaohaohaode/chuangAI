@@ -174,7 +174,7 @@ export interface ExecuteParams {
     /** TTS 语速 0.5-2.0 */
     speed?: number
     /** TTS 输出格式 */
-    responseFormat?: 'mp3' | 'wav' | 'opus'
+    responseFormat?: 'mp3' | 'wav'
     /** ASR 音频（Buffer / base64 / URL） */
     audio?: Buffer | string
     /** ASR 语言 */

@@ -24,7 +24,7 @@
 
 import { useCallback, useEffect, useState, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Button, Card, Combobox, Icon, GlassCard, VariableProximity, AnchorMiniMap, type ComboboxOption } from '@/components/ui'
+import { Button, Card, Combobox, Icon, GlassCard, VariableProximity, type ComboboxOption } from '@/components/ui'
 import { StreamText } from '@/components/ui/StreamText'
 import '@/components/ui/icons-extended'
 import { api } from '@/lib/api'
@@ -221,8 +221,6 @@ export default function WorkbenchPage() {
 
     return (
         <div className="pr-wb pr-v5-enter-workbench">
-            {/* v5.0 Task 4：右侧悬浮锚点迷你地图，自动扫描下方 data-anchor 章节 */}
-            <AnchorMiniMap />
             {/* v5.0 Hero 区 —— 金字塔 3D 透视升起意象（Task A.4）
              * 左侧文字区（eyebrow + 巨型标题 + 副标题 + WS 状态/班级选择）+
              * 右侧装饰性六阶金字塔 SVG（6 层从底到顶逐层缩小），
@@ -403,8 +401,7 @@ export default function WorkbenchPage() {
                 </aside>
             </div>
 
-            {/* v5.0 Task 22：智能题卡推荐 —— 基于学生学情数据精准推荐
-             * 位于主三列网格下方，独立 section 承载 AnchorMiniMap 锚点 */}
+            {/* v5.0 Task 22：智能题卡推荐 —— 基于学生学情数据精准推荐 */}
             <section className="pr-wb-recommend-section" data-anchor data-anchor-label="智能推荐">
                 <IntelligentRecommendation />
             </section>

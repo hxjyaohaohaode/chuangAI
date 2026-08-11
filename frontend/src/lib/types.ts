@@ -1911,17 +1911,17 @@ export interface AiGeneratedImage {
     createdAt: number
     /** 是否命中服务端持久缓存 */
     cached: boolean
-    /** 是否确实由模型生成 */
-    aiGenerated: boolean
-    /** 是否为显式演示态 */
-    demo: boolean
-    /** 是否为本地降级占位图 */
-    degraded: boolean
+    /** 生图成功只允许真实模型结果 */
+    aiGenerated: true
+    /** 动态生图不以演示占位伪装成功 */
+    demo: false
+    /** 生图失败走非 2xx，不返回占位图片 */
+    degraded: false
 }
 
 /** AI 生图响应体 */
 export interface AiImageGenerateResponse {
-    status: 'ok' | 'degraded'
+    status: 'ok'
     /** 生成图片列表 */
     images: AiGeneratedImage[]
     /** 生成模型 */
@@ -1930,17 +1930,16 @@ export interface AiImageGenerateResponse {
     requestedModel: 'wan2.7-image'
     /** 服务端请求 ID（用于排查） */
     requestId?: string
-    aiGenerated: boolean
-    demo: boolean
-    degraded: boolean
-    degradationReason?: AiDegradationReason
+    aiGenerated: true
+    demo: false
+    degraded: false
 }
 
 /** AI TTS 请求体（mimo-v2.5-tts） */
 export interface AiTtsRequest {
     /** 要合成语音的文本（诗词内容） */
     text: string
-    /** 音色 ID，默认 'alloy' */
+    /** MiMo 音色 ID，默认 'mimo_default' */
     voice?: string
     /** 语速 0.5-2.0，默认 1.0 */
     speed?: number
@@ -2599,12 +2598,12 @@ export interface RecitationPoem {
 /** TTS 范读生成请求体 */
 export interface RecitationTtsRequest {
     poemId: string
-    /** 音色 ID（可选，默认 alloy） */
+    /** MiMo 音色 ID（可选，默认 mimo_default） */
     voice?: string
     /** 语速 0.5-2.0（可选，默认 0.9 适合古诗朗读） */
     speed?: number
     /** 输出格式 */
-    format?: 'mp3' | 'wav' | 'opus'
+    format?: 'mp3' | 'wav'
 }
 
 /** TTS 范读生成响应 */
@@ -3972,7 +3971,7 @@ export interface CultureImage {
     /** 图片方向 */
     orientation: 'landscape' | 'portrait'
     aiGenerated: boolean
-    source: 'wan2.7' | 'local-illustration'
+    source: 'wan2.7' | 'wan2.7-packaged'
     model?: string
     generationRequestId?: string
     createdAt: number
@@ -6234,7 +6233,7 @@ export interface ModelCredentialStatus {
 /** 模型凭据由哪里管理；Render 使用持久盘加密保险柜。 */
 export interface ModelCredentialManagement {
     mutable: boolean
-    managedBy: 'encrypted-vault' | 'local-env' | 'render-dashboard'
+    managedBy: 'encrypted-vault' | 'local-env'
 }
 
 /** 模型凭据列表的完整服务端契约。 */

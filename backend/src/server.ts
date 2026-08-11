@@ -49,6 +49,7 @@ import { normalizeHttpError } from './routes/_helpers.js'
 import { isPublicSharedReportPage, shouldServeSpaFallback } from './lib/spa-fallback.js'
 import { AuthService, authRoutes, installAuthBoundary } from './security/auth.js'
 import { db, initDatabase, closeDatabase, seedDatabase } from './db/index.js'
+import { seedLearningDemo } from './db/seed/seed-learning-demo.js'
 import { enforceSingleTenantDataBoundary } from './security/single-tenant-data-boundary.js'
 import { initializeCredentialStore } from './lib/credentials.js'
 import {
@@ -89,6 +90,10 @@ async function startServer() {
     initDatabase()
     // 写入种子数据（幂等）—— 根因修复：此前从未调用，导致所有表为空
     seedDatabase()
+    if (config.seedLearningDemo) {
+        const learningSeed = seedLearningDemo()
+        logger.info({ ...learningSeed, synthetic: true }, '合成演示学情已写入')
+    }
     logBootProfile('database-ready')
     const tenantBoundary = enforceSingleTenantDataBoundary(db, config.auth.teacherId)
 

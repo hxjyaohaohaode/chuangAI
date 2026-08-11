@@ -9,7 +9,6 @@ vi.mock('./auth-session', () => ({
 }))
 
 import { api } from './api'
-import { ApiError } from './errors'
 
 describe('model credential management API contract', () => {
     beforeEach(() => {
@@ -24,7 +23,7 @@ describe('model credential management API contract', () => {
         vi.unstubAllGlobals()
     })
 
-    it('preserves the authoritative Render read-only management metadata', async () => {
+    it('preserves the authoritative Render encrypted-vault management metadata', async () => {
         mocks.authenticatedFetch.mockResolvedValue(new Response(JSON.stringify({
             status: 'ok',
             providers: [{
@@ -36,8 +35,8 @@ describe('model credential management API contract', () => {
                 masked: 'sk-****abcd',
             }],
             management: {
-                mutable: false,
-                managedBy: 'render-dashboard',
+                mutable: true,
+                managedBy: 'encrypted-vault',
             },
         }), { status: 200 }))
 
@@ -51,8 +50,8 @@ describe('model credential management API contract', () => {
                 masked: 'sk-****abcd',
             }],
             management: {
-                mutable: false,
-                managedBy: 'render-dashboard',
+                mutable: true,
+                managedBy: 'encrypted-vault',
             },
         })
         expect(mocks.authenticatedFetch).toHaveBeenCalledWith(
@@ -63,29 +62,14 @@ describe('model credential management API contract', () => {
         )
     })
 
-    it('rejects a Render-managed PUT with HTTP 409 instead of resolving as saved', async () => {
+    it('saves a credential through the authenticated encrypted-vault endpoint', async () => {
         mocks.authenticatedFetch.mockResolvedValue(new Response(JSON.stringify({
-            status: 'error',
-            error: 'SETTINGS_MANAGED_EXTERNALLY',
-            message: 'Model credentials are managed in Render Environment',
-            statusCode: 409,
-            management: {
-                mutable: false,
-                managedBy: 'render-dashboard',
-            },
-        }), { status: 409, statusText: 'Conflict' }))
+            status: 'ok', provider: 'deepseek', label: 'DeepSeek', configured: true, masked: 'sk-****abcd',
+        }), { status: 200 }))
 
-        let rejected: unknown
-        try {
-            await api.settings.saveCredential('deepseek', 'never-store-this-value')
-        } catch (error) {
-            rejected = error
-        }
-
-        expect(rejected).toBeInstanceOf(ApiError)
-        expect(rejected).toMatchObject({ name: 'ApiError', status: 409 })
-        // Vitest 运行在 DEV，统一客户端会保留错误正文用于契约诊断；生产环境不会暴露它。
-        expect((rejected as ApiError).devDetail).toContain('SETTINGS_MANAGED_EXTERNALLY')
+        await expect(api.settings.saveCredential('deepseek', 'never-store-this-value')).resolves.toMatchObject({
+            provider: 'deepseek', configured: true, masked: 'sk-****abcd',
+        })
         expect(mocks.authenticatedFetch).toHaveBeenCalledWith(
             '/api/settings/credentials/deepseek',
             expect.objectContaining({

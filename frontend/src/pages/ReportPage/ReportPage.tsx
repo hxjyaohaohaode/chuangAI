@@ -24,7 +24,7 @@
 
 import { useEffect } from 'react'
 import '@/components/ui/icons-extended'
-import { Icon, AnchorMiniMap } from '@/components/ui'
+import { Icon } from '@/components/ui'
 import { GradualBlur } from '@/components/ui/GradualBlur'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { useReportStore } from '@/stores/report'
@@ -78,9 +78,6 @@ export default function ReportPage() {
 
     return (
         <div className="pr-rpt-page pr-v5-enter-report">
-            {/* v5.0 Task 4：右侧悬浮锚点迷你地图 */}
-            <AnchorMiniMap />
-
             {/* v5.0 Hero：长卷轴意象 —— 标题横跨全宽 + 模板切换标签 + 卷轴缩略预览
              * spec v7 Phase 6：集成 VariableProximity（标题字重跟随鼠标）+ StreamText（副标题流式输出） */}
             <section

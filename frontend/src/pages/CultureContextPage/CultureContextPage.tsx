@@ -17,7 +17,7 @@
  * - ImmersiveProjector 随文档流（position: relative，已在 CSS 中落实）
  * - 主区域改为 Tab 分区布局（译文/背景/意象/图集）
  * - Tab 切换使用 CSS display:none，不重新渲染已加载组件（保留状态/滚动位置）
- * - 每个 Tab 面板添加 data-anchor 属性，供 AnchorMiniMap 识别
+ * - 每个 Tab 面板保留稳定 ID，便于标签与面板语义关联
  * - Tab 切换动画：200ms opacity + translateY 8px（规范 6.3）
  *
  * 设计要点：
@@ -30,7 +30,7 @@
  */
 
 import { useMemo, useState } from 'react'
-import { Icon, AnchorMiniMap } from '@/components/ui'
+import { Icon } from '@/components/ui'
 import { FallingText } from '@/components/ui/FallingText'
 import { MasonryGrid } from '@/components/ui/MasonryGrid'
 import { PixelSnow } from '@/components/ui/PixelSnow'
@@ -52,7 +52,7 @@ import './CultureContextPage.css'
  * Task 28：Tab 分区配置
  * ------------------------------------------------------------
  * 中主区四个 Tab：译文 / 背景 / 意象 / 图集
- * - 每个Tab对应一个 anchor，供 AnchorMiniMap 识别
+ * - 每个 Tab 对应一个稳定面板
  * - 切换使用 CSS display:none，保留组件状态与已加载内容
  * - Tab 按钮使用 Phosphor 图标（规范 13.1 无 emoji）
  * ============================================================ */
@@ -151,9 +151,6 @@ export default function CultureContextPage() {
 
     return (
         <div className="pr-culture pr-v5-enter-culture">
-            {/* v5.0 Task 4：右侧悬浮锚点迷你地图 */}
-            <AnchorMiniMap />
-
             {/* v5.0 Hero 区 —— 卷轴铺展意象（Task A.4）
              * 左侧文字区（eyebrow + 巨型标题 + 副标题 + AI 协作标注）+
              * 右侧装饰性文化场景图，
@@ -283,7 +280,7 @@ export default function CultureContextPage() {
                             {/* Task 28：Tab 面板容器
                              * - 所有面板始终挂载，仅通过 CSS display 切换可见性
                              * - 保留组件状态（如 TranslationPanel 已加载的内容、ImageGallery 已选图片）
-                             * - 每个面板带 data-anchor 供 AnchorMiniMap 识别
+                             * - 每个面板带稳定 ID，供标签语义关联
                              * - 激活面板使用 pr-culture-tab-panel--active 触发淡入动画（200ms） */}
                             <div className="pr-culture-tab-panels">
                                 <div

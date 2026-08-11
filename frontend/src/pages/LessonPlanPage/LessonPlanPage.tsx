@@ -9,7 +9,7 @@
  * 4 Tab 结构（SubTask 25.1）：
  * 1. 模板：VirtualList 虚拟列表 + Combobox 筛选 + 原生图片画廊预览
  * 2. 生成：AI 流式生成（deepseek-v4-pro）+ 光标脉动 + 中断/继续
- * 3. 预览：AnchorMiniMap + 教案详情完整渲染
+ * 3. 预览：教案详情完整渲染
  * 4. 导出：PDF / Word / Markdown 三种格式
  *
  * Tab 切换：200ms opacity + translateY 8px 过渡，CSS display:none 不重新渲染
@@ -39,7 +39,6 @@ import {
 } from '@/components/ui'
 import { StreamText } from '@/components/ui/StreamText'
 import { VirtualList } from '@/components/ui/VirtualList'
-import { AnchorMiniMap } from '@/components/ui/AnchorMiniMap'
 import { QuickVoiceAssist } from '@/components/ui/QuickVoiceAssist'
 import { SphereGallery, type SphereGalleryImage } from '@/components/ui/SphereGallery'
 import '@/components/ui/icons-extended'
@@ -584,8 +583,6 @@ export function LessonPlanPage() {
                 </section>
             </div>
 
-            {/* ── AnchorMiniMap（章节导航） ── */}
-            <AnchorMiniMap containerSelector=".pr-lp" />
         </div>
     )
 }

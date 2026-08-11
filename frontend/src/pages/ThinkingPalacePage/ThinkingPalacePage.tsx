@@ -26,7 +26,7 @@ import { logError } from '@/lib/errors'
 import { splitPoemClauses } from '@/lib/poem-lines'
 import { subscribeMediaQuery } from '@/lib/media-query'
 import { Icon } from '@/components/ui/Icon'
-import { Combobox, AnchorMiniMap, type ComboboxOption } from '@/components/ui'
+import { Combobox, type ComboboxOption } from '@/components/ui'
 import { ThinkingChainList } from './ThinkingChainList'
 import { ThinkingNodeDetail } from './ThinkingNodeDetail'
 import { PoemImageGenerator } from './PoemImageGenerator'
@@ -735,8 +735,6 @@ export default function ThinkingPalacePage() {
             {/* v5.0 Task 4：右侧悬浮锚点迷你地图
              * key={view} —— view 切换时强制重挂载，触发 IntersectionObserver 重扫描
              * 因为 poem/ai 两个 view 的 data-anchor 元素完全不同（poem-palace vs thinking-palace-body） */}
-            <AnchorMiniMap key={view} />
-
             {/* Hero 标题区 */}
             <header
                 className="thinking-palace-hero"

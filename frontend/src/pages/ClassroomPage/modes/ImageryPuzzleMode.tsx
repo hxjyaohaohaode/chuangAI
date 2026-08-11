@@ -251,19 +251,12 @@ export const ImageryPuzzleMode = memo(function ImageryPuzzleMode({
         if (!targetPoem) return
         setImageLoading(true)
         try {
-            // 这里调用 AI 生图（wan2.7-image）；降级态保留诗库图并明确提示，
-            // 不把本地 SVG 当作模型生成的新图覆盖进去。
+            // 只有真实 Wan WebP 才会成功；任何不可用状态均进入 catch，保留同诗原图。
             const result = await api.ai.imageGenerate({
                 prompt: `古风诗意插画：${targetPoem.title} - ${targetPoem.poet}笔下的意境`,
                 n: 1,
                 orientation: 'landscape',
             })
-            if (result.degraded) {
-                setError(result.demo
-                    ? '当前为演示模式，未调用 wan2.7-image；已保留诗库内置图'
-                    : 'wan2.7-image 当前不可用或配置不合规；已保留诗库内置图')
-                return
-            }
             const firstImage = result?.images?.[0]?.url
             if (firstImage) {
                 setImageUrl(firstImage)

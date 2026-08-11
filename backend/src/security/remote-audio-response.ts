@@ -35,6 +35,43 @@ function hasExpectedAudioSignature(bytes: Buffer, format: TtsAudioFormat): boole
     )
 }
 
+/**
+ * MiMo 的官方 TTS Chat Completion 响应把音频放在
+ * choices[0].message.audio.data（base64）中，而不是返回二进制 Response。
+ * 这里对 base64 语法、解码后字节上限和文件魔数同时失败关闭。
+ */
+export function decodeBoundedTtsAudioData(
+    data: string,
+    format: TtsAudioFormat,
+): Buffer {
+    const normalized = data.trim()
+    const maxBytes = TTS_AUDIO_BYTE_LIMITS[format]
+    const maxBase64Characters = Math.ceil(maxBytes / 3) * 4
+    if (
+        normalized.length === 0
+        || normalized.length > maxBase64Characters
+        || normalized.length % 4 !== 0
+        || !/^[A-Za-z0-9+/]+={0,2}$/u.test(normalized)
+    ) {
+        throw new Error('TTS 音频响应不是合法且受限的 base64')
+    }
+
+    const bytes = Buffer.from(normalized, 'base64')
+    const canonicalInput = normalized.replace(/=+$/u, '')
+    const canonicalDecoded = bytes.toString('base64').replace(/=+$/u, '')
+    if (
+        bytes.length === 0
+        || bytes.length > maxBytes
+        || canonicalDecoded !== canonicalInput
+    ) {
+        throw new Error('TTS 音频响应 base64 解码失败或超过字节上限')
+    }
+    if (!hasExpectedAudioSignature(bytes, format)) {
+        throw new Error(`TTS 音频响应魔数与请求格式 ${format} 不一致`)
+    }
+    return bytes
+}
+
 /** MiMo TTS 响应只允许请求格式对应的 MIME、字节上限与文件魔数。 */
 export async function readBoundedTtsAudioResponse(
     response: Response,

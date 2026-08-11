@@ -37,8 +37,8 @@ describe('AI image response contract', () => {
         expect(parsed.degraded).toBe(false)
     })
 
-    it('accepts an honestly labelled local demo placeholder', () => {
-        const parsed = parseAiImageGenerateResponse({
+    it('rejects a former local demo SVG placeholder instead of treating it as success', () => {
+        expect(() => parseAiImageGenerateResponse({
             status: 'degraded',
             images: [{
                 id: 'local-1',
@@ -59,11 +59,7 @@ describe('AI image response contract', () => {
             demo: true,
             degraded: true,
             degradationReason: 'demo-mode',
-        })
-
-        expect(parsed.status).toBe('degraded')
-        expect(parsed.images[0]?.model).toBe('local-placeholder')
-        expect(parsed.aiGenerated).toBe(false)
+        })).toThrow(/只允许真实 wan2.7-image/)
     })
 
     it('rejects the former backend shape instead of creating a fake frontend success', () => {
@@ -81,7 +77,7 @@ describe('AI image response contract', () => {
         expect(() => parseAiImageGenerateResponse(forged)).toThrow(/禁止把 SVG/)
     })
 
-    it('rejects an external image URL disguised as a local degraded placeholder', () => {
+    it('rejects an external URL disguised as a local degraded placeholder', () => {
         expect(() => parseAiImageGenerateResponse({
             status: 'degraded',
             images: [{
@@ -103,7 +99,7 @@ describe('AI image response contract', () => {
             demo: false,
             degraded: true,
             degradationReason: 'provider-failed',
-        })).toThrow(/本地 SVG/)
+        })).toThrow(/只允许真实 wan2.7-image/)
     })
 })
 

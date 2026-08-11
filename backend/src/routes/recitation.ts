@@ -81,7 +81,7 @@ const ttsGenerateSchema = z.object({
         .regex(/^[A-Za-z0-9_-]+$/u, '音色仅允许字母、数字、下划线和连字符')
         .optional(),
     speed: z.number().min(0.5).max(2.0).optional(),
-    format: z.enum(['mp3', 'wav', 'opus']).optional(),
+    format: z.enum(['mp3', 'wav']).optional(),
 })
 
 /** POST /asr/transcribe 表单字段（multipart 解析后校验） */
@@ -414,7 +414,7 @@ export const recitationRoutes: FastifyPluginAsync = async (app: FastifyInstance)
     app.post('/tts/generate', async (req: FastifyRequest, reply) => {
         const body = validateBody(ttsGenerateSchema, req, reply)
         if (!body) return
-        const { poemId, voice = 'alloy', speed = 0.9, format = 'mp3' } = body
+        const { poemId, voice = 'mimo_default', speed = 0.9, format = 'mp3' } = body
 
         const poem = repos.poems.findById(poemId)
         if (!poem) {
@@ -450,7 +450,7 @@ export const recitationRoutes: FastifyPluginAsync = async (app: FastifyInstance)
         try {
             const result = await eyeAgent.tts.invoke(ttsInput, ctx)
             const audio = result.output.audio
-            const ext = format === 'wav' ? 'wav' : format === 'opus' ? 'opus' : 'mp3'
+            const ext = format === 'wav' ? 'wav' : 'mp3'
             const fileName = `tts_${poemId}_${voice}.${ext}`
             const filePath = path.join(TTS_DIR, fileName)
             await writeFile(filePath, audio)

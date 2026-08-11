@@ -39,7 +39,7 @@ import { toast } from '@/stores/toast'
 import { logError } from '@/lib/errors'
 import { Icon } from '@/components/ui/Icon'
 import '@/components/ui/icons-extended'
-import { Button, Combobox, AnchorMiniMap, type ComboboxOption } from '@/components/ui'
+import { Button, Combobox, type ComboboxOption } from '@/components/ui'
 import { useClasses } from '@/hooks/useClasses'
 import { PatternPanel } from './PatternPanel'
 import { ABTestChart } from './ABTestChart'
@@ -847,8 +847,6 @@ export default function EvolutionEyePage() {
         <div className="evolution-eye-container" role="region" aria-label="进化之眼基因谱">
             {/* v5.0 Task 4：右侧悬浮锚点迷你地图
              * key={view} —— view 切换时强制重挂载，触发 IntersectionObserver 重扫描 */}
-            <AnchorMiniMap key={view} />
-
             {/* Hero 标题区 */}
             <header
                 className="evolution-eye-hero"

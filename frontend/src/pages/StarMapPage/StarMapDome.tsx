@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-    SphereGallery,
-    type SphereGalleryImage,
-} from '@/components/ui/SphereGallery'
+    FlyingPosters,
+    type FlyingPosterItem,
+} from '@/components/ui/FlyingPosters'
 import { Icon } from '@/components/ui/Icon'
 import type { GraphData, GraphEdge, GraphNode, NodeType, ViewMode } from '@/lib/types'
 import { EDGE_TYPE_LABELS, NODE_TYPE_LABELS } from '@/lib/types'
@@ -58,7 +58,6 @@ export function StarMapDome({
     searchQuery,
     selectedNode,
     onSelectNode,
-    onHoverNode,
     relationLens,
     onSelectEdge,
     onDoubleClick,
@@ -73,13 +72,16 @@ export function StarMapDome({
         [scene, selectedNode, searchQuery],
     )
 
-    // 顺序只取决于原始诗篇数据。无图诗篇仍保留在原生按钮列表中，
-    // 因而筛选、选中、图片失败都不会让诗篇从交互与可访问树中消失。
+    // 3D 海报严格只接收同 ID 的真实位图。未完成生成的诗篇仍保留在
+    // 页面原生星体目录中，但不能拿另一首诗的图片或 SVG 占位冒充。
     const galleryEntries = useMemo(
         () => data.nodes
             .filter((node) => node.type === 'Poem')
             .sort((left, right) => left.id.localeCompare(right.id))
-            .map((node) => ({ node, src: getPoetryNodeImageSource(node) })),
+            .flatMap((node) => {
+                const src = getPoetryNodeImageSource(node)
+                return src ? [{ node, src }] : []
+            }),
         [data.nodes],
     )
     const nodes = useMemo(() => galleryEntries.map((entry) => entry.node), [galleryEntries])
@@ -96,12 +98,13 @@ export function StarMapDome({
         })
         return adjacency
     }, [scene.edges])
-    const images = useMemo<SphereGalleryImage[]>(
+    const images = useMemo<FlyingPosterItem[]>(
         () => galleryEntries.map(({ node, src }) => ({
             id: node.id,
             src,
-            alt: `${node.label} · ${NODE_TYPE_LABELS[node.type]}`,
-            caption: [node.dynasty, node.poet].filter(Boolean).join(' · ') || '诗篇图像待补齐',
+            alt: `${node.label}${[node.dynasty, node.poet].filter(Boolean).length > 0
+                ? ` · ${[node.dynasty, node.poet].filter(Boolean).join(' · ')}`
+                : ''}`,
         })),
         [galleryEntries],
     )
@@ -121,13 +124,11 @@ export function StarMapDome({
     const lensLabel = lens?.label ?? '全部诗脉'
     const lensDescription = lens?.description ?? '显示全部可验证关系'
 
-    const focusGalleryCard = useCallback((index: number) => {
-        const safeIndex = clampGalleryIndex(index, nodes.length)
-        const card = galleryRegionRef.current?.querySelector<HTMLButtonElement>(
-            `.pr-sphere-gallery-card[data-gallery-index="${safeIndex}"]`,
-        )
-        card?.focus({ preventScroll: true })
-    }, [nodes.length])
+    const focusGalleryCard = useCallback((_index: number) => {
+        galleryRegionRef.current
+            ?.querySelector<HTMLCanvasElement>('.pr-flying-posters__canvas')
+            ?.focus({ preventScroll: true })
+    }, [])
 
     // 外部选中诗篇时让前景与选中态同步；关闭详情后回到触发详情的准确诗篇按钮。
     useEffect(() => {
@@ -151,10 +152,6 @@ export function StarMapDome({
         setActiveIndex(safeIndex)
         onSelectNode(node)
     }, [nodes, onSelectNode])
-
-    const handleHoverIndex = useCallback((index: number | null) => {
-        onHoverNode(index == null ? null : nodes[clampGalleryIndex(index, nodes.length)] ?? null)
-    }, [nodes, onHoverNode])
 
     const handleActiveIndex = useCallback((index: number) => {
         setActiveIndex(clampGalleryIndex(index, nodes.length))
@@ -252,17 +249,16 @@ export function StarMapDome({
             <div className="pr-sm-dome-orbit pr-sm-dome-orbit--inner" aria-hidden />
 
             <div ref={galleryRegionRef} className="pr-sm-dome-gallery-region">
-                <SphereGallery
-                    images={images}
+                <FlyingPosters
+                    items={images}
                     className="pr-sm-dome-gallery"
-                    activation="select"
-                    ariaLabel="穹顶诗篇画廊"
-                    selectedIndex={selectedPoemIndex}
-                    focusIndex={safeActiveIndex}
-                    emphasisIndices={emphasizedIndices}
-                    onImageSelect={handleSelectIndex}
-                    onImageHover={handleHoverIndex}
-                    onActiveImageChange={handleActiveIndex}
+                    ariaLabel="3D 旋转诗境画廊"
+                    activeIndex={safeActiveIndex}
+                    distortion={3}
+                    planeWidth={560}
+                    planeHeight={315}
+                    onActivate={handleSelectIndex}
+                    onActiveIndexChange={handleActiveIndex}
                 />
             </div>
 

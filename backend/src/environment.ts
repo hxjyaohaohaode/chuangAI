@@ -43,6 +43,8 @@ export const environmentSchema = z.object({
     ).default(''),
     CREDENTIAL_VAULT_MASTER_KEY: z.string().default(''),
     DEMO_MODE: z.enum(['true', 'false']).default('false'),
+    // 仅用于竞赛/产品演示部署：写入明确标记、可清除的合成学情，不影响模型调用模式。
+    SEED_LEARNING_DEMO: z.enum(['true', 'false']).default('false'),
     ALLOW_UNAUTHENTICATED_NON_LOOPBACK: z.enum(['true', 'false']).default('false'),
 
     // 公网同源服务使用 Render 自动注入地址；自定义域名必须显式列出精确 Origin。
@@ -78,8 +80,8 @@ export const environmentSchema = z.object({
     AUTH_SESSION_TTL_MINUTES: z.coerce.number().int().min(5).max(1_440).default(480),
     AUTH_COOKIE_SECURE: z.enum(['auto', 'true', 'false']).default('auto'),
     AUTH_TEACHER_ID: z.string().trim().min(1).max(128).default('teacher-001'),
-    AUTH_TEACHER_NAME: z.string().trim().min(1).max(80).default('王雅琴'),
-    AUTH_TEACHER_PHONE: z.string().trim().regex(/^1[3-9]\d{9}$/u).default('13100000000'),
+    AUTH_TEACHER_NAME: z.string().trim().min(1).max(80).default('曹老师'),
+    AUTH_TEACHER_PHONE: z.string().trim().regex(/^1[3-9]\d{9}$/u).default('13177091153'),
     AUTH_PASSWORD_SCRYPT: z.string().default(''),
 })
 
