@@ -1,0 +1,541 @@
+/**
+ * ShowcaseCards 三卡片展示区样式
+ *
+ * 严格依据《界面设计规范.md》第 2、4、5、6、14 章实现
+ *
+ * 设计要点：
+ * - 响应式 3 列 → 2 列（第三张占满）→ 1 列
+ * - 玻璃态卡片：surface-elevated + backdrop-blur 20px + box-shadow
+ * - 无硬边框：仅 box-shadow + 12px 圆角
+ * - staggered 入场：50ms 间隔，spring-soft 250ms
+ * - 完整 hover/focus 三态
+ * - prefers-reduced-motion 降级
+ */
+
+/* ============================================================
+ * 容器
+ * ============================================================ */
+
+.pr-grading-showcase {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.pr-grading-showcase-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-grading-showcase-title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-grading-showcase-subtitle {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-sm);
+}
+
+/* ============================================================
+ * 三列网格 —— 桌面 3 列 / 平板 2 列（第三张占满）/ 移动 1 列
+ * ============================================================ */
+
+.pr-grading-showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+    align-items: stretch;
+}
+
+@media (max-width: 1100px) {
+    .pr-grading-showcase-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* 第三张卡片占满两列宽度 */
+    .pr-grading-showcase-card--progress {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 720px) {
+    .pr-grading-showcase-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pr-grading-showcase-card--progress {
+        grid-column: auto;
+    }
+}
+
+/* ============================================================
+ * 单张卡片 —— 玻璃态面板
+ * ============================================================ */
+
+.pr-grading-showcase-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    /* 玻璃态背景：surface-elevated 85% + backdrop-blur 20px（规范 2.2 / 14.3） */
+    background-color: var(--surface-elevated);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    /* 无硬边框 —— 仅 box-shadow（规范 4.1），复用 --shadow-card-hover token */
+    box-shadow: var(--shadow-card-hover);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    min-height: 380px;
+    /* staggered 入场动画 */
+    opacity: 0;
+    transform: translateY(8px);
+    animation: pr-grading-showcase-in var(--dur-medium) var(--spring-soft) forwards;
+    animation-delay: var(--showcase-stagger, 0ms);
+    transition:
+        box-shadow var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-soft);
+}
+
+.pr-grading-showcase-card:hover {
+    /* 复用 --shadow-modal token（规范 14.x：hover 加深一档阴影） */
+    box-shadow: var(--shadow-modal);
+    transform: translateY(-2px);
+}
+
+.pr-grading-showcase-card:focus-within {
+    /* focus 环 + 卡片阴影 —— 复用 --shadow-focus-accent + --shadow-card-hover */
+    box-shadow:
+        var(--shadow-focus-accent),
+        var(--shadow-card-hover);
+}
+
+@keyframes pr-grading-showcase-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+ * 卡片头部
+ * ============================================================ */
+
+.pr-grading-showcase-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.pr-grading-showcase-card-heading {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-grading-showcase-card-meta {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--tracking-tightest);
+}
+
+/* ============================================================
+ * 卡片主体区
+ * ============================================================ */
+
+.pr-grading-showcase-card-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    position: relative;
+}
+
+/* ============================================================
+ * CardSwap 卡片内单个内容
+ * ============================================================ */
+
+.pr-grading-showcase-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    width: 100%;
+    height: 100%;
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-grading-showcase-card-tag {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tightest);
+}
+
+.pr-grading-showcase-card-image {
+    flex: 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    min-height: 80px;
+    background-color: var(--surface-secondary-alpha);
+}
+
+.pr-grading-showcase-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pr-grading-showcase-card-image .pr-grading-media-image-fallback {
+    min-height: 100%;
+}
+
+.pr-grading-showcase-card-glyph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--card-tone, rgb(var(--c-accent-primary)));
+    background-color: rgb(var(--c-accent-primary) / 0.06);
+    border-radius: var(--radius-md);
+    min-height: 80px;
+}
+
+.pr-grading-showcase-card-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-sm);
+}
+
+.pr-grading-showcase-card-subtitle {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-xs);
+}
+
+.pr-grading-showcase-card-text {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-sm);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    background-color: var(--inline-code-bg);
+}
+
+.pr-grading-showcase-card-swap-wrap {
+    width: 100%;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================================
+ * StackGallery 卡片占位符（无图时）
+ * ============================================================ */
+
+.pr-grading-showcase-stack-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    height: 100%;
+    color: rgb(var(--c-accent-primary));
+    background: var(--gradient-brand-subtle);
+    border-radius: var(--radius-md);
+}
+
+.pr-grading-showcase-card-stack-wrap {
+    width: 100%;
+    height: 280px;
+    position: relative;
+}
+
+/* ============================================================
+ * PixelTransition 卡片内容
+ * ============================================================ */
+
+.pr-grading-showcase-card-pixel-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    width: 100%;
+}
+
+.pr-grading-showcase-progress-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    width: 100%;
+    height: 100%;
+    padding: var(--space-md);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-grading-showcase-progress-ring {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.pr-grading-showcase-progress-ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.pr-grading-showcase-progress-ring-track {
+    fill: none;
+    stroke: var(--progress-tone, rgb(var(--c-accent-primary)));
+    stroke-opacity: 0.15;
+    stroke-width: 3.5;
+}
+
+/* v7：渐变 stroke 通过 SVG inline style 设置，此处仅控制几何属性 + 光晕 + 过渡 */
+.pr-grading-showcase-progress-ring-fill {
+    fill: none;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    /* v7：drop-shadow 光晕 —— 使用 --progress-tone 变量，无需字符串拼接 */
+    filter: drop-shadow(0 0 2px var(--progress-tone, rgb(var(--c-accent-primary))));
+    transition: stroke-dasharray var(--dur-medium) var(--ease-out);
+}
+
+.pr-grading-showcase-progress-ring-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pr-grading-showcase-progress-ring-value {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--tracking-tightest);
+}
+
+.pr-grading-showcase-progress-info {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--progress-tone, rgb(var(--c-accent-primary)));
+}
+
+.pr-grading-showcase-progress-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pr-grading-showcase-progress-info-label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-grading-showcase-progress-info-count {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    font-variant-numeric: tabular-nums;
+}
+
+/* 进度条形指示器列表 */
+.pr-grading-showcase-progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-secondary-alpha);
+}
+
+.pr-grading-showcase-progress-item {
+    display: grid;
+    grid-template-columns: 64px 1fr 28px;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.pr-grading-showcase-progress-label {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: var(--tracking-tight);
+}
+
+/* v7：移除重复 background-color（原行 402-403 重复定义导致 tone 色被覆盖） */
+.pr-grading-showcase-progress-track {
+    height: 4px;
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-surface-tertiary));
+    overflow: hidden;
+    position: relative;
+}
+
+/* v7：width → transform: scaleX（GPU 加速，规范 15.2 仅 transform/opacity 动画） */
+.pr-grading-showcase-progress-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-full);
+    background-color: var(--progress-tone, rgb(var(--c-accent-primary)));
+    transform-origin: left center;
+    transform: scaleX(var(--progress-scale, 0));
+    transition: transform var(--dur-medium) var(--ease-out);
+}
+
+.pr-grading-showcase-progress-count {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-primary));
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    font-weight: var(--weight-medium);
+}
+
+/* ============================================================
+ * 加载/错误/空态
+ * ============================================================ */
+
+.pr-grading-showcase-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    width: 100%;
+    height: 100%;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: var(--space-md);
+}
+
+.pr-grading-showcase-skeleton.is-tall {
+    min-height: 240px;
+}
+
+.pr-grading-showcase-skeleton.is-short {
+    min-height: 120px;
+}
+
+.pr-grading-showcase-skeleton-bar {
+    height: 12px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg,
+            var(--surface-secondary-alpha) 0%,
+            var(--surface-tertiary-alpha) 50%,
+            var(--surface-secondary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-grading-showcase-shimmer 1.6s var(--ease-in-out) infinite;
+}
+
+.pr-grading-showcase-skeleton-block {
+    flex: 1;
+    width: 100%;
+    border-radius: var(--radius-md);
+    background: linear-gradient(90deg,
+            var(--surface-secondary-alpha) 0%,
+            var(--surface-tertiary-alpha) 50%,
+            var(--surface-secondary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-grading-showcase-shimmer 1.6s var(--ease-in-out) infinite;
+}
+
+.pr-grading-showcase-skeleton-text {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tight);
+}
+
+@keyframes pr-grading-showcase-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.pr-grading-showcase-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    color: rgb(var(--c-accent-error));
+    background-color: var(--accent-error-10);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    font-size: var(--text-sm);
+    text-align: center;
+}
+
+.pr-grading-showcase-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    color: rgb(var(--c-text-tertiary));
+    padding: var(--space-md);
+    font-size: var(--text-sm);
+    text-align: center;
+}
+
+/* ============================================================
+ * prefers-reduced-motion 降级
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-grading-showcase-card {
+        opacity: 1;
+        transform: none;
+        animation: none;
+        transition: none;
+    }
+
+    .pr-grading-showcase-skeleton-bar,
+    .pr-grading-showcase-skeleton-block {
+        animation: none;
+    }
+}

@@ -1,0 +1,754 @@
+{
+  "generatedAt": "2026-08-11T05:49:05.465Z",
+  "hosting": "fastify-production-same-origin",
+  "nodeEnv": "production",
+  "authMode": "demo",
+  "passwordAuthentication": {
+    "checked": false,
+    "credentialSource": null
+  },
+  "authStatusFailureClosed": {
+    "checked": true,
+    "demoShortcutHidden": true,
+    "submitDisabled": true
+  },
+  "notificationEmptyDialogFocus": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-empty-local-notification-store with a non-dispatching BroadcastChannel test double; verifies frontend dialog focus, keyboard boundary and mobile geometry only, not classroom events, notification delivery or teaching outcomes",
+    "verifies": [
+      "empty-modal-dialog-has-programmatic-focus-target-and-receives-initial-focus",
+      "empty-modal-dialog-retains-focus-on-tab-and-shift-tab",
+      "escape-closes-empty-notification-dialog-and-restores-trigger-focus",
+      "mobile-empty-notification-dialog-remains-unclipped-without-page-horizontal-overflow"
+    ]
+  },
+  "commandPaletteMobile": {
+    "checked": true,
+    "viewport": "390x844",
+    "testDataBoundary": "authenticated-production-E2E-command-palette-ui; verifies keyboard focus, responsive geometry and close restoration only, not search relevance, student data or teaching outcomes",
+    "verifies": [
+      "ctrl-or-command-k-opens-the-lazy-command-palette-and-focuses-search-input",
+      "search-input-exposes-combobox-listbox-active-descendant-contract",
+      "arrow-navigation-updates-active-descendant-and-single-roving-option-tab-stop",
+      "mobile-command-palette-remains-within-viewport-without-page-horizontal-overflow",
+      "tab-from-search-input-remains-within-command-dialog",
+      "escape-closes-command-palette-and-restores-source-trigger-focus-after-parent-unmount"
+    ]
+  },
+  "sidebarResizerKeyboard": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "authenticated-production-AppShell preference control; verifies keyboard range operations, ARIA value semantics and breakpoint cleanup only, not teaching data or outcomes",
+    "verifies": [
+      "focusable-vertical-separator-exposes-current-minimum-and-maximum-width-values",
+      "home-end-arrow-and-page-keys-update-sidebar-width-with-focus-retained",
+      "desktop-drag-entering-mobile-breakpoint-releases-global-resize-state-and-keeps-page-without-horizontal-overflow"
+    ]
+  },
+  "generatedMediaBoundary": {
+    "checked": true,
+    "unauthenticatedRejected": true,
+    "authenticatedRead": true,
+    "cacheControl": "private, no-store"
+  },
+  "cultureDemoGalleryFallback": {
+    "checked": true,
+    "poemBound": true,
+    "localIllustrationOnly": true,
+    "aiGeneratedFalse": true,
+    "fourUniqueSvgScenes": true,
+    "detailIndexReadable": true
+  },
+  "ttsBinaryContract": {
+    "checked": true,
+    "unauthenticatedRejected": true,
+    "authenticatedBinaryAudio": true,
+    "browserBlobPlayback": true,
+    "contentType": "audio/wav",
+    "cacheControl": "private, no-store",
+    "bytes": 40044,
+    "signature": "RIFF"
+  },
+  "voiceInputLifecycle": {
+    "checked": true,
+    "viewport": "1440x900",
+    "testDataBoundary": "isolated-controlled-browser-media-device-and-ASR response; verifies frontend recorder lifecycle and request boundary only, not real microphone capture, student speech, ASR quality or teaching outcomes",
+    "verifies": [
+      "normal-stop-waits-for-final-dataavailable-and-submits-exactly-one-multipart-asr-request",
+      "second-click-during-pending-permission-cancels-late-stream-without-starting-recorder-or-submitting-asr",
+      "late-media-permission-resolution-after-module-unmount-stops-the-stream-without-starting-recorder-or-submitting-asr",
+      "active-recorder-module-unmount-stops-the-device-and-cancels-final-asr-delivery"
+    ]
+  },
+  "quickVoiceCaptureLifecycle": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-controlled-browser-media-device-and-ASR response through the production AI-copilot quick-voice entry; verifies frontend recorder lifecycle, cancellation and mobile action geometry only, not real microphone capture, teacher speech, ASR quality or teaching outcomes",
+    "verifies": [
+      "normal-stop-waits-for-final-dataavailable-and-refills-editable-ai-copilot-input-with-one-multipart-asr-request",
+      "pending-permission-keeps-an-explicit-cancel-control-and-late-stream-never-starts-recorder-or-submits-asr",
+      "late-media-permission-after-ai-copilot-unmount-stops-the-stream-without-starting-recorder-or-submitting-asr",
+      "active-quick-voice-recorder-unmount-stops-the-device-and-cancels-final-asr-delivery",
+      "mobile-quick-voice-action-remains-unclipped-with-at-least-44px-touch-height"
+    ]
+  },
+  "recitationAudioReferenceBoundary": {
+    "checked": true,
+    "arbitraryExternalUrlRejected": true,
+    "pathTraversalRejected": true,
+    "queryStringRejected": true,
+    "backslashRejected": true,
+    "ttsReferenceRejectedForEvaluation": true,
+    "unsafeTtsVoiceRejected": true,
+    "modelReceivesControlledBufferOnly": true
+  },
+  "gradingImageReferenceBoundary": {
+    "checked": true,
+    "arbitraryExternalUrlRejected": true,
+    "inlineImageMagicRequired": true,
+    "dashscopeDownloadAllowlisted": true
+  },
+  "aiChatImageReferenceBoundary": {
+    "checked": true,
+    "arbitraryExternalUrlRejected": true,
+    "inlineImageMagicRequired": true,
+    "imagePartsRestrictedToUserMessages": true,
+    "requestBodyAndAggregateLimitsConfigured": true
+  },
+  "persistentImageReferenceBoundary": {
+    "checked": true,
+    "externalTrackerUrlRejectedBeforePersistence": true,
+    "generatedWebpPathAllowlisted": true
+  },
+  "baseUrl": "http://127.0.0.1:52254",
+  "routeViewportCombinations": 32,
+  "warnings": 0,
+  "failures": 0,
+  "memoryGovernance": {
+    "checked": true,
+    "operations": [
+      "list",
+      "update",
+      "delete",
+      "deidentified-create",
+      "class-clear-confirmation"
+    ]
+  },
+  "offlineDisclosure": {
+    "checked": true,
+    "unsavedChangesAreNotClaimedAsQueued": true
+  },
+  "keyboardNavigation": {
+    "checked": true,
+    "firstFocusIsSkipLink": true,
+    "skipLinkMovesFocusToMain": true
+  },
+  "modalFocusManagement": {
+    "checked": true,
+    "forwardAndReverseTrap": true,
+    "escapeCloses": true,
+    "focusReturnsToTrigger": true
+  },
+  "lessonPlanStartExperience": {
+    "checked": true,
+    "verifies": [
+      "path-disclosure",
+      "template-detail-navigation",
+      "tablist-controls-unique-panels-and-supports-arrow-home-end-navigation"
+    ]
+  },
+  "toastOverflow": {
+    "checked": true,
+    "maxCollapsedVisible": 2,
+    "verifies": [
+      "expand-hidden-feedback",
+      "collapse-back-to-compact-state",
+      "aria-expanded"
+    ]
+  },
+  "gradingInitialAction": {
+    "checked": true,
+    "workspaceFollowsStepper": true,
+    "desktopUploadZoneVisibleInInitialViewport": true,
+    "uploadRemainsDisabledBeforeContextSelection": true
+  },
+  "gradingResultTableKeyboard": {
+    "checked": true,
+    "testDataBoundary": "isolated-controlled-api-responses; not student-or-model-outcome-evidence",
+    "verifies": [
+      "teacher-ui-path-selects-class-and-question-then-uploads-recognizes-and-grades",
+      "visually-hidden-file-input-remains-keyboard-focusable-and-enter-opens-the-native-file-chooser",
+      "pending-multi-file-upload-uses-an-indeterminate-aria-progress-contract-without-fake-percentages-or-per-file-timers",
+      "established-batch-locks-class-and-upload-entry-points-and-does-not-expose-a-local-only-delete-control",
+      "new-batch-clears-local-previews-before-a-separate-reupload",
+      "multi-file-recognition-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "result-table-uses-table-rowgroup-row-cell-semantics",
+      "result-row-focus-and-enter-expand-details",
+      "animation-wrapper-does-not-double-handle-row-selection"
+    ]
+  },
+  "gradingProgressTransitionKeyboard": {
+    "checked": true,
+    "testDataBoundary": "isolated-controlled-grading-flow-state; not student-or-model-outcome-evidence",
+    "verifies": [
+      "pixel-transition-exposes-a-named-button-role-and-pressed-state",
+      "space-and-enter-toggle-progress-view-while-focus-remains-on-the-control",
+      "pointer-hover-remains-a-progressive-enhancement-not-the-only-interaction-path"
+    ]
+  },
+  "gradingCardSwapMotionControl": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-controlled-grading-flow; verifies frontend motion, semantics and geometry only, not student work, teaching quality or model-outcome evidence",
+    "verifies": [
+      "non-actionable-comparison-cards-do-not-fake-button-semantics-or-pointer-cursor",
+      "native-named-control-explicitly-pauses-and-keyboard-space-resumes-automatic-comparison-rotation",
+      "paused-state-freezes-card-transforms-rather-than-only-changing-a-label",
+      "hover-pauses-as-progressive-enhancement-without-replacing-explicit-control",
+      "prefers-reduced-motion-stops-timer-and-card-motion-with-a-truthful-static-disclosure",
+      "mobile-motion-control-remains-visible-at-least-24px-and-without-page-horizontal-overflow"
+    ]
+  },
+  "gradingStackGalleryAccessibility": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-controlled-grading-flow-and-image-responses; verifies frontend semantic controls, keyboard focus and mobile geometry only, not student work, teaching quality or model-outcome evidence",
+    "verifies": [
+      "visible-stack-cards-use-native-buttons-without-faux-button-role",
+      "all-visible-cards-are-tab-reachable-and-autoplay-pauses-while-gallery-has-focus",
+      "keyboard-enter-opens-labelled-lightbox-and-focuses-explicit-close-control",
+      "lightbox-traps-tab-and-shift-tab-within-available-controls",
+      "escape-closes-lightbox-and-restores-source-card-focus",
+      "aborted-student-image-replaces-stack-card-and-lightbox-with-readable-nonblank-fallbacks",
+      "mobile-stack-gallery-action-remains-unclipped-without-page-horizontal-overflow"
+    ]
+  },
+  "copilotAttachmentPreviewRecovery": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-controlled-browser-image-error-after-real-local-file-selection-and-compression; verifies frontend preview recovery and outgoing-request exclusion only, not image content, student data or model outcomes",
+    "verifies": [
+      "preview-decode-error-replaces-thumbnail-with-a-named-polite-failure-state",
+      "failed-preview-is-excluded-from-the-next-ai-request-payload",
+      "teacher-can-still-send-a-pure-text-message-after-the-failed-attachment-is-fail-closed",
+      "mobile-failure-card-wraps-without-page-horizontal-overflow-and-keeps-a-24px-remove-target"
+    ]
+  },
+  "immersiveDrawerAccessibility": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "authenticated-production-starmap-route; verifies frontend navigation-drawer semantics, keyboard focus and mobile geometry only, not star-map learning data, teaching quality or model-outcome evidence",
+    "verifies": [
+      "closed-offscreen-drawer-has-no-dialog-modal-semantics-and-is-aria-hidden",
+      "keyboard-open-focuses-explicit-close-control",
+      "drawer-traps-tab-and-shift-tab-within-navigation-controls",
+      "overlay-close-removes-dialog-semantics-and-restores-menu-trigger-focus",
+      "mobile-drawer-stays-within-eighty-percent-viewport-with-40px-close-target-and-no-page-overflow"
+    ]
+  },
+  "classroomMobileLaunch": {
+    "checked": true,
+    "initialVisibleModes": 1,
+    "canExpandAllSevenModes": true,
+    "canCollapseBackToCurrentMode": true,
+    "selectedModeReordersToFeatureCard": true,
+    "featureCardDisclosesSelectedModeScenarioAndDuration": true,
+    "launchConfigurationVisibleInInitialViewport": true
+  },
+  "classroomLaunchBriefFullText": {
+    "checked": true,
+    "viewport": "1440x900",
+    "verifies": [
+      "classroom-scenario-and-duration-use-natural-wrap-instead-of-ellipsis",
+      "critical-launch-summary-has-no-horizontal-or-vertical-text-clipping"
+    ]
+  },
+  "classroomTextSwitchContract": {
+    "checked": true,
+    "viewport": "1440x900; prefers-reduced-motion: no-preference/reduce",
+    "testDataBoundary": "authenticated production classroom start page; verifies the seven frontend mode labels, native controls, timer pause/resume and DOM-observable media fallbacks only, not screen-reader vendor speech, real classroom outcomes or all browser background scheduling policies",
+    "verifies": [
+      "seven-real-classroom-mode-labels-use-one-native-roving-button-group",
+      "arrow-home-end-selection-synchronizes-focus-visible-text-and-one-atomic-live-region",
+      "focus-hover-and-explicit-manual-pause-each-stop-auto-rotation-for-longer-than-the-production-interval",
+      "manual-resume-restores-a-real-auto-rotation-step",
+      "reduced-motion-stops-auto-rotation-while-preserving-immediate-manual-selection",
+      "offscreen-content-stops-auto-rotation-and-resumes-from-a-full-interval-when-visible",
+      "the-component-has-no-character-split-dom-canvas-svg-or-gsap-runtime-resource"
+    ]
+  },
+  "electricBorderDecoration": {
+    "checked": true,
+    "viewport": "1440x900; prefers-reduced-motion: reduce",
+    "testDataBoundary": "authenticated-production-E2E DOM/CSS contract only; verifies the decorative layer, not teaching outcomes, hardware performance or browser support beyond the test browser",
+    "verifies": [
+      "selected-mode-decoration-is-aria-hidden-and-does-not-create-an-interactive-descendant",
+      "selected-mode-decoration-has-no-canvas-or-rendered-child-elements",
+      "selected-mode-decoration-is-absolute-and-non-blocking",
+      "reduced-motion-disables-both-border-and-glow-animations"
+    ]
+  },
+  "classroomStartFailureClosure": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-controlled-first POST /api/classroom/start response only; verifies failure presentation, no-navigation and retry behavior, not an actual school database failure, teaching data or teaching outcome",
+    "verifies": [
+      "controlled-503-keeps-the-teacher-on-the-unstarted-classroom-route",
+      "failure-alert-states-that-no-join-code-or-realtime-channel-was-created",
+      "the-single-primary-action-remains-enabled-and-is-renamed-for-safe-retry",
+      "inline-failure-feedback-suppresses-a-duplicate-generic-start-toast",
+      "mobile-failure-alert-and-retry-action-stay-visible-without-horizontal-overflow",
+      "the-second-attempt-uses-the-production-start-contract-and-navigates-only-after-success"
+    ]
+  },
+  "reducedMotionCompliance": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "authenticated-production-E2E reduced-motion browser preference; verifies DOM-observable CSS and Web Animations API behavior only. Three/WebGL paths are verified by their dedicated lightweight-view regressions.",
+    "verifies": [
+      "prefers-reduced-motion-media-query-is-active-for-every-route-and-viewport",
+      "visible-CSS-animations-and-transitions-are-no-longer-than-20ms",
+      "settled-pages-have-no-long-running-DOM-Web-Animations",
+      "custom-interactive-ARIA-roles-share-the-runtime-accessible-name-audit"
+    ]
+  },
+  "mobileBrandHierarchy": {
+    "checked": true,
+    "viewport": "390x844",
+    "testDataBoundary": "authenticated-production-E2E header presentation and accessibility-name contract only; does not measure brand recognition or classroom outcomes.",
+    "verifies": [
+      "mobile-header-displays-the-complete-Chinese-primary-brand-without-an-ellipsis-truncated-English-suffix",
+      "visual-brand-text-is-aria-hidden-to-avoid-duplicate-screen-reader-output",
+      "screen-reader-only-text-preserves-the-complete-product-name",
+      "brand-container-has-no-horizontal-text-clipping"
+    ]
+  },
+  "dashboardMagicBentoContract": {
+    "checked": true,
+    "viewport": "1440x900; 390x844 touch; forced-colors active; print",
+    "testDataBoundary": "production dashboard with controlled illustration API and one intentionally aborted decorative image; verifies frontend semantics, resource recovery and media fallbacks only, not generated-image quality, teaching quality or competition outcome",
+    "verifies": [
+      "six-native-links-preserve-keyboard-spa-and-modifier-or-middle-click-browser-behavior",
+      "aborted-decorative-image-keeps-css-landscape-without-card-layout-shift",
+      "css-renderer-creates-no-legacy-particle-ripple-global-spotlight-or-runtime-style",
+      "reduced-motion-and-real-coarse-pointer-context-remain-static-and-operable",
+      "desktop-three-column-and-mobile-single-column-layouts-have-no-horizontal-overflow",
+      "forced-colors-and-print-media-preserve-boundaries-focus-text-and-page-break-safety",
+      "source-gate-excludes-gsap-raf-timers-global-listeners-randomness-canvas-and-webgl"
+    ]
+  },
+  "anchorMiniMapContract": {
+    "checked": true,
+    "viewport": "1440x900;390x844; prefers-reduced-motion: reduce; forced-colors active; print",
+    "testDataBoundary": "authenticated production Dashboard plus temporary DOM-only synthetic anchors; verifies navigation identity, geometry and media fallbacks only, not teaching content, information architecture quality or every physical assistive device",
+    "verifies": [
+      "collapsed-native-toggle-and-every-section-target-preserve-at-least-44px-css-hit-size",
+      "space-key-expands-and-aria-expanded-plus-local-storage-persist-across-reload",
+      "late-visible-generated-anchors-receive-distinct-stable-dom-identities",
+      "duplicate-business-ids-still-scroll-the-exact-internal-element-with-auto-behavior-under-reduced-motion",
+      "equivalent-live-page-mutations-do-not-change-the-exposed-navigation-contract",
+      "header-remains-computed-sticky-at-top-after-the-real-scroll-state-threshold",
+      "forced-colors-preserves-system-color-pair-and-visible-keyboard-focus",
+      "print-hides-auxiliary-navigation-and-mobile-breakpoint-unmounts-it-without-overflow"
+    ]
+  },
+  "dashboardAsyncContentVisibility": {
+    "checked": true,
+    "viewport": "1440x900; prefers-reduced-motion: reduce",
+    "testDataBoundary": "one delayed controlled dashboard-alert response; verifies conditional-ref mount visibility and motion fallback only, not real student risk, alert correctness or teaching outcomes",
+    "verifies": [
+      "loading-skeleton-exists-before-the-delayed-query-is-released",
+      "late-mounted-list-item-reaches-full-opacity-instead-of-staying-hidden",
+      "reduced-motion-removes-transform-and-transition-from-the-revealed-item"
+    ]
+  },
+  "dashboardTabKeyboard": {
+    "checked": true,
+    "viewport": "1440x900",
+    "verifies": [
+      "top-level-tablist-controls-dynamic-panel",
+      "arrow-keys-home-and-end-update-selection-and-focus",
+      "lazy-loaded-diagnosis-tablist-preserves-the-same-keyboard-contract"
+    ]
+  },
+  "dashboardAlertActionSemantics": {
+    "checked": true,
+    "testDataBoundary": "isolated-controlled-dashboard-alert; not student-risk-or-teaching-outcome evidence",
+    "verifies": [
+      "alert-list-item-has-one-focusable-action-instead-of-a-clickable-card-plus-nested-button",
+      "action-has-a-disambiguated-accessible-name",
+      "keyboard-enter-navigates-to-the-declared-dashboard-diagnosis-route",
+      "level-badge-and-detail-use-the-rendered-style-contract"
+    ]
+  },
+  "reportHistoryActionSemantics": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-controlled-report-history-list-detail-and-chart-responses; verifies frontend native-table semantics, explicit actions, keyboard activation and mobile geometry only, not report content, teaching quality or model-outcome evidence",
+    "verifies": [
+      "native-table-row-has-no-button-role-tab-stop-or-row-level-navigation",
+      "completed-and-failed-reports-expose-disambiguated-native-view-and-delete-actions",
+      "generating-report-keeps-view-unavailable-while-preserving-a-named-delete-action",
+      "neutral-title-cell-does-not-trigger-report-detail-fetch",
+      "keyboard-enter-on-view-button-fetches-only-the-declared-report-and-transfers-focus-to-loaded-title",
+      "mobile-history-prioritizes-title-status-time-and-actions-without-table-or-page-horizontal-overflow"
+    ]
+  },
+  "publicReportSharing": {
+    "checked": true,
+    "viewport": "1440x900;390x844; prefers-reduced-motion: reduce; forced-colors: active; print",
+    "testDataBoundary": "isolated controlled public-share JSON response rendered through the production same-origin SPA entry; verifies anonymous routing, request privacy, runtime DTO/HTML validation, sandbox/CSP, failure states and responsive/media contracts only, not public DNS, TLS certificate deployment, report truth or deidentification completeness",
+    "verifies": [
+      "exact-shared-report-path-bypasses-auth-without-auth-status-health-cookie-csrf-or-referer-side-effects",
+      "direct-html-response-and-document-meta-declare-no-store-no-referrer-and-noindex",
+      "bearer-token-never-enters-query-hash-console-local-storage-or-session-storage",
+      "controlled-report-body-exists-only-in-a-no-script-no-form-no-network-sandbox-srcdoc-with-deny-by-default-csp",
+      "loading-unavailable-expired-invalid-response-network-and-keyboard-retry-states-fail-closed-without-demo-content",
+      "desktop-mobile-44px-reduced-motion-forced-colors-and-print-contracts-remain-readable-without-horizontal-overflow"
+    ]
+  },
+  "reportShareManagement": {
+    "checked": true,
+    "viewport": "1440x900;390x844; prefers-reduced-motion: reduce",
+    "testDataBoundary": "isolated controlled completed-report, protected-preview, create, tokenless-summary and revoke responses; verifies frontend consent, DTO, one-time bearer handling, clipboard recovery, accessibility and responsive behavior only, not live recipient access, external distribution, backend redaction quality or public TLS",
+    "verifies": [
+      "protected-server-preview-creates-no-share-record-and-renders-only-in-sandbox-srcdoc",
+      "create-remains-disabled-until-human-confirmation-and-an-arbitrary-integer-expiry-within-1-through-90-days",
+      "create-request-binds-the-confirmed-preview-fingerprint-and-sends-no-html-or-token",
+      "one-time-path-only-link-cannot-be-dismissed-with-escape-before-explicit-save-confirmation",
+      "clipboard-success-and-permission-denial-manual-selection-fallback-are-both-operable",
+      "token-never-enters-local-or-session-storage-and-is-removed-from-visible-dom-after-dedicated-close",
+      "owner-list-exposes-tokenless-summary-and-keyboard-revocation-with-visible-result-feedback",
+      "mobile-modal-remains-contained-with-44px-controls-reduced-motion-and-focus-restoration"
+    ]
+  },
+  "diagnosisStudentListKeyboard": {
+    "checked": true,
+    "testDataBoundary": "isolated-production-E2E-temporary-SQLite-student-fixture; verifies frontend selection mechanics only, not student-learning evidence",
+    "verifies": [
+      "student-group-has-no-extra-focusable-container",
+      "exactly-one-selected-button-is-the-roving-tab-stop",
+      "home-arrow-down-end-and-home-sync-selection-and-dom-focus",
+      "student-actions-remain-native-buttons-without-listbox-option-role-conflict"
+    ]
+  },
+  "radarDecoration": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "production diagnosis page with isolated temporary student fixtures; verifies decorative rendering only, not diagnosis accuracy or teaching outcomes",
+    "verifies": [
+      "single-css-renderer-with-no-canvas-svg-runtime-style-or-ogl-vendor-resource",
+      "decorative-layer-is-hidden-from-assistive-technology-and-does-not-capture-pointer-events",
+      "reduced-motion-keeps-the-sweep-static-in-the-real-browser-runtime",
+      "desktop-and-mobile-radar-remain-contained-without-page-horizontal-overflow"
+    ]
+  },
+  "aiCopilotMobileInitialAction": {
+    "checked": true,
+    "firstVisitUsesAnEmptyConversationState": true,
+    "primaryTextInputVisibleInInitialViewport": true,
+    "primaryConversationPrecedesSecondaryConfiguration": true
+  },
+  "creationTaskPublishing": {
+    "checked": true,
+    "verifies": [
+      "authenticated-poem-load",
+      "authenticated-task-create",
+      "published-task-board-receipt"
+    ]
+  },
+  "creationTaskMobileComposer": {
+    "checked": true,
+    "viewport": "390x844",
+    "verifies": [
+      "poem-select-visible-in-initial-viewport",
+      "form-controls-no-horizontal-clipping",
+      "submit-target-minimum-size"
+    ]
+  },
+  "workbenchPoemFallbackTruth": {
+    "checked": true,
+    "verifies": [
+      "persistent-demo-poem-disclosure",
+      "live-generation-blocked",
+      "manual-live-poem-retry-restores-state"
+    ]
+  },
+  "workbenchPrimaryStartPath": {
+    "checked": true,
+    "viewport": "1440x900",
+    "verifies": [
+      "primary-poem-start-action-visible-in-initial-review-viewport",
+      "action-focuses-and-expands-the-single-real-poem-combobox",
+      "image-layout-cannot-push-primary-configuration-below-the-hero"
+    ]
+  },
+  "workbenchRefineModalKeyboard": {
+    "checked": true,
+    "viewport": "1440x1200",
+    "testDataBoundary": "isolated-controlled-workbench-question-response; not student, pedagogical-quality, or model-outcome evidence",
+    "verifies": [
+      "teacher-refine-entry-opens-a-labelled-modal",
+      "mode-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "manual-edit-produces-a-visible-diff-and-enables-selected-adoption",
+      "long-form-manual-edit-keeps-the-decision-footer-visible",
+      "leaving-modal-retains-focus-until-the-dialog-unmounts",
+      "escape-closes-the-modal-and-restores-trigger-focus",
+      "unsaved-manual-edits-are-discarded-before-the-next-refine-session"
+    ]
+  },
+  "workbenchRefineModalMobile": {
+    "checked": true,
+    "viewport": "390x844",
+    "testDataBoundary": "isolated-controlled-workbench-question-response; verifies frontend modal geometry, scroll containment, decision controls and focus restoration only, not student, pedagogical-quality, or model-outcome evidence",
+    "verifies": [
+      "visible-title-labels-the-modal-without-a-duplicate-aria-label",
+      "dynamic-viewport-modal-panel-remains-inside-mobile-viewport-without-page-horizontal-overflow",
+      "long-form-body-keeps-an-independent-scroll-container",
+      "all-three-decision-actions-remain-visible-and-unclipped",
+      "escape-closes-mobile-refine-modal-and-restores-source-trigger-focus"
+    ]
+  },
+  "workbenchRichMarkdownDetailAccessibility": {
+    "checked": true,
+    "viewport": "1440x1200",
+    "testDataBoundary": "isolated-controlled-workbench-question-response; verifies frontend rich-content semantics and focus restoration only, not student, pedagogical-quality, or model-outcome evidence",
+    "verifies": [
+      "rich-markdown-stem-remains-non-button-and-keeps-source-link",
+      "single-native-detail-button-is-named-from-card-index",
+      "keyboard-enter-opens-detail-and-escape-returns-focus-to-source-control"
+    ]
+  },
+  "copilotMaterialTruthBoundary": {
+    "checked": true,
+    "verifies": [
+      "student-outage-disclosure-without-demo-substitution",
+      "poem-outage-disclosure-without-demo-substitution",
+      "material-category-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "manual-retry-restores-live-anonymized-material-references"
+    ]
+  },
+  "copilotMarkdownImageRecovery": {
+    "checked": true,
+    "viewport": "1440x900",
+    "testDataBoundary": "isolated-controlled-AI-chat SSE response plus an intentionally aborted HTTP(S) image request; verifies shared Markdown resource-failure recovery only, not AI reply quality, image-model quality or provider availability",
+    "verifies": [
+      "failed-markdown-image-replaces-loading-affordance-with-an-announced-readable-status",
+      "failure-status-keeps-image-alt-context-and-removes-the-broken-image-element",
+      "failed-http-markdown-image-retry-issues-a-fresh-cache-busted-request"
+    ]
+  },
+  "classroomPoemTruthAndInnovativeMode": {
+    "checked": true,
+    "testDataBoundary": "launch and poem-source recovery use production endpoints; embedded explain UI uses an explicitly-labelled controlled response solely for front-end state, source-verification disclosure, accessibility and keyboard-contract verification, not for textbook, student, pedagogical-quality or model-outcome evidence",
+    "verifies": [
+      "classroom-launch-poem-outage-disclosure-without-local-substitution",
+      "hero-text-switch-uses-roving-button-group-and-pauses-auto-rotation-while-focused",
+      "manual-retry-restores-live-launch-poem-selection",
+      "poem-relay-mode-starts-through-frontend-backend-contract",
+      "relay-poem-outage-blocks-unknown-source-start-and-retries-live-source",
+      "relay-start-poem-combobox-has-explicit-name-and-recovers-live-source",
+      "runtime-classroom-view-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "explain-view-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "classroom-explain-panel-defaults-to-full-source-verification-disclosure-not-only-a-compact-badge",
+      "dance-directive-tablist-controls-panel-and-keeps-pre-session-input-protected",
+      "deterministic-intervention-content-and-persisted-adoption"
+    ]
+  },
+  "culturePoemVerificationDisclosure": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-controlled-poem-content response; verifies frontend source-verification disclosure, native details keyboard behavior and responsive geometry only, not textbook, student, pedagogical-quality or model-outcome evidence",
+    "verifies": [
+      "unverified-or-incomplete-source-status-is-expanded-by-default-and-not-hidden-in-hover-only-content",
+      "disclosure-separates-poem-scope-review-date-source-registration-and-ai-teaching-content-boundary",
+      "native-summary-supports-enter-and-space-to-collapse-and-reopen-the-disclosure",
+      "mobile-disclosure-remains-within-the-viewport-without-page-horizontal-overflow"
+    ]
+  },
+  "pixelSnowDecorationContract": {
+    "checked": true,
+    "viewport": "1440x900 reduced/no-preference/forced-colors/print; 390x844 touch",
+    "testDataBoundary": "two explicitly synthetic E2E poems routed through the production Culture page and store; verifies frontend trigger, rendering and fallback mechanics only, not poem provenance, textbook classification, seasonal accuracy, teaching quality or device-wide performance",
+    "verifies": [
+      "non-winter-to-winter-to-non-winter-production-selection-chain-mounts-and-unmounts-decoration",
+      "deterministic-bounded-span-field-has-no-canvas-svg-controls-runtime-style-or-three-resource",
+      "reduced-motion-keeps-visible-static-snow-with-stable-geometry",
+      "normal-fine-pointer-enables-css-only-enhancement-when-cqh-is-supported",
+      "real-touch-coarse-pointer-context-remains-static-nonblocking-and-overflow-free",
+      "forced-colors-and-print-hide-the-purely-decorative-layer",
+      "source-gate-excludes-three-webgl-raf-observers-listeners-randomness-canvas-and-react-effects"
+    ]
+  },
+  "fallingTextTitleContract": {
+    "checked": true,
+    "viewport": "1440x900; prefers-reduced-motion: reduce",
+    "testDataBoundary": "controlled poem metadata and production frontend DOM/CSS contract only; does not establish poem provenance, teaching quality, device performance or animation support outside the test browser",
+    "verifies": [
+      "title-is-rendered-as-react-word-level-text-before-enhancement",
+      "auto-title-entrance-has-no-canvas-or-image-surface",
+      "reduced-motion-keeps-the-complete-title-static-and-within-its-container",
+      "automatic-decoration-does-not-add-button-or-tab-stop-semantics"
+    ]
+  },
+  "masonryGridContract": {
+    "checked": true,
+    "viewport": "1440x900;390x844; prefers-reduced-motion: reduce",
+    "testDataBoundary": "controlled culture-background response and production frontend DOM/CSS contract only; verifies card layout, semantics and fallback behavior, not cultural-content provenance or teaching outcomes",
+    "verifies": [
+      "desktop-card-grid-renders-four-controlled-cards-in-three-real-visual-columns",
+      "mobile-card-grid-reflows-to-one-full-width-column-without-horizontal-overflow",
+      "container-and-cards-expose-native-list-and-listitem-semantics",
+      "layout-does-not-inject-runtime-style-elements-or-inline-motion-properties",
+      "reduced-motion-keeps-every-card-static-and-readable"
+    ]
+  },
+  "starfieldBackgroundFallback": {
+    "checked": true,
+    "viewport": "403/404 at 1440x900 and 390x844; prefers-reduced-motion: reduce",
+    "testDataBoundary": "production fallback-page DOM/CSS and resource-timing contract only; verifies decorative reliability and page-root coverage, not GPU support outside the test browser",
+    "verifies": [
+      "fallback-pages-render-one-aria-hidden-pointer-transparent-starfield",
+      "starfield-contains-no-canvas-and-loads-no-ogl-vendor-resource",
+      "two-css-layers-and-one-glow-cover-the-owning-fallback-page",
+      "reduced-motion-stops-all-starfield-layer-animations"
+    ]
+  },
+  "magicRingsDecoration": {
+    "checked": true,
+    "viewport": "1440x900; prefers-reduced-motion: reduce",
+    "testDataBoundary": "authenticated production dashboard DOM/CSS contract only; verifies decorative structure, attribute forwarding and motion fallback, not perceived innovation or teaching outcomes",
+    "verifies": [
+      "caller-aria-hidden-is-forwarded-to-the-decoration-root",
+      "decoration-uses-one-non-interactive-svg-with-two-percentage-rect-tracks",
+      "decoration-contains-no-runtime-path-or-canvas-surface",
+      "reduced-motion-converts-every-track-to-a-static-complete-outline"
+    ]
+  },
+  "thinkingPalaceLightweightAudit": {
+    "checked": true,
+    "verifies": [
+      "reduced-motion-defaults-to-clickable-two-dimensional-audit",
+      "three-vendor-is-not-downloaded-before-teacher-opt-in",
+      "teacher-can-explicitly-enable-immersive-three-dimensional-view",
+      "thinking-chain-button-preserves-full-bounded-question-as-accessible-name"
+    ]
+  },
+  "poemImageCardAccessibility": {
+    "checked": true,
+    "testDataBoundary": "isolated-controlled-image-api-response plus an intentionally aborted HTTP(S) image request; verifies frontend resource-failure recovery only, not generated-image-model quality or provider availability",
+    "verifies": [
+      "poem-module-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "image-card-exposes-sibling-native-open-button-and-download-link",
+      "image-lightbox-focuses-close-control-and-keeps-tab-boundary",
+      "image-lightbox-is-portaled-to-body-covers-the-full-viewport-blocks-shell-chrome-and-locks-background-scroll",
+      "escape-closes-image-lightbox-and-restores-the-source-button-focus",
+      "lightbox-close-restores-background-scroll",
+      "aborted-image-resource-ends-loading-state-and-hides-misleading-open-and-download-controls",
+      "failed-http-image-reload-issues-a-fresh-cache-busted-request",
+      "reduced-motion-image-cards-remain-visually-opaque"
+    ]
+  },
+  "starMapLightweightView": {
+    "checked": true,
+    "testDataBoundary": "authenticated production route, navigation-drawer DOM and browser resource timing; verifies directory and opted-in poetry-gallery rendering boundaries only, not graph truth, image provenance or learning outcomes",
+    "verifies": [
+      "reduced-motion-defaults-to-accessible-starmap-directory",
+      "closed-observatory-drawer-is-aria-hidden-and-inert-open-focuses-search-and-close-restores-trigger",
+      "directory-category-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "three-vendor-is-not-downloaded-before-or-after-starmap-teacher-opt-in",
+      "teacher-opt-in-renders-a-lightweight-native-poetry-gallery-with-zero-canvas"
+    ]
+  },
+  "evolutionEmptyEvidence": {
+    "checked": true,
+    "viewport": "1440x900",
+    "verifies": [
+      "top-level-student-ai-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "ai-sidebar-tablist-controls-panel-and-supports-arrow-home-end-navigation",
+      "empty-genealogy-discloses-that-no-version-evidence-exists",
+      "empty-state-does-not-load-three-vendor-or-genealogy-renderer",
+      "teacher-can-refresh-persisted-evidence-and-open-pattern-collection-conditions",
+      "pattern-empty-state-discloses-signal-sources-and-opens-live-ai-run-evidence"
+    ]
+  },
+  "evolutionPatternLinkedNavigation": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "isolated-controlled-evolution-pattern-edge-and-node; verifies frontend semantic list, evidence-linked navigation, selection and focus transfer only, not agent performance or real evolution outcome evidence",
+    "verifies": [
+      "pattern-list-uses-list-and-listitem-without-clickable-card-role",
+      "only-patterns-with-persisted-edge-and-node-expose-native-related-version-action",
+      "same-pattern-different-agent-remains-independent-and-cannot-borrow-edge",
+      "related-version-chips-use-distinct-node-version-labels",
+      "enter-selects-the-latest-matching-target-node-switches-to-genealogy-and-transfers-focus-to-tabpanel",
+      "unlinked-stale-or-cross-agent-pattern-remains-informational-without-a-fabricated-navigation-action",
+      "stale-edge-is-explicitly-disclosed-without-fabricated-navigation",
+      "selected-node-detail-keeps-full-agent-id-when-it-fits-without-silent-slicing",
+      "compact-agent-id-labels-use-explicit-ellipsis-and-preserve-full-title",
+      "related-version-action-preserves-full-long-pattern-as-accessible-name",
+      "pattern-source-multi-combobox-supports-home-end-filters-live-items-and-chip-removal-is-keyboard-reachable-at-least-24px-without-mobile-overflow",
+      "mobile-pattern-action-remains-unclipped-at-least-32px-high-and-without-horizontal-overflow"
+    ]
+  },
+  "lessonPlanImageGallery": {
+    "checked": true,
+    "viewport": "1440x900;390x844 touch;forced-colors;print",
+    "testDataBoundary": "isolated controlled lesson-plan templates and local image responses, including one intentionally aborted image request; verifies frontend gallery semantics, geometry, focus, media fallbacks and resource recovery only, not template pedagogical quality, image provenance, backend persistence or teaching outcomes",
+    "verifies": [
+      "each-controlled-template-image-renders-once-with-visible-caption-and-native-button-semantics",
+      "roving-arrow-home-end-navigation-changes-focus-without-premature-activation",
+      "enter-and-space-open-a-viewport-covering-labelled-preview-dialog",
+      "tab-shift-tab-escape-backdrop-close-and-explicit-close-restore-the-exact-trigger",
+      "aborted-image-request-becomes-a-nonblank-stable-readable-failure-state-without-disabling-preview",
+      "touch-horizontal-scroll-does-not-block-page-scrolling-or-create-page-overflow",
+      "reduced-motion-forced-colors-and-print-preserve-an-explicit-usable-fallback"
+    ]
+  },
+  "starMapPoetryGallery": {
+    "checked": true,
+    "viewport": "1440x900;390x844 touch",
+    "testDataBoundary": "isolated controlled three-poem graph with explicitly synthetic E2E relation edges and controlled local image responses, including one intentionally aborted poem image; verifies frontend node-index mapping, selection, focus transfer, responsive interaction and failure isolation only, not knowledge-graph truth, image provenance, student mastery or learning outcomes",
+    "verifies": [
+      "gallery-renders-one-native-card-per-controlled-poem-without-duplicate-sphere-tiles",
+      "arrow-navigation-updates-the-foreground-poem-without-selecting-a-node",
+      "enter-selects-the-exact-poem-node-and-opens-the-matching-detail-title",
+      "failed-poem-image-preserves-the-poem-selection-business-action",
+      "closing-detail-with-button-or-escape-restores-the-originating-poem-card-focus",
+      "select-mode-never-opens-the-generic-image-preview-dialog",
+      "touch-scrolling-changes-the-active-poem-without-accidental-selection-or-page-overflow",
+      "mobile-detail-sheet-is-opaque-settled-topmost-touch-blocking-and-reduced-motion-safe"
+    ]
+  },
+  "sphereGalleryLightweightResourceBoundary": {
+    "checked": true,
+    "viewport": "1440x900;390x844",
+    "testDataBoundary": "production-build source and browser resource-timing boundary for the two tested gallery consumers; verifies those routes do not use Three.js, WebGL, Canvas, RAF, automatic timers or infinite gallery animations, not GPU behavior on untested browsers or long-duration device memory characteristics",
+    "verifies": [
+      "gallery-and-starmap-dome-source-contain-no-three-webgl-canvas-or-raf-path",
+      "lesson-plan-and-opted-in-starmap-gallery-load-no-three-vendor-resource",
+      "both-consumers-render-zero-canvas-elements",
+      "gallery-is-manual-only-and-runs-no-infinite-web-animation",
+      "gallery-registers-no-window-level-pointer-drag-listeners"
+    ]
+  },
+  "truthBoundaryChecks": {
+    "poemContent": true,
+    "unauthenticatedApiRejected": true
+  },
+  "securityHeaders": {
+    "shell": {
+      "contentSecurityPolicy": "default-src 'self';base-uri 'self';font-src 'self' data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline';upgrade-insecure-requests;connect-src 'self' ws: wss:;media-src 'self' blob: data:;worker-src 'self' blob:",
+      "xFrameOptions": "SAMEORIGIN",
+      "xContentTypeOptions": "nosniff",
+      "referrerPolicy": "no-referrer",
+      "strictTransportSecurity": "max-age=15552000; includeSubDomains",
+      "permissionsPolicy": "microphone=(self), camera=(), display-capture=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), accelerometer=(), gyroscope=()"
+    },
+    "api": {
+      "cacheControl": "private, no-store",
+      "pragma": "no-cache"
+    }
+  }
+}

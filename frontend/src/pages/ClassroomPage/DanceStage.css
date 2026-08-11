@@ -1,0 +1,412 @@
+/**
+ * DanceStage 样式 —— AI 诗教共舞舞台主容器
+ *
+ * 设计规范合规：
+ * - 玻璃态面板（规范 2.3 第 4 层 surface-glass-heavy）
+ * - 无硬边框（规范 4.1）
+ * - 松紧得当：头部紧带，区块间稳带（规范 5.3）
+ * - transform/opacity 动画（规范 6.6）
+ * - 流体间距 clamp()（规范 5.2）
+ */
+
+.pr-dance-stage {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    /* 玻璃态面板（规范 2.3 第 4 层 surface-glass-heavy） */
+    background-color: rgb(var(--c-surface-secondary) / 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    /* 规范 14.2：border-radius: 16px 替换为 var(--radius-xl) token */
+    border-radius: var(--radius-xl);
+    padding: clamp(var(--space-md), 1.5vw, var(--space-lg));
+}
+
+/* ── 头部 ── */
+.pr-dance-stage__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.pr-dance-stage__title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-dance-stage__title {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: rgb(var(--c-text-primary));
+    letter-spacing: -0.02em;
+}
+
+.pr-dance-stage__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    background-color: rgb(var(--c-text-primary) / 0.05);
+    padding: 2px 8px;
+    /* 规范 14.2：border-radius: 4px 替换为 var(--radius-xs) token */
+    border-radius: var(--radius-xs);
+    letter-spacing: 0.02em;
+}
+
+.pr-dance-stage__status-dot {
+    width: 6px;
+    height: 6px;
+    /* 规范 14.2：border-radius: 50% 替换为 var(--radius-full) token */
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-text-tertiary));
+    /* 规范 7.2：禁止 ease-out 关键字，改用 var(--ease-out)；200ms → var(--dur-small) */
+    transition: background-color var(--dur-small) var(--ease-out);
+}
+
+.pr-dance-stage__status--active {
+    color: rgb(var(--c-accent-success));
+    background-color: rgb(var(--c-accent-success) / 0.10);
+}
+
+.pr-dance-stage__status--active .pr-dance-stage__status-dot {
+    background-color: rgb(var(--c-accent-success));
+    /* 呼吸动画（规范 6.4 滚动驱动，此处为状态指示器微动效）
+       规范 7.2：cubic-bezier(0.65,0,0.35,1) 等价 var(--ease-in-out) token，替换以消除硬编码 */
+    animation: pr-dance-pulse 2s var(--ease-in-out) infinite;
+}
+
+/* ── AI 流式输出区 ── */
+.pr-dance-stage__ai-stream {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    background-color: rgb(var(--c-accent-info) / 0.06);
+    /* 规范 14.2：border-radius: 10px 替换为 var(--radius-md) token */
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    /* 规范 7.2：cubic-bezier(0.16,1,0.3,1) 等价 var(--ease-out) token；250ms → var(--dur-medium) */
+    animation: pr-dance-stream-enter var(--dur-medium) var(--ease-out) both;
+}
+
+.pr-dance-stage__ai-stream-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-xs);
+    color: rgb(var(--c-accent-info));
+    font-weight: 500;
+}
+
+.pr-dance-stage__ai-stream-label {
+    letter-spacing: -0.01em;
+}
+
+.pr-dance-stage__ai-stream-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    font-weight: 400;
+}
+
+/* ── 事件流 ── */
+.pr-dance-stage__events {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-dance-stage__events-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-xs);
+}
+
+.pr-dance-stage__events-title {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: -0.01em;
+}
+
+.pr-dance-stage__events-count {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-dance-stage__events-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    max-height: clamp(240px, 30vh, 400px);
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    padding: var(--space-xs);
+    /* 自定义滚动条 */
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--c-text-primary) / 0.15) transparent;
+}
+
+.pr-dance-stage__events-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.pr-dance-stage__events-list::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--c-text-primary) / 0.15);
+    border-radius: 2px;
+}
+
+.pr-dance-stage__events-loading,
+.pr-dance-stage__events-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-xl) var(--space-md);
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-sm);
+    text-align: center;
+}
+
+.pr-dance-stage__events-empty-hint {
+    font-size: var(--text-xs);
+    max-width: 320px;
+    line-height: 1.54;
+    letter-spacing: -0.01em;
+}
+
+.pr-dance-stage__events-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    background-color: rgb(var(--c-accent-warning) / 0.10);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    line-height: 1.45;
+}
+
+.pr-dance-stage__events-error button {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0 var(--space-sm);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-accent-warning) / 0.16);
+    color: rgb(var(--c-text-primary));
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pr-dance-stage__events-error button:hover:not(:disabled) {
+    background: rgb(var(--c-accent-warning) / 0.24);
+}
+
+.pr-dance-stage__events-error button:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-dance-stage__events-error button:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+/* ── 教师指挥台 ── */
+.pr-dance-stage__console {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    background-color: rgb(var(--c-surface-tertiary) / 0.45);
+    /* 规范 14.2：border-radius: 10px 替换为 var(--radius-md) token */
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+}
+
+.pr-dance-stage__console-tabs {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.pr-dance-stage__directive-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    min-width: 0;
+}
+
+.pr-dance-stage__console-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    /* 规范 14.2：border-radius: 6px 替换为 var(--radius-sm) token */
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: rgb(var(--c-text-secondary));
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    /* 规范 7.2：禁止 ease-out 关键字，改用 var(--ease-out)；150ms → var(--dur-micro) */
+    transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    letter-spacing: -0.01em;
+}
+
+.pr-dance-stage__console-tab:hover {
+    background-color: rgb(var(--c-text-primary) / 0.04);
+    color: rgb(var(--c-text-primary));
+}
+
+/* 规范 7.3：补齐 focus-visible 态（5 态反馈链路） */
+.pr-dance-stage__console-tab:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-dance-stage__console-tab--active {
+    /* 选中态：20% alpha 背景 + 100% 文字（规范 2.4） */
+    background-color: rgb(var(--c-accent-primary) / 0.20);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-dance-stage__console-tab--active:hover {
+    background-color: rgb(var(--c-accent-primary) / 0.28);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-dance-stage__console-input {
+    display: flex;
+    gap: var(--space-xs);
+    align-items: flex-end;
+}
+
+.pr-dance-stage__textarea {
+    flex: 1;
+    resize: none;
+    /* 输入框样式（规范 14.2）：常态极淡 alpha 线，focus 强调色光晕 */
+    background-color: rgb(var(--c-surface-primary) / 0.6);
+    border: 1px solid rgb(var(--c-text-primary) / 0.10);
+    /* 规范 14.2：border-radius: 8px 替换为 var(--radius-sm) token */
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+    line-height: 1.54;
+    color: rgb(var(--c-text-primary));
+    font-family: inherit;
+    letter-spacing: -0.01em;
+    /* 规范 7.2：禁止 ease-out 关键字，改用 var(--ease-out)；150ms → var(--dur-micro) */
+    transition: border-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    min-height: 40px;
+}
+
+.pr-dance-stage__textarea::placeholder {
+    color: rgb(var(--c-text-tertiary));
+    font-style: normal;
+}
+
+.pr-dance-stage__textarea:hover {
+    border-color: rgb(var(--c-text-primary) / 0.20);
+}
+
+.pr-dance-stage__textarea:focus {
+    outline: none;
+    border-color: rgb(var(--c-accent-primary));
+    /* 规范 7.3：focus 光晕使用 var(--shadow-focus-accent) token（与设计系统对齐） */
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-dance-stage__textarea:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pr-dance-stage__console-hint {
+    margin: 0;
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    text-align: center;
+    letter-spacing: -0.01em;
+}
+
+/* ── 动画关键帧 ── */
+@keyframes pr-dance-pulse {
+
+    0%,
+    100% {
+        opacity: 0.9;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes pr-dance-stream-enter {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 规范 7.11：prefers-reduced-motion 降级 —— 装饰性动效完全移除，必要状态变化改为瞬时切换 */
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-dance-stage__ai-stream,
+    .pr-dance-stage__status--active .pr-dance-stage__status-dot {
+        animation: none;
+    }
+
+    .pr-dance-stage__status-dot,
+    .pr-dance-stage__console-tab,
+    .pr-dance-stage__textarea {
+        transition: none;
+    }
+}
+
+/* 响应式：窄屏调整 */
+@media (max-width: 767px) {
+    .pr-dance-stage {
+        padding: var(--space-sm);
+        /* 规范 14.2：border-radius: 12px 替换为 var(--radius-lg) token */
+        border-radius: var(--radius-lg);
+    }
+
+    .pr-dance-stage__head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pr-dance-stage__console-input {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pr-dance-stage__events-error {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

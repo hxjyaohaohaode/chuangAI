@@ -1,0 +1,63 @@
+/**
+ * HighlightJs 主题样式（从 ui.css 拆分，B3.4 CSS 代码分割）
+ * 设计依据：规范第 9 章
+ *
+ * 暖调浅色，与系统色板协调。
+ * 说明：highlight.js 没有对应 TSX 组件，由 Markdown.tsx 通过 dangerouslySetInnerHTML 渲染。
+ * 由 index.css 全局 import。
+ */
+
+.hljs {
+    color: rgb(var(--c-text-primary));
+    background: transparent;
+}
+
+.hljs-comment,
+.hljs-quote {
+    color: rgb(var(--c-text-tertiary));
+    font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name,
+.hljs-tag {
+    color: rgb(var(--c-accent-primary-hover));
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-attribute,
+.hljs-literal,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-addition {
+    color: rgb(var(--c-accent-success));
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-selector-class {
+    color: rgb(var(--c-accent-info));
+}
+
+.hljs-variable,
+.hljs-attr,
+.hljs-deletion {
+    color: rgb(var(--c-accent-error));
+}
+
+.hljs-emphasis {
+    font-style: italic;
+}
+
+.hljs-strong {
+    font-weight: var(--weight-bold);
+}

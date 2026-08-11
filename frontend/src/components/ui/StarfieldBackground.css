@@ -1,0 +1,84 @@
+.pr-starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    contain: strict;
+    opacity: var(--starfield-opacity, 0.56);
+}
+
+.pr-starfield--embedded {
+    position: absolute;
+}
+
+.pr-starfield__layer,
+.pr-starfield__glow {
+    position: absolute;
+    inset: -12%;
+    pointer-events: none;
+}
+
+.pr-starfield__layer {
+    background-image:
+        radial-gradient(circle, var(--starfield-color-a) 0 var(--starfield-dot-size), transparent calc(var(--starfield-dot-size) + 0.7px)),
+        radial-gradient(circle, var(--starfield-color-b) 0 var(--starfield-dot-large), transparent calc(var(--starfield-dot-large) + 0.8px)),
+        radial-gradient(circle, var(--starfield-color-c) 0 1px, transparent 1.8px);
+    background-repeat: repeat;
+    animation: pr-starfield-drift var(--starfield-duration, 120s) linear infinite;
+}
+
+.pr-starfield__layer--near {
+    background-position: 8px 14px, 52px 71px, 29px 43px;
+    background-size:
+        var(--starfield-spacing) var(--starfield-spacing),
+        var(--starfield-spacing-wide) var(--starfield-spacing-wide),
+        var(--starfield-spacing-tight) var(--starfield-spacing-tight);
+}
+
+.pr-starfield__layer--far {
+    background-position: 37px 9px, 91px 48px, 13px 82px;
+    background-size:
+        var(--starfield-spacing-far) var(--starfield-spacing-far),
+        var(--starfield-spacing-farthest) var(--starfield-spacing-farthest),
+        var(--starfield-spacing-mid) var(--starfield-spacing-mid);
+    opacity: 0.58;
+    animation-direction: reverse;
+    animation-duration: var(--starfield-duration-far, 162s);
+}
+
+.pr-starfield__glow {
+    background:
+        radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--starfield-color-a) 12%, transparent), transparent 32%),
+        radial-gradient(circle at 82% 74%, color-mix(in srgb, var(--starfield-color-b) 10%, transparent), transparent 38%);
+}
+
+@keyframes pr-starfield-drift {
+    to {
+        transform: translate3d(var(--starfield-drift-x, 10px), var(--starfield-drift-y, -14px), 0);
+    }
+}
+
+.pr-starfield[data-starfield-static='true'] .pr-starfield__layer {
+    animation: none;
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+    .pr-starfield__layer {
+        animation: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .pr-starfield {
+        display: none;
+    }
+}
+
+@supports not (background: color-mix(in srgb, red 10%, transparent)) {
+    .pr-starfield__glow {
+        display: none;
+    }
+}

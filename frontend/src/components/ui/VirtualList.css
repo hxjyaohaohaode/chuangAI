@@ -1,0 +1,96 @@
+/**
+ * VirtualList 虚拟列表样式（SubTask 25.2）
+ *
+ * 设计规范合规：
+ * - 零硬编码色值：所有色值引用 CSS 变量
+ * - 流体尺寸：高度由 props 控制，内部用百分比
+ * - GPU 友好：transform 定位，避免触发 layout
+ * - 平滑滚动：scroll-behavior: smooth
+ * - WCAG: role="list" + aria-label
+ * - 滚动条暖色调样式（避免默认丑陋灰色滚动条）
+ */
+
+.pr-virtual-list {
+    position: relative;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* 规范 6.5：全局平滑惯性滚动 */
+    scroll-behavior: smooth;
+    /* 自定义滚动条（暖色调，规范 9.2） */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(176, 136, 80, 0.3) transparent;
+    /* 防止内容溢出导致横向滚动 */
+    contain: strict;
+    /* iOS 滚动惯性 */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* WebKit 滚动条样式 */
+.pr-virtual-list::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.pr-virtual-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pr-virtual-list::-webkit-scrollbar-thumb {
+    background-color: rgba(176, 136, 80, 0.3);
+    border-radius: 3px;
+    transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pr-virtual-list::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(176, 136, 80, 0.5);
+}
+
+/* 撑开总高度的容器（不可见） */
+.pr-virtual-list-spacer {
+    width: 100%;
+    /* 高度由 inline style 设置（totalHeight） */
+}
+
+/* 可见项视口，通过 translateY 定位 */
+.pr-virtual-list-viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    will-change: transform;
+    /* 仅 transform / opacity 动画（GPU 友好，规范 6.6） */
+}
+
+/* 每一项容器，固定高度 */
+.pr-virtual-list-item {
+    width: 100%;
+    /* 高度由 inline style 设置（itemHeight） */
+    /* 避免子元素溢出导致高度计算错误 */
+    overflow: hidden;
+    /* GPU 友好 */
+    contain: layout style paint;
+}
+
+/* 加载态容器 */
+.pr-virtual-list--loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+}
+
+/* 空状态容器 */
+.pr-virtual-list--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+}
+
+/* prefers-reduced-motion 降级：禁用平滑滚动 */
+@media (prefers-reduced-motion: reduce) {
+    .pr-virtual-list {
+        scroll-behavior: auto;
+    }
+}

@@ -1,0 +1,492 @@
+﻿﻿﻿﻿﻿﻿﻿﻿/**
+ * v5.0 破格动效库（Task B.2）
+ *
+ * 13 页面独立入场动效 —— 每页都有独特的视觉冲击
+ * 设计哲学：克制内容，奔放形式
+ *
+ * 使用方式：
+ *   <div className="pr-v5-enter-dashboard">...</div>
+ *   或在页面根容器添加对应类名
+ *
+ * 性能保障：
+ * - 仅使用 transform / opacity / clip-path / filter / offset-path（GPU 加速，不触发 Layout）
+ * - prefers-reduced-motion 降级为 200ms 淡入
+ * - 单页并发动画 ≤ 30 个
+ * - 一次性动画不保留 will-change，避免完成后长期占用合成层
+ *
+ * 缓动令牌说明（v5 局部变量）：
+ *   --v5-spring-bounce : 带过冲的弹性曲线（聚合、爆发、环绕）
+ *   --v5-spring-soft   : 柔顺减速曲线（滑入、翻转、轨道）
+ *   --v5-ease-out      : 标准减速曲线（升起、展开、钻取）
+ *   注：与 tokens.css 中已有的 --spring-soft / --ease-out 命名不一致
+ *   （项目 --spring-soft 实为 bounce 曲线），故 v5 文件自包含定义，
+ *   避免语义混淆。值与《界面设计规范.md》6.2 一致。
+ */
+
+/* ============================================================
+ * 基础变量 —— v5 缓动曲线（规范 6.2）
+ * ============================================================ */
+
+:root {
+    --v5-spring-bounce: cubic-bezier(0.25, 0.1, 0.07, 1.45);
+    /* 弹性过冲：聚合、爆发、环绕等"有质量感"的入场 */
+    --v5-spring-soft: cubic-bezier(0.16, 1, 0.3, 1);
+    /* 柔顺减速：滑入、翻转、轨道等"顺滑收束"的入场 */
+    --v5-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    /* 标准减速：升起、展开、钻取等"自然落定"的入场 */
+}
+
+/* ============================================================
+ * 通用入场动画 —— P0-C4：替代 ScrollReveal 包裹
+ * ------------------------------------------------------------
+ * 用于页面主体布局容器，淡入 + 上移（8px→0）
+ * 替代原 ScrollReveal 组件包裹（大容器嵌套小容器违反规范）
+ * 350ms ease-out，仅 transform/opacity（GPU 加速）
+ * ============================================================ */
+
+@keyframes pr-v5-fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-v5-fade-in-up {
+    animation: pr-v5-fade-in-up 350ms var(--v5-ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-v5-fade-in-up {
+        animation: none;
+    }
+}
+
+/* ============================================================
+ * 1. Dashboard —— 数据星云聚合
+ * ------------------------------------------------------------
+ * 设计意图：内容从下方轻柔上浮淡入，如星云缓缓显现。
+ *   采用 translateY(12px)→0 + opacity 0→1 的克制入场，
+ *   避免夸张的 scale 放大缩小造成视觉干扰（规范 6.1 / 6.4）。
+ *   600ms ease-out 时长符合大范围过渡标准（300-500ms 区间上限）。
+ * 子元素建议：内部统计卡片使用 .pr-v5-stagger-item 错落入场，
+ *   形成层次分明的渐进式披露节奏。
+ * ============================================================ */
+
+@keyframes pr-v5-dashboard-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-v5-enter-dashboard {
+    animation: pr-v5-dashboard-enter 600ms var(--v5-ease-out) both;
+}
+
+/* ============================================================
+ * 2. Starmap —— 星图缓缓浮现
+ * ------------------------------------------------------------
+ * 设计意图：星图如夜幕初启，星辰自极轻微的收束中浮现。
+ *   scale(0.97)→1 的微幅收缩模拟"星光凝聚"的克制感，
+ *   避免夸张的放大缩小造成视觉冲击（规范 6.1 / 6.4）。
+ *   600ms ease-out 符合大范围过渡标准上限，
+ *   内部星点建议用 .pr-v5-stagger-item 错落点亮，形成渐次显现。
+ * ============================================================ */
+
+@keyframes pr-v5-starmap-enter {
+    0% {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.pr-v5-enter-starmap {
+    transform-origin: center;
+    animation: pr-v5-starmap-enter 600ms var(--v5-ease-out) both;
+}
+
+/* ============================================================
+ * 3. Workbench —— 金字塔 3D 透视升起
+ * ------------------------------------------------------------
+ * 设计意图：六阶金字塔从底部以 3D 透视方式升起，
+ *   rotateX(45deg)→0 形成由仰视到平视的"拔地而起"。
+ *   perspective(1000px) 置于 transform 首位作用于自身。
+ * ============================================================ */
+
+@keyframes pr-v5-workbench-enter {
+    0% {
+        opacity: 0;
+        transform: perspective(1000px) rotateX(45deg) translateY(100%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: perspective(1000px) rotateX(0) translateY(0);
+    }
+}
+
+.pr-v5-enter-workbench {
+    transform-origin: center bottom;
+    /* P0-D3：入场动画从 1000ms 缩短至 400ms（规范 6.1 上限 400ms / 6.3 路由过渡 350ms） */
+    animation: pr-v5-workbench-enter 400ms var(--v5-ease-out) both;
+}
+
+/* ============================================================
+ * 4. Classroom —— 剧场帷幕拉开
+ * ------------------------------------------------------------
+ * 设计意图：左右两半帷幕从中央向两侧拉开，
+ *   clip-path inset(0 50% 0 50%) 仅显露中线一条缝，
+ *   逐步展开至 inset(0 0 0 0) 全幅显现。
+ *   透明度同步淡入避免初始突兀。
+ * ============================================================ */
+
+@keyframes pr-v5-classroom-enter {
+    0% {
+        opacity: 0;
+        clip-path: inset(0 50% 0 50%);
+    }
+
+    100% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.pr-v5-enter-classroom {
+    /* P0-D3：入场动画从 1000ms 缩短至 400ms（规范 6.1 上限 400ms / 6.3 路由过渡 350ms） */
+    animation: pr-v5-classroom-enter 400ms var(--v5-ease-out) both;
+}
+
+/* ============================================================
+ * 5. Grading —— 批改流水线滚动
+ * ------------------------------------------------------------
+ * 设计意图：作业从右侧流水线传送带滚入，
+ *   translateX(100%)→0 叠加 rotate(2deg)→0 模拟传送轻微倾斜，
+ *   60% 处回弹至 -8px 形成"刹车驻定"的节奏感。
+ * ============================================================ */
+
+@keyframes pr-v5-grading-enter {
+    0% {
+        opacity: 0;
+        transform: translateX(100%) rotate(2deg);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateX(-8px) rotate(-0.3deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0) rotate(0);
+    }
+}
+
+.pr-v5-enter-grading {
+    animation: pr-v5-grading-enter 800ms var(--v5-spring-soft) both;
+}
+
+/* ============================================================
+ * 6. Copilot —— 星河轨道环绕
+ * ------------------------------------------------------------
+ * 设计意图：多个光点沿轨道环绕后聚合为星河。
+ *   根容器以 rotate(-30deg)→0 + scale(0.85)→1 模拟轨道扫入，
+ *   brightness(1.6)→1 暗示星光由强收束。
+ *   子元素（光点）可使用 .pr-v5-stagger-item 配合
+ *   各自的 --v5-stagger-delay 形成多体环绕错落感。
+ * ============================================================ */
+
+@keyframes pr-v5-copilot-enter {
+    0% {
+        opacity: 0;
+        transform: rotate(-8deg) scale(0.85);
+        filter: brightness(1.6);
+    }
+
+    60% {
+        opacity: 1;
+        transform: rotate(2deg) scale(1.03);
+        filter: brightness(1.1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: rotate(0) scale(1);
+        filter: brightness(1);
+    }
+}
+
+.pr-v5-enter-copilot {
+    transform-origin: center;
+    /* P0-D3：入场动画从 1000ms 缩短至 400ms（规范 6.1 上限 400ms / 6.3 路由过渡 350ms） */
+    animation: pr-v5-copilot-enter 400ms var(--v5-spring-soft) both;
+}
+
+/* ============================================================
+ * 7. Report —— 卷轴垂直展开
+ * ------------------------------------------------------------
+ * 设计意图：古卷轴自顶部向下展开，
+ *   clip-path inset(0 0 100% 0) 仅露顶边，
+ *   展开至 inset(0 0 0 0) 全卷铺陈。
+ * ============================================================ */
+
+@keyframes pr-v5-report-enter {
+    0% {
+        opacity: 0;
+        clip-path: inset(0 0 100% 0);
+    }
+
+    100% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.pr-v5-enter-report {
+    /* P0-D3：入场动画从 1000ms 缩短至 400ms（规范 6.1 上限 400ms / 6.3 路由过渡 350ms） */
+    animation: pr-v5-report-enter 400ms var(--v5-ease-out) both;
+}
+
+/* ============================================================
+ * 8. Selfstudy —— 闯关地图弯曲路径
+ * ------------------------------------------------------------
+ * 设计意图：沿弯曲贝塞尔路径滑入，模拟地图关卡的弯曲前进感。
+ *   offset-path 定义路径，offset-distance 0%→100% 驱动位移，
+ *   路径 M -80,140 Q 0,40 0,0 起点在左下方、终点回归自然位置 (0,0)，
+ *   中间经 (0,40) 形成上凸弧线。
+ *   offset-rotate: 0deg 保持页面正立不随切线旋转。
+ *   注：offset-path/offset-distance 为 GPU 加速的运动路径属性，
+ *   不触发 Layout，符合"仅合成层动画"的性能约束。
+ * ============================================================ */
+
+@keyframes pr-v5-selfstudy-enter {
+    0% {
+        opacity: 0;
+        offset-distance: 0%;
+    }
+
+    100% {
+        opacity: 1;
+        offset-distance: 100%;
+    }
+}
+
+.pr-v5-enter-selfstudy {
+    offset-path: path('M -80,140 Q 0,40 0,0');
+    offset-rotate: 0deg;
+    /* P0-D3：入场动画从 1000ms 缩短至 400ms（规范 6.1 上限 400ms / 6.3 路由过渡 350ms） */
+    animation: pr-v5-selfstudy-enter 400ms var(--v5-spring-soft) both;
+}
+
+/* ============================================================
+ * 9. Diagnosis —— 认知热力聚焦揭示
+ * ------------------------------------------------------------
+ * 设计意图：热力图自中心向四围缓缓揭示，如视场由宏观收束至细节。
+ *   clip-path inset(12%)→inset(0) 模拟"视野聚焦"的揭示感，
+ *   避免夸张的 scale 缩放与模糊过曝造成视觉干扰（规范 6.1 / 6.4）。
+ *   600ms ease-out 符合大范围过渡标准上限。
+ * ============================================================ */
+
+@keyframes pr-v5-diagnosis-enter {
+    0% {
+        opacity: 0;
+        clip-path: inset(12% 12% 12% 12%);
+    }
+
+    100% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.pr-v5-enter-diagnosis {
+    animation: pr-v5-diagnosis-enter 600ms var(--v5-ease-out) both;
+}
+
+/* ============================================================
+ * 10. Recitation —— 声波频谱展开
+ * ------------------------------------------------------------
+ * 设计意图：从中心向左右展开声波形，
+ *   scaleX 0→1.05→1 配合 transform-origin: center 形成中轴向两侧铺展，
+ *   短暂过冲 1.05 模拟声波弹性能量。
+ *   内部竖条建议用 .pr-v5-stagger-item 形成频谱逐条升起。
+ * ============================================================ */
+
+@keyframes pr-v5-recitation-enter {
+    0% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scaleX(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+}
+
+.pr-v5-enter-recitation {
+    transform-origin: center;
+    animation: pr-v5-recitation-enter 800ms var(--v5-spring-soft) both;
+}
+
+/* ============================================================
+ * 11. Creation —— 画布轻柔浮现
+ * ------------------------------------------------------------
+ * 设计意图：画布自下方轻柔上浮淡入，如卷轴缓缓铺陈。
+ *   translateY(16px)→0 + opacity 0→1 的克制入场，
+ *   避免夸张的 scale 放大与模糊过曝（规范 6.1 / 6.4）。
+ *   600ms ease-out 符合大范围过渡标准上限。
+ * ============================================================ */
+
+@keyframes pr-v5-creation-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-v5-enter-creation {
+    animation: pr-v5-creation-enter 600ms var(--v5-ease-out) both;
+}
+
+/* ============================================================
+ * 12. Culture —— 时空穿梭水平滑入
+ * ------------------------------------------------------------
+ * 设计意图：从左侧时间轴滑入，模拟时空隧道穿越，
+ *   translateX(-100%)→0 叠加 blur(8px)→0 形成"穿越迷雾抵达"，
+ *   60% 回弹至 +12px 模拟时空落定的惯性。
+ *   内部时间节点建议用 .pr-v5-stagger-item 错落浮现。
+ * ============================================================ */
+
+@keyframes pr-v5-culture-enter {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+        filter: blur(8px);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateX(12px);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+        filter: blur(0);
+    }
+}
+
+.pr-v5-enter-culture {
+    animation: pr-v5-culture-enter 800ms var(--v5-spring-soft) both;
+}
+
+/* ============================================================
+ * 13. Privacy —— 盾牌矩阵数据流
+ * ------------------------------------------------------------
+ * 设计意图：从顶部数据流下降汇聚，盾牌矩阵由上方注入就位，
+ *   translateY(-50px)→0 + blur(6px)→0，
+ *   60% 回弹至 +4px 模拟数据落定的轻微下沉。
+ *   内部盾牌元素建议用 .pr-v5-stagger-item 形成矩阵逐枚落定。
+ * ============================================================ */
+
+@keyframes pr-v5-privacy-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+        filter: blur(6px);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(4px);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+.pr-v5-enter-privacy {
+    animation: pr-v5-privacy-enter 800ms var(--v5-spring-soft) both;
+}
+
+/* ============================================================
+ * 辅助：子元素错落入场（.pr-v5-stagger-item）
+ * ------------------------------------------------------------
+ * 用于支撑"多粒子汇聚 / 多节点错落 / 多盾牌矩阵"等多元素编排：
+ *   dashboard（12 方向）、copilot（光点环绕）、
+ *   recitation（频谱竖条）、culture（时间节点）、
+ *   privacy（盾牌矩阵）。
+ *
+ * 用法：
+ *   <div style="--v5-stagger-delay: 80ms" className="pr-v5-stagger-item">...</div>
+ *   delay 通过 CSS 变量按子元素索引递增（由 JS 或内联 style 注入）。
+ *
+ * 动画属性同样限定为 transform / opacity（GPU 合成）。
+ * ============================================================ */
+
+@keyframes pr-v5-stagger-fade {
+    0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.96);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.pr-v5-stagger-item {
+    animation: pr-v5-stagger-fade 600ms var(--v5-spring-soft) both;
+    animation-delay: var(--v5-stagger-delay, 0ms);
+}
+
+/* ============================================================
+ * prefers-reduced-motion 降级（规范 6.6）
+ * ------------------------------------------------------------
+ * 降级为静态终态：
+ *   - 属性选择器 [class*="pr-v5-enter-"] 特异性 (0,1,0) 高于
+ *     tokens.css 全局 * 规则 (0,0,0)。这里必须显式取消 animation，
+ *     而不能用更高优先级的 200ms 动画反向覆盖全局降级规则。
+ *   - 取消 stagger 延迟；减少动态偏好下，内容以最终可用状态即时呈现。
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    [class*='pr-v5-enter-'],
+    .pr-v5-stagger-item {
+        animation: none !important;
+        animation-delay: 0ms !important;
+    }
+}

@@ -1,0 +1,209 @@
+﻿/**
+ * 3D 节点详情面板样式（规范第 2、4、6、14 章）
+ *
+ * 设计要点：
+ *  - 视觉一体：wrapper 包裹 NodeDetailPanel + footer，玻璃态延续
+ *  - 无硬边框：footer 顶部用极淡 alpha 分割线（规范 4.1）
+ *  - 完整三态：按钮 hover/active/focus-visible（规范 7.2）
+ *  - 流体尺寸：clamp() 控制内边距
+ *  - 零硬编码：所有色值引用 tokens.css 变量
+ */
+
+/* ============================================================
+ * 外层容器 —— 包裹 NodeDetailPanel + 3D 操作按钮
+ * ============================================================ */
+
+.pr-sm3d-panel-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* 确保面板内容可滚动但 footer 固定在底部 */
+    overflow: hidden;
+}
+
+/* NodeDetailPanel 渲染的 aside.pr-sm-panel 撑满剩余空间 */
+.pr-sm3d-panel-wrapper > .pr-sm-panel {
+    flex: 1 1 auto;
+    overflow: auto;
+    /* 移除底部圆角，让 footer 无缝衔接 */
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* ============================================================
+ * 3D 操作按钮区（footer）
+ * 玻璃态延续面板，顶部极淡 alpha 分割线
+ * ============================================================ */
+
+.pr-sm3d-panel-footer {
+    /* 玻璃态背景（延续 surface-glass-heavy） */
+    background-color: var(--surface-glass-heavy);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    /* 顶部极淡分割线（alpha 6%，规范 4.1：非硬边框） */
+    box-shadow: 0 -1px 0 rgb(var(--c-text-primary) / 0.06);
+    /* 圆角：仅底部（与面板顶部圆角呼应） */
+    border-radius: 0 0 var(--radius-lg, 16px) var(--radius-lg, 16px);
+    /* 内边距：稳带（16px），规范 5.3 */
+    padding: 13px 15px 15px;
+    /* 布局 */
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    /* 固定在底部 */
+    flex-shrink: 0;
+    /* 微妙噪点纹理（规范 2.5：表面非纯色） */
+    background-image: var(--noise-texture, none);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+}
+
+.pr-sm3d-panel-context {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 2px 0;
+}
+
+.pr-sm3d-panel-context > span {
+    color: rgb(var(--c-accent-primary));
+    font-family: var(--font-ui, system-ui, sans-serif);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .13em;
+}
+
+.pr-sm3d-panel-context p {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0;
+    color: rgb(var(--c-text-secondary));
+    font-family: var(--font-ui, system-ui, sans-serif);
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.pr-sm3d-panel-context p strong {
+    color: rgb(var(--c-text-primary));
+    font-size: 13px;
+    font-weight: 680;
+}
+
+.pr-sm3d-panel-context p i {
+    width: 3px;
+    height: 3px;
+    margin-inline: 1px;
+    border-radius: 50%;
+    background: rgb(var(--c-text-primary) / .2);
+}
+
+.pr-sm3d-panel-context small {
+    color: rgb(var(--c-text-tertiary));
+    font-family: var(--font-ui, system-ui, sans-serif);
+    font-size: 9px;
+    line-height: 1.45;
+}
+
+/* ============================================================
+ * 操作按钮 —— 幽灵按钮变体（规范 14.1）
+ * ============================================================ */
+
+.pr-sm3d-panel-action {
+    /* 布局 */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs, 4px);
+    /* 字体 */
+    font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+    font-size: 13px;
+    line-height: 1.54;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--text-secondary);
+    /* 背景：透明（幽灵按钮） */
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    /* 内边距 */
+    min-height: 42px;
+    padding: var(--space-sm, 8px) var(--space-md, 16px);
+    /* 交互 */
+    cursor: pointer;
+    /* 过渡：150ms ease-out（规范 6.3 微交互） */
+    transition:
+        background-color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+        color 150ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 100ms cubic-bezier(0.3, 200, 20, 0);
+}
+
+/* hover：极淡 accent 背景（规范 14.1 幽灵按钮） */
+.pr-sm3d-panel-action:hover {
+    background-color: rgb(var(--c-accent-primary) / 0.06);
+    color: var(--text-primary);
+}
+
+/* active：缩放回弹（规范 7.2） */
+.pr-sm3d-panel-action:active {
+    transform: scale(0.97);
+}
+
+/* focus-visible：alpha 光晕（规范 14.2 焦点环） */
+.pr-sm3d-panel-action:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(var(--c-accent-primary) / 0.12);
+}
+
+/* ============================================================
+ * 主按钮变体 —— accent 色调（规范 14.1 次要按钮）
+ * ============================================================ */
+
+.pr-sm3d-panel-action--primary {
+    color: rgb(var(--c-surface-primary));
+    background:
+        linear-gradient(105deg, rgb(var(--c-text-primary)), rgb(var(--c-accent-primary) / .92));
+    box-shadow: 0 10px 26px rgb(var(--c-text-primary) / .13);
+}
+
+.pr-sm3d-panel-action--primary:hover {
+    color: rgb(var(--c-surface-primary));
+    background:
+        linear-gradient(105deg, rgb(var(--c-text-primary) / .92), rgb(var(--c-accent-primary)));
+    box-shadow: 0 13px 30px rgb(var(--c-text-primary) / .18);
+    transform: translateY(-1px);
+}
+
+.pr-sm3d-panel-action--primary.is-active {
+    color: rgb(var(--c-text-primary));
+    background:
+        linear-gradient(110deg, rgb(var(--c-accent-primary) / .12), rgb(89 126 116 / .14));
+    box-shadow:
+        inset 0 0 0 1px rgb(var(--c-accent-primary) / .15),
+        0 8px 22px rgb(var(--c-text-primary) / .06);
+}
+
+.pr-sm3d-panel-action--primary.is-active::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgb(89 126 116);
+    box-shadow: 0 0 0 4px rgb(89 126 116 / .1);
+}
+
+/* ============================================================
+ * 无障碍：prefers-reduced-motion 禁用过渡（规范 6.6）
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-sm3d-panel-action {
+        transition: none;
+    }
+
+    .pr-sm3d-panel-action:active {
+        transform: none;
+    }
+}

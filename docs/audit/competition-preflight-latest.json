@@ -1,0 +1,199 @@
+{
+  "generatedAt": "2026-08-11T06:01:18.097Z",
+  "mode": "demo",
+  "deployment": "local",
+  "status": "passed",
+  "summary": {
+    "passed": 33,
+    "warnings": 4,
+    "failures": 0,
+    "total": 37
+  },
+  "checks": [
+    {
+      "id": "runtime.node",
+      "status": "PASS",
+      "message": "Node.js 20.20.2 符合锁定的比赛机运行时 >=20.19 <21"
+    },
+    {
+      "id": "runtime.pnpm",
+      "status": "PASS",
+      "message": "Corepack pnpm 10.34.5，要求 10.34.5（该版本支持 Node 20）"
+    },
+    {
+      "id": "dependencies.backend",
+      "status": "PASS",
+      "message": "backend 锁文件存在，包管理器已锁定 Node 20 兼容版本，Node 引擎已锁定 >=20.19 <21"
+    },
+    {
+      "id": "dependencies.frontend",
+      "status": "PASS",
+      "message": "frontend 锁文件存在，包管理器已锁定 Node 20 兼容版本，Node 引擎已锁定 >=20.19 <21"
+    },
+    {
+      "id": "port.3001",
+      "status": "PASS",
+      "message": "端口 3001 可用"
+    },
+    {
+      "id": "port.5173",
+      "status": "PASS",
+      "message": "端口 5173 可用"
+    },
+    {
+      "id": "security.provider-endpoints",
+      "status": "WARN",
+      "message": "DeepSeek、MiMo 端点合规；Wan Workspace 端点未配置，生图将诚实降级"
+    },
+    {
+      "id": "security.generated-image-download",
+      "status": "PASS",
+      "message": "生图下载拒绝重定向，限制 30 秒/20MiB/MIME/魔数/解码像素并流式超限取消"
+    },
+    {
+      "id": "security.tts-response",
+      "status": "PASS",
+      "message": "TTS 响应按 MP3/WAV/Opus 限制 MIME、魔数、声明/流式字节并取消超限读取"
+    },
+    {
+      "id": "security.provider-responses",
+      "status": "PASS",
+      "message": "供应商错误文本/JSON 响应限制 64KiB/1MiB，超时覆盖正文消费且接口拒绝重定向"
+    },
+    {
+      "id": "security.image-cache-durability",
+      "status": "PASS",
+      "message": "生图同键并发单航班合并，WebP/索引同目录刷盘原子替换且完成时合并最新索引"
+    },
+    {
+      "id": "reliability.sqlite-runtime",
+      "status": "PASS",
+      "message": "运行时 SQLite 校验索引白名单/容量上限；写入与淘汰同一 BEGIN IMMEDIATE 事务，并在短暂写锁竞争中等待"
+    },
+    {
+      "id": "reliability.classroom-start-atomicity",
+      "status": "PASS",
+      "message": "课堂短期 runtime 与长期 lessons 均失败关闭：runtime 写失败不归档，归档失败补偿回滚；两类 503 均可由前端重试"
+    },
+    {
+      "id": "reliability.timer-lifecycle",
+      "status": "PASS",
+      "message": "超时竞争、认证/业务正文/Signal/SSE、课堂监测/DanceStage、前端 DEMO 流式定时器和编排事件监听器均具备完成态清理与服务关闭兜底"
+    },
+    {
+      "id": "security.loopback",
+      "status": "PASS",
+      "message": "后端监听边界为 127.0.0.1"
+    },
+    {
+      "id": "security.server-auth",
+      "status": "PASS",
+      "message": "AUTH_MODE=demo；仅回环公开演示档案，会话由服务器签名"
+    },
+    {
+      "id": "security.deployment-contract",
+      "status": "PASS",
+      "message": "Compose 仅发布回环 5173；后端/Neo4j 内网隔离；无 Key DEMO 与安装说明一致"
+    },
+    {
+      "id": "security.reverse-proxy-contract",
+      "status": "PASS",
+      "message": "Nginx 参考契约仅对批改上传精确放宽至 90m 并关闭请求缓冲；60s 上传、125s 前端生图、90s Wan 与 30s 下载预算均有代理余量"
+    },
+    {
+      "id": "credential.deepseek_api_key",
+      "status": "PASS",
+      "message": "DEEPSEEK_API_KEY 已配置（值未输出）"
+    },
+    {
+      "id": "credential.mimo_api_key",
+      "status": "PASS",
+      "message": "MIMO_API_KEY 已配置（值未输出）"
+    },
+    {
+      "id": "credential.dashscope_api_key",
+      "status": "PASS",
+      "message": "DASHSCOPE_API_KEY 已配置（值未输出）"
+    },
+    {
+      "id": "build.backend",
+      "status": "PASS",
+      "message": "backend/dist/server.js 不早于源码"
+    },
+    {
+      "id": "build.frontend",
+      "status": "PASS",
+      "message": "frontend/dist/index.html 不早于源码"
+    },
+    {
+      "id": "evidence.bundle",
+      "status": "PASS",
+      "message": "初始 JS gzip 95023B / 120000B"
+    },
+    {
+      "id": "evidence.api-contract",
+      "status": "PASS",
+      "message": "前端调用 210/210，后端端点 219/219，匹配 210，路径缺失 0，方法错配 0"
+    },
+    {
+      "id": "evidence.routes",
+      "status": "PASS",
+      "message": "HTTP 路由失败数 0"
+    },
+    {
+      "id": "evidence.runtime-endpoints",
+      "status": "PASS",
+      "message": "运行时覆盖 214 条 HTTP + 1 条 WebSocket；未认证拒绝 通过"
+    },
+    {
+      "id": "evidence.websocket",
+      "status": "PASS",
+      "message": "WebSocket 状态 passed"
+    },
+    {
+      "id": "evidence.production-e2e",
+      "status": "PASS",
+      "message": "生产同源 E2E 32 组，0 警告，0 失败；认证=demo，认证故障失败关闭、告警单操作入口、报告历史原生表格/具名查看删除/键盘查看、答题图片堆原生按钮/大图焦点闭环/资源失败非空终态、沉浸导航关闭态语义/遮罩回焦、空通知对话框焦点兜底/窄屏视口几何、命令面板 Ctrl/Cmd+K/组合框 roving/窄屏几何/卸载回焦、命题精修模态框可见标题命名/动态视口/独立滚动/决策区、诊断学生 roving 焦点、批改进度 Space/Enter 状态切换、命题富 Markdown 题干语义隔离/详情入口/焦点归还、进化模式真实关联版本定位/陈旧边失败关闭/焦点交接、文化语境原文验收默认披露/原生详情键盘开合/窄屏几何、生成媒体会话边界、DEMO 文化图库同诗 SVG 来源与详情索引、TTS/跟读录音收尾、迟到授权取消、组件卸载设备回收与 OCR/生图/AI 对话图片引用边界、内容真实性、未认证 API、断网披露、创造任务认证发布/看板回执、命题/课堂/副驾的诗库局部降级披露、演示隔离、创新模式契约与恢复、受限环境中的二维/目录优先与 Three.js 主动加载边界、生产安全头 通过"
+    },
+    {
+      "id": "evidence.dependency-security",
+      "status": "PASS",
+      "message": "生产依赖审计 passed，需修复 0，条件缓解 0，7 天内"
+    },
+    {
+      "id": "evidence.production-licenses",
+      "status": "WARN",
+      "message": "生产包 403，GPL/AGPL 0，人工复核 1，npm 元数据未声明许可证 0，包根目录文本未发现 28（不等同于无许可证）；LICENSE/NOTICE 存在，来源复核记录 存在，7 天内"
+    },
+    {
+      "id": "evidence.release-boundary",
+      "status": "PASS",
+      "message": "发布候选密钥命中 0，排除本地私密文件 44，链接 0，7 天内"
+    },
+    {
+      "id": "evidence.image-assets",
+      "status": "PASS",
+      "message": "图像门 PASS；随包精选 WebP 22/22；正式内容 SVG 引用 0；运行时缓存生产映射 0；发布污染 0；dist 同源 passed；输入哈希当前；7 天内"
+    },
+    {
+      "id": "evidence.poem-provenance",
+      "status": "WARN",
+      "message": "逐首内容复核 0/148 通过；结构错误 0"
+    },
+    {
+      "id": "evidence.real-pilot",
+      "status": "WARN",
+      "message": "缺少通过隐私、授权、最小化字段、日期窗口、缺失值和配对口径校验的真实试点报告"
+    },
+    {
+      "id": "submission.integrity",
+      "status": "PASS",
+      "message": "提交物哈希校验 8/8 通过"
+    },
+    {
+      "id": "storage.sqlite",
+      "status": "PASS",
+      "message": "SQLite 目录可读写（未修改数据）"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+.pr-sandboxed-report {
+    display: block;
+    width: 100%;
+    min-height: min(520px, 62dvh);
+    border: 1px solid var(--border-primary-alpha);
+    border-radius: var(--radius-md);
+    background: rgb(var(--c-surface-elevated));
+    color-scheme: light;
+}
+
+.pr-sandboxed-report--expanded {
+    min-height: min(680px, 74dvh);
+}
+
+.pr-sandboxed-report:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px var(--accent-primary-40);
+}
+
+@media (max-width: 600px) {
+    .pr-sandboxed-report,
+    .pr-sandboxed-report--expanded {
+        min-height: 62dvh;
+        border-radius: var(--radius-sm);
+    }
+}
+
+@media (forced-colors: active) {
+    .pr-sandboxed-report {
+        border: 1px solid CanvasText;
+        background: Canvas;
+        forced-color-adjust: auto;
+    }
+}
+
+@media print {
+    .pr-sandboxed-report {
+        min-height: 0;
+        border: 0;
+        border-radius: 0;
+        overflow: visible;
+    }
+}

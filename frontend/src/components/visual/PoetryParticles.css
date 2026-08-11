@@ -1,0 +1,73 @@
+/**
+ * PoetryParticles 流体诗意粒子组件样式（视觉创新层 4/4）
+ *
+ * 设计依据：规范第 2、6、6.6 章
+ * - 纯 SVG + GSAP（非 Canvas），粒子为 circle/path 元素
+ * - 仅 transform/opacity 动画，will-change: transform（规范 6.6 性能硬指标）
+ * - pointer-events: none，不干扰交互
+ * - 暖调色板 alpha，零硬编码
+ * - prefers-reduced-motion 降级为静态分布
+ */
+
+.pr-poetry-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.pr-poetry-particles__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* 粒子通用 —— 初始透明，由 GSAP 接管 */
+.pr-poetry-particles__particle {
+    will-change: transform, opacity;
+    transform-origin: center;
+}
+
+/* —— 1. 花瓣 variant —— 暖粉椭圆，飘落 + 旋转 */
+.pr-poetry-particles__petal {
+    fill: rgb(var(--c-accent-primary));
+    fill-opacity: 0.42;
+}
+
+/* —— 2. 雪花 variant —— 暖白小圆，纷飞 */
+.pr-poetry-particles__snow {
+    fill: rgb(var(--c-text-inverse));
+    fill-opacity: 0.62;
+}
+
+/* —— 3. 萤火虫 variant —— 暖黄光点，带光晕 */
+.pr-poetry-particles__firefly {
+    fill: rgb(var(--c-accent-warning));
+    fill-opacity: 0.85;
+}
+
+.pr-poetry-particles__firefly-glow {
+    fill: rgb(var(--c-accent-warning));
+    fill-opacity: 0.18;
+}
+
+/* —— 4. 墨点 variant —— 暖褐扩散 */
+.pr-poetry-particles__ink {
+    fill: rgb(var(--c-text-primary));
+    fill-opacity: 0.30;
+}
+
+/* ============================================================
+ * prefers-reduced-motion 降级（规范 6.6）
+ * 粒子静态分布，不运动，保留极淡装饰感
+ * ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .pr-poetry-particles__particle {
+        opacity: 0.4 !important;
+        transform: none !important;
+        will-change: auto;
+    }
+}

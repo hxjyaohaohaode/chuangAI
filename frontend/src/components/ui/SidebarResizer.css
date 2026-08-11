@@ -1,0 +1,100 @@
+/**
+ * SidebarResizer —— 侧边栏宽度可调节手柄样式
+ *
+ * 设计依据：
+ * - 规范 2.4 强调色：常态透明，hover/drag 显 accent-primary
+ * - 规范 4.1 无边框设计：常态无可见边框，hover 时显色块暗示可交互
+ * - 规范 6.3 时长：微交互 150ms ease-out
+ * - 规范 7.2 微交互：hover 时宽度 4→8px，伴随色变
+ * - 规范 13.1 无 emoji：纯 CSS 实现，无装饰图形
+ *
+ * 容器位于 aside 右边缘（aside 必须是 position: relative/sticky 才能承载 absolute 子元素）
+ */
+
+.sidebar-resizer {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 10;
+    background: transparent;
+    /* 规范 6.3：微交互 150ms ease-out
+     * 同时过渡 width + background-color，保证 hover 时扩展与显色同步 */
+    transition:
+        width var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out);
+    /* 透明手柄需可接收点击 */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* hover：宽度 4→8px + 显 accent-primary 色块
+ * 规范 7.2：hover 给出即时视觉反馈（≤100ms 内） */
+.sidebar-resizer:hover,
+.sidebar-resizer.dragging {
+    width: 8px;
+    background: rgb(var(--c-accent-primary));
+}
+
+/* focus-visible：双环光晕（规范 14.1 焦点环）
+ * 内环 surface-primary + 外环 accent 40% alpha */
+.sidebar-resizer:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px rgb(var(--c-accent-primary) / 0.4);
+}
+
+/* ::after —— 垂直虚线纹理，常态透明，hover/drag 时浮现
+ * 增强视觉锚点，暗示"此处可水平拖拽" */
+.sidebar-resizer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+        to bottom,
+        rgb(var(--c-text-tertiary) / 0.22) 0,
+        rgb(var(--c-text-tertiary) / 0.22) 3px,
+        transparent 3px,
+        transparent 8px
+    );
+    background-size: 100% 8px;
+    background-repeat: repeat-y;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-micro) var(--ease-out);
+}
+
+.sidebar-resizer:hover::after,
+.sidebar-resizer.dragging::after {
+    opacity: 0.7;
+}
+
+/* ============================================================
+ * 全局拖拽中状态
+ * ============================================================
+ * 拖拽期间所有元素 cursor 强制 col-resize + 禁用文本选择
+ * 同时：AppShell aside 通过 body.sidebar-resizing 选择器禁用 width transition
+ * 避免拖拽时宽度变化被 200ms transition 滞后，造成"粘滞"感 */
+body.sidebar-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
+body.sidebar-resizing * {
+    cursor: col-resize !important;
+}
+
+/* ============================================================
+ * Reduced Motion 降级（规范 6.5）
+ * ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar-resizer,
+    .sidebar-resizer::after {
+        transition: none !important;
+    }
+}

@@ -1,0 +1,275 @@
+/**
+ * TextSwitch：完整字符串、有限单次动效、44px 原生控制。
+ * 隐藏测量层与可见层共享同一网格单元，容器尺寸始终覆盖所有候选文本。
+ */
+
+.pr-textswitch {
+    position: relative;
+    display: inline-grid;
+    justify-items: center;
+    max-inline-size: 100%;
+    min-inline-size: 0;
+    white-space: pre-wrap;
+}
+
+.pr-textswitch-stage {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    max-inline-size: 100%;
+    min-inline-size: 0;
+    min-block-size: 1.55em;
+}
+
+.pr-textswitch-measure,
+.pr-textswitch-content {
+    grid-area: 1 / 1;
+    max-inline-size: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.pr-textswitch-measure {
+    display: grid;
+    visibility: hidden;
+    pointer-events: none;
+    user-select: none;
+}
+
+.pr-textswitch-measure-item {
+    grid-area: 1 / 1;
+    max-inline-size: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.pr-textswitch-content {
+    display: inline-block;
+    opacity: var(--pr-textswitch-to-opacity, 1);
+    filter: var(--pr-textswitch-to-filter, none);
+    transform:
+        translate3d(
+            var(--pr-textswitch-to-x, 0px),
+            var(--pr-textswitch-to-y, 0px),
+            0
+        )
+        scale(var(--pr-textswitch-to-scale, 1))
+        rotate(var(--pr-textswitch-to-rotate, 0deg));
+    transform-origin: center;
+}
+
+.pr-textswitch-content[data-animate="true"] {
+    animation-name: pr-textswitch-enter;
+    animation-duration: var(--pr-textswitch-duration, 360ms);
+    animation-delay: var(--pr-textswitch-delay, 0ms);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-iteration-count: 1;
+    animation-fill-mode: both;
+}
+
+.pr-textswitch-value {
+    display: inline;
+    white-space: inherit;
+}
+
+.pr-textswitch-lines .pr-textswitch-value {
+    white-space: pre-line;
+}
+
+.pr-textswitch-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs, 4px);
+    max-inline-size: 100%;
+    margin-block-start: var(--space-xs, 4px);
+}
+
+.pr-textswitch-dots {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-inline-size: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.pr-textswitch-dot,
+.pr-textswitch-pause {
+    position: relative;
+    box-sizing: border-box;
+    flex: 0 0 44px;
+    inline-size: 44px;
+    block-size: 44px;
+    min-inline-size: 44px;
+    min-block-size: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-sm, 8px);
+    color: rgb(var(--c-text-secondary) / 0.88);
+    background: transparent;
+    appearance: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+        color var(--dur-micro, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+        background-color var(--dur-micro, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.pr-textswitch-dot::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-start: 50%;
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: 50%;
+    background: rgb(var(--c-text-tertiary) / 0.46);
+    transform: translate(-50%, -50%);
+    transition:
+        background-color var(--dur-micro, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+        transform var(--dur-micro, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.pr-textswitch-dot.is-active::before {
+    background: rgb(var(--c-accent-primary) / 0.86);
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+.pr-textswitch-pause {
+    display: inline-grid;
+    place-items: center;
+    box-shadow: inset 0 0 0 1px rgb(var(--c-text-primary) / 0.09);
+}
+
+.pr-textswitch-pause-icon {
+    display: block;
+    font-size: var(--text-2xs, 11px);
+    font-weight: var(--weight-semibold, 600);
+    line-height: 1;
+    transform: translateY(-0.02em);
+}
+
+.pr-textswitch-pause[aria-pressed="true"] {
+    color: rgb(var(--c-accent-primary));
+    background: rgb(var(--c-accent-primary) / 0.09);
+}
+
+.pr-textswitch-dot:focus-visible,
+.pr-textswitch-pause:focus-visible {
+    outline: 2px solid rgb(var(--c-accent-primary) / 0.9);
+    outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pr-textswitch-dot:hover,
+    .pr-textswitch-pause:hover {
+        background: rgb(var(--c-accent-primary) / 0.08);
+    }
+
+    .pr-textswitch-dot:hover::before {
+        background: rgb(var(--c-accent-primary) / 0.68);
+        transform: translate(-50%, -50%) scale(1.18);
+    }
+
+    .pr-textswitch-dot.is-active:hover::before {
+        transform: translate(-50%, -50%) scale(1.3);
+    }
+}
+
+@keyframes pr-textswitch-enter {
+    from {
+        opacity: var(--pr-textswitch-from-opacity, 0);
+        filter: var(--pr-textswitch-from-filter, none);
+        transform:
+            translate3d(
+                var(--pr-textswitch-from-x, 0px),
+                var(--pr-textswitch-from-y, 38%),
+                0
+            )
+            scale(var(--pr-textswitch-from-scale, 1))
+            rotate(var(--pr-textswitch-from-rotate, 0deg));
+    }
+
+    to {
+        opacity: var(--pr-textswitch-to-opacity, 1);
+        filter: var(--pr-textswitch-to-filter, none);
+        transform:
+            translate3d(
+                var(--pr-textswitch-to-x, 0px),
+                var(--pr-textswitch-to-y, 0px),
+                0
+            )
+            scale(var(--pr-textswitch-to-scale, 1))
+            rotate(var(--pr-textswitch-to-rotate, 0deg));
+    }
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+    .pr-textswitch,
+    .pr-textswitch *,
+    .pr-textswitch::before,
+    .pr-textswitch::after,
+    .pr-textswitch *::before,
+    .pr-textswitch *::after {
+        /* tokens.css 会以 !important 把全局动画/过渡压到 0.01ms；
+         * 组件内的根节点、所有后代与伪元素都必须显式归零，
+         * 避免未生成内容的 ::before/::after 仍在计算样式中泄漏 0.01ms。 */
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .pr-textswitch-dot.is-active::before {
+        transform: translate(-50%, -50%);
+    }
+}
+
+@media (forced-colors: active) {
+    .pr-textswitch-content[data-animate="true"] {
+        animation: none;
+    }
+
+    .pr-textswitch-dot,
+    .pr-textswitch-pause {
+        color: ButtonText;
+        border: 1px solid ButtonText;
+        background: Canvas;
+        forced-color-adjust: auto;
+    }
+
+    .pr-textswitch-dot::before {
+        background: ButtonText;
+    }
+
+    .pr-textswitch-dot.is-active::before,
+    .pr-textswitch-pause[aria-pressed="true"] {
+        color: HighlightText;
+        background: Highlight;
+    }
+
+    .pr-textswitch-dot:focus,
+    .pr-textswitch-pause:focus {
+        /* Windows 高对比度下，程序聚焦或鼠标后聚焦不一定命中
+         * :focus-visible；强制色模式应始终保留清晰的焦点边界。 */
+        outline: 3px solid Highlight;
+        outline-offset: 2px;
+    }
+}
+
+@media print {
+    .pr-textswitch-controls {
+        display: none;
+    }
+
+    .pr-textswitch-content[data-animate="true"] {
+        animation: none;
+    }
+
+    .pr-textswitch-content {
+        filter: none;
+        transform: none;
+    }
+}

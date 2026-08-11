@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-08-11T03:16:11.134Z",
+  "baseUrl": "http://127.0.0.1:51419",
+  "status": "passed",
+  "created": true,
+  "listed": true,
+  "updated": true,
+  "missingOwnerRejected": true,
+  "sensitiveRejected": true,
+  "ambiguousStudentListRejected": true,
+  "ambiguousStudentDeleteRejected": true,
+  "deleted": true
+}

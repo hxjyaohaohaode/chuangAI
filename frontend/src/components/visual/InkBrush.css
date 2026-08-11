@@ -1,0 +1,214 @@
+/**
+ * InkBrush 水墨笔触动画组件样式（视觉创新层 1/4）
+ *
+ * 设计依据：规范第 2、6、9、14 章
+ * - 颜色使用 --c-text-primary（#2C241A 深暖褐）的不同 alpha，模拟墨色浓淡
+ * - 动画仅 transform/opacity/stroke-dashoffset（GPU 合成 + 可绘属性）
+ * - 缓动曲线 --ease-out / --spring-soft，时长 150-400ms（笔触绘制稍长以可见）
+ * - prefers-reduced-motion 降级：直接显示，无动画
+ * - 零硬编码，全部走设计 token
+ */
+
+/* ============================================================
+ * InkBrush —— 逐字毛笔书写
+ * ============================================================ */
+
+.pr-ink-brush {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-xs);
+    /* 字号流体，默认继承也可被外部覆盖 */
+    font-family: var(--font-serif-italic);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-lg);
+    letter-spacing: var(--tracking-normal);
+    user-select: none;
+}
+
+.pr-ink-brush__char {
+    position: relative;
+    display: inline-block;
+    /* 初始隐藏，由 GSAP 接管显现（防 FOUC） */
+    opacity: 0;
+}
+
+/* 字符内部的 SVG —— text 元素同时承载 stroke（描边）与 fill（填墨） */
+.pr-ink-brush__svg {
+    display: block;
+    overflow: visible;
+}
+
+/* stroke 描边层：模拟毛笔运笔轨迹 */
+.pr-ink-brush__stroke {
+    fill: none;
+    stroke: rgb(var(--c-text-primary));
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* paint-order 让 stroke 先于 fill 绘制，形成"先勾勒后填墨"的书写感 */
+    paint-order: stroke fill;
+}
+
+/* fill 填墨层：浓淡渐变（晕染） */
+.pr-ink-brush__fill {
+    fill: rgb(var(--c-text-primary));
+    opacity: 0;
+}
+
+/* —— 4 种笔触风格 —— */
+
+/* 1. 造笔（起笔）：标准描边 + 实心填墨，起笔利落 */
+.pr-ink-brush--style-zao .pr-ink-brush__stroke {
+    stroke-width: 1.4;
+    stroke-opacity: 0.55;
+}
+
+/* 2. 晕染（浓淡渐变）：描边更淡，填墨带浓淡过渡 */
+.pr-ink-brush--style-yun .pr-ink-brush__stroke {
+    stroke-width: 1;
+    stroke-opacity: 0.32;
+}
+.pr-ink-brush--style-yun .pr-ink-brush__fill {
+    /* 浓淡由 GSAP 驱动 opacity 0 → 0.82，模拟墨色晕开 */
+    opacity: 0;
+}
+
+/* 3. 枯笔（飞白效果）：描边虚线 + 降低填墨不透明度，模拟干涩飞白 */
+.pr-ink-brush--style-ku .pr-ink-brush__stroke {
+    stroke-width: 1.6;
+    stroke-opacity: 0.42;
+    /* 虚线模拟飞白断续 */
+    stroke-dasharray: 0.6 1.4;
+}
+.pr-ink-brush--style-ku .pr-ink-brush__fill {
+    opacity: 0;
+}
+
+/* 4. 飞白（收笔）：描边渐细 + 收尾拖尾 */
+.pr-ink-brush--style-fei .pr-ink-brush__stroke {
+    stroke-width: 1.2;
+    stroke-opacity: 0.48;
+}
+.pr-ink-brush--style-fei .pr-ink-brush__fill {
+    opacity: 0;
+}
+
+/* 书写光标 —— 跟随当前正在书写的字符，脉动暗示 */
+.pr-ink-brush__cursor {
+    display: inline-block;
+    width: 0.06em;
+    height: 1em;
+    margin-left: 0.04em;
+    background: rgb(var(--c-text-primary));
+    opacity: 0;
+    transform-origin: center;
+}
+
+.pr-ink-brush__cursor--active {
+    opacity: 0.7;
+}
+
+/* ============================================================
+ * InkDivider —— 水墨分割线
+ * ============================================================ */
+
+.pr-ink-divider {
+    display: block;
+    width: 100%;
+    /* 极淡透明线 + 水墨笔触感（规范 9.2 hr：1px alpha 6%） */
+    /* 此处用水墨笔触 SVG 替代单调 hr，更具诗意 */
+}
+
+.pr-ink-divider__svg {
+    display: block;
+    width: 100%;
+    height: 14px;
+    overflow: visible;
+}
+
+.pr-ink-divider__path {
+    fill: none;
+    stroke: rgb(var(--c-text-primary));
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* 浓淡：起笔重、中段淡、收笔重，模拟一笔挥就 */
+    stroke-opacity: 0.22;
+    stroke-width: 1.6;
+}
+
+/* 居中收束的分割线变体 —— 两端淡、中间一点浓墨 */
+.pr-ink-divider--center {
+    width: clamp(280px, 40vw, 480px);
+    margin-inline: auto;
+}
+
+/* ============================================================
+ * InkSplash —— 墨迹扩散背景装饰
+ * ============================================================ */
+
+.pr-ink-splash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.pr-ink-splash__svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* 墨团 —— 不规则形状，低 alpha，纯装饰 */
+.pr-ink-splash__blob {
+    fill: rgb(var(--c-text-primary));
+    opacity: 0;
+    will-change: opacity, transform;
+    transform-origin: center;
+}
+
+/* 墨点 —— 飞溅小点 */
+.pr-ink-splash__dot {
+    fill: rgb(var(--c-text-primary));
+    opacity: 0;
+}
+
+/* ============================================================
+ * prefers-reduced-motion 降级（规范 6.6）
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-ink-brush__char {
+        opacity: 1;
+    }
+
+    .pr-ink-brush__fill {
+        opacity: 0.82;
+    }
+
+    .pr-ink-brush__stroke {
+        stroke-opacity: 0.5;
+        stroke-dasharray: none;
+    }
+
+    .pr-ink-brush__cursor {
+        display: none;
+    }
+
+    .pr-ink-divider__path {
+        stroke-opacity: 0.22;
+        stroke-dasharray: none;
+    }
+
+    .pr-ink-splash__blob,
+    .pr-ink-splash__dot {
+        opacity: 0.08;
+        transform: none;
+    }
+
+    .pr-ink-splash__blob {
+        will-change: auto;
+    }
+}

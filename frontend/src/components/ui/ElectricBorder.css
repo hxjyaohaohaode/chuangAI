@@ -1,0 +1,170 @@
+/*
+ * A composited visual treatment for the current choice. The border itself is
+ * still visible when masks, colour mixing, animation, or JavaScript are not
+ * available; those capabilities only improve the finish.
+ */
+
+.pr-electric-border {
+    --electric-border-color: rgb(197 133 59);
+    --electric-border-radius: 24px;
+    --electric-border-duration: 7.2s;
+    --electric-border-glow-opacity: 0.2;
+    --electric-border-rest-opacity: 0.15;
+    --electric-border-glow-size: 10px;
+    --electric-border-motion-state: running;
+    position: relative;
+    display: block;
+    border-radius: var(--electric-border-radius);
+    isolation: isolate;
+}
+
+/* Empty instances are ornamental overlays, so they take no document space. */
+.pr-electric-border[data-electric-decoration='true'] {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.pr-electric-border::before,
+.pr-electric-border::after {
+    position: absolute;
+    pointer-events: none;
+    content: '';
+}
+
+/*
+ * The masked sweep keeps the card itself clean while giving the active choice
+ * a short, deliberate sense of direction. CSS animations run on the compositor
+ * and replace the former perpetual JavaScript/canvas frame loop.
+ */
+.pr-electric-border::before {
+    z-index: 1;
+    inset: 0;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: linear-gradient(
+            112deg,
+            transparent 0%,
+            color-mix(in srgb, var(--electric-border-color) 38%, transparent) 27%,
+            var(--electric-border-color) 46%,
+            color-mix(in srgb, var(--electric-border-color) 58%, white) 52%,
+            var(--electric-border-color) 58%,
+            color-mix(in srgb, var(--electric-border-color) 36%, transparent) 72%,
+            transparent 100%
+        )
+        0 50% / 240% 100%;
+    opacity: 0.96;
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    box-shadow:
+        0 0 var(--electric-border-glow-size) color-mix(in srgb, var(--electric-border-color) 48%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--electric-border-color) 36%, transparent);
+    animation: pr-electric-border-travel var(--electric-border-duration) linear infinite;
+    animation-play-state: var(--electric-border-motion-state);
+}
+
+.pr-electric-border::after {
+    z-index: -1;
+    inset: -7px;
+    border-radius: inherit;
+    background: radial-gradient(
+        ellipse at 50% 100%,
+        color-mix(in srgb, var(--electric-border-color) 28%, transparent),
+        transparent 68%
+    );
+    filter: blur(var(--electric-border-glow-size));
+    opacity: var(--electric-border-glow-opacity);
+    transform: scale(0.98);
+    animation: pr-electric-border-breathe calc(var(--electric-border-duration) * 1.7) ease-in-out infinite;
+    animation-play-state: var(--electric-border-motion-state);
+}
+
+.pr-electric-border__content {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+    border-radius: inherit;
+}
+
+@keyframes pr-electric-border-travel {
+    to {
+        background-position: 200% 50%;
+    }
+}
+
+@keyframes pr-electric-border-breathe {
+    0%,
+    100% {
+        opacity: var(--electric-border-rest-opacity);
+        transform: scale(0.98);
+    }
+
+    50% {
+        opacity: var(--electric-border-glow-opacity);
+        transform: scale(1.02);
+    }
+}
+
+/* A plain outline is a deliberate compatibility fallback for old webviews. */
+@supports not ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+    .pr-electric-border::before {
+        padding: 0;
+        background: transparent;
+        border: 1.5px solid var(--electric-border-color);
+        box-shadow: 0 0 var(--electric-border-glow-size) var(--electric-border-color);
+    }
+}
+
+/* Safari-era and managed classroom webviews may understand masks before they
+ * understand color-mix(). In that combination, prefer an explicit outline to
+ * an invisible decorative enhancement. */
+@supports not (color: color-mix(in srgb, black, white)) {
+    .pr-electric-border::before {
+        padding: 0;
+        background: transparent;
+        border: 1.5px solid var(--electric-border-color);
+        box-shadow: 0 0 var(--electric-border-glow-size) var(--electric-border-color);
+        -webkit-mask: none;
+        mask: none;
+        animation: none;
+    }
+
+    .pr-electric-border::after {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+    .pr-electric-border::before,
+    .pr-electric-border::after {
+        animation: none;
+    }
+
+    .pr-electric-border::before {
+        background-position: 50% 50%;
+    }
+}
+
+/* High-contrast/forced-colors users get a system-colour outline instead of an
+ * indistinct translucent glow. It remains non-interactive and static. */
+@media (forced-colors: active) {
+    .pr-electric-border::before {
+        padding: 0;
+        border: 2px solid CanvasText;
+        background: transparent;
+        box-shadow: none;
+        -webkit-mask: none;
+        mask: none;
+        animation: none;
+    }
+
+    .pr-electric-border::after {
+        display: none;
+    }
+}

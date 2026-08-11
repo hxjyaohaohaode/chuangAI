@@ -1,0 +1,3121 @@
+﻿﻿/**
+ * 课堂导播台 Classroom 样式（Task 11）
+ *
+ * Phase 4.3：视图模式切换样式（答题模式 / 讲解模式）
+ */
+
+/* ── 课堂视图模式切换 ── */
+.pr-classroom-view-switch {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: var(--space-xs);
+    background: var(--surface-tertiary-alpha);
+    border-radius: var(--radius-sm);
+    gap: 2px;
+    margin-bottom: var(--space-sm);
+}
+
+.pr-classroom-view-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    font-family: inherit;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    /* 规范 7.2：禁用 ease-out 关键字，改用 Spring 物理曲线 var(--ease-out)；
+       150ms → var(--dur-micro) */
+    transition: background var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+
+.pr-classroom-view-tab:hover {
+    color: var(--text-primary);
+    background: var(--surface-elevated-soft);
+}
+
+.pr-classroom-view-tab--active {
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-card);
+}
+
+.pr-classroom-view-tab--active:hover {
+    background: var(--surface-primary);
+}
+
+.pr-classroom-view-tab:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-classroom-view-tab {
+        transition: none;
+    }
+}
+
+/* Phase 4.3 视图模式切换样式结束 */
+
+/**
+ * 课堂导播台 Classroom 样式（Task 11）—— 原始样式
+ *
+ * 严格依据《界面设计规范.md》第 2、4、5、6、7、14 章实现
+ *
+ * 设计要点：
+ * - 零硬编码：所有色值/尺寸/时长引用 tokens.css 的 CSS 变量
+ * - 无边框优先：区域分隔用透明度差异 + backdrop-blur
+ * - 流体尺寸：关键路径用 clamp()，响应 600-2400px 视口无断裂
+ * - 完整三态：所有可交互元素具备 hover/active/focus-visible
+ * - GPU 友好：动画仅使用 transform 与 opacity
+ * - 课堂场景：投屏大屏 + 控制台 + AI 副驾，信息密度高但呼吸感不丢
+ */
+
+/* ============================================================
+ * 页面主布局
+ * ============================================================ */
+
+.pr-classroom {
+    display: flex;
+    flex-direction: column;
+    /* v7 布局修复：页面级区块间距从稳带(16px)提升至松带(32px)
+     * 计算依据：设计规范 5.3 松紧得当原则——页面级锚点切换必须使用松带(32-96px)
+     * 16px 属于紧带，仅适用于同一语义组内元素分隔，不足以产生页面级区块分离感
+     * 32px 是松带下限，刚好足以在视觉上分离 Hero 与主体内容区 */
+    gap: var(--space-xl);
+    width: 100%;
+    min-height: calc(100vh - 56px);
+}
+
+.pr-classroom-launch-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 34vw, 370px);
+    gap: clamp(14px, 2vw, 28px);
+    align-items: stretch;
+    min-height: min(680px, calc(100vh - 88px));
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* ============================================================
+ * v5.0 Hero 区 —— 剧场帷幕意象（Task A.4）
+ * ------------------------------------------------------------
+ * 设计意图：左右帷幕从中央向两侧拉开（呼应 pr-v5-enter-classroom
+ *   的 clip-path 入场动效），中央露出 4 模式 Bento 错落预览。
+ * 视觉锚点：剧场红渐变（--page-classroom-hero-gradient）+ 巨型标题。
+ * 非对称：第 1 张模式卡为 feature（跨 2 行），其余 3 张为小卡。
+ * ============================================================ */
+
+.pr-classroom-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    height: 100%;
+    padding: clamp(28px, 4vh, 52px) clamp(20px, 3vw, 40px);
+    background-color: var(--surface-secondary-alpha);
+    background-image: var(--page-classroom-hero-gradient), var(--noise-texture);
+    background-size: 100% 100%, 160px 160px;
+    background-blend-mode: overlay, overlay;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    isolation: isolate;
+    min-width: 0;
+}
+
+/* 左右帷幕装饰：纯 CSS 渐变模拟褶皱质感，无硬色块 */
+.pr-classroom-hero-curtain {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: clamp(40px, 6vw, 72px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.55;
+}
+
+.pr-classroom-hero-curtain--left {
+    left: 0;
+    /* 规范 14.2：硬编码色值替换为 token —— 帷幕色复用 --c-page-classroom-hero 通道 */
+    background: linear-gradient(90deg,
+            rgb(var(--c-page-classroom-hero) / 0.22) 0%,
+            rgb(var(--c-page-classroom-hero) / 0.08) 60%,
+            transparent 100%);
+}
+
+.pr-classroom-hero-curtain--right {
+    right: 0;
+    background: linear-gradient(270deg,
+            rgb(var(--c-page-classroom-hero) / 0.22) 0%,
+            rgb(var(--c-page-classroom-hero) / 0.08) 60%,
+            transparent 100%);
+}
+
+.pr-classroom-hero-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+    width: 100%;
+    max-width: 960px;
+    text-align: center;
+    min-width: 0;
+}
+
+.pr-classroom-hero-modes,
+.pr-classroom-mode-card--hero {
+    min-width: 0;
+}
+
+.pr-classroom-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--page-classroom-hero-accent);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+}
+
+.pr-classroom-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(34px, 4.2vw, 58px);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-loose);
+    line-height: var(--leading-3xl);
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+    /* 巨型排版：内容即设计，文字本身就是视觉主体 */
+    text-wrap: balance;
+}
+
+.pr-classroom-hero-subtitle {
+    font-size: var(--text-base);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-base);
+    letter-spacing: var(--tracking-tight);
+    max-width: 520px;
+}
+
+/* 4 模式 Bento 错落网格 —— 非对称 1:2:1:3 比例
+ * 桌面：feature 卡跨 2 列 + 2 行，3 张小卡右侧
+ * 平板：feature 卡跨 2 列，小卡 1 行 3 列
+ * 移动：单列堆叠 */
+.pr-classroom-hero-modes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    gap: var(--space-md);
+    width: 100%;
+    margin-top: var(--space-sm);
+    text-align: left;
+}
+
+.pr-classroom-launch-mode-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    min-height: var(--control-height-compact);
+    padding: var(--space-xs) var(--space-md);
+    border: none;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-classroom-launch-mode-toggle:hover {
+    background-color: var(--border-row-hover);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-classroom-launch-mode-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-classroom-mode-card--hero.pr-classroom-mode-card--feature {
+    grid-column: 1 / span 2;
+    grid-row: 1 / span 2;
+    padding: var(--space-xl);
+    background-color: var(--surface-elevated-soft);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    box-shadow: var(--shadow-glass-layered);
+}
+
+.pr-classroom-mode-card--hero.pr-classroom-mode-card--feature .pr-classroom-mode-card-name {
+    font-size: var(--text-xl);
+}
+
+.pr-classroom-mode-card--hero.pr-classroom-mode-card--feature .pr-classroom-mode-card-desc {
+    font-size: var(--text-sm);
+    line-height: var(--leading-sm);
+}
+
+/* 主卡只呈现当前选择的真实模式元信息：用课堂组织与既定节奏收束留白，
+ * 不插入预测性学情、虚构参与人数或尚未发生的课堂结果。 */
+.pr-classroom-mode-card--hero.pr-classroom-mode-card--feature .pr-classroom-mode-card-feature-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sm);
+    margin-top: auto;
+    padding-top: var(--space-md);
+    border-top: 1px solid rgb(var(--c-text-primary) / 0.08);
+}
+
+.pr-classroom-mode-card-feature-detail {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+}
+
+.pr-classroom-mode-card-feature-detail > span {
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+}
+
+.pr-classroom-mode-card-feature-detail strong {
+    overflow: hidden;
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-xs);
+    line-height: var(--leading-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-classroom-mode-card--hero:not(.pr-classroom-mode-card--feature) {
+    padding: var(--space-md);
+    /* 规范 14.2：硬编码 rgba 替换为 --surface-glass token（55% alpha 玻璃态） */
+    background-color: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 900px) {
+    .pr-classroom-launch-shell {
+        grid-template-columns: 1fr;
+        min-height: 0;
+    }
+
+    .pr-classroom-hero-modes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pr-classroom-mode-card--hero.pr-classroom-mode-card--feature {
+        grid-column: 1 / span 2;
+        grid-row: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .pr-classroom-hero {
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    .pr-classroom-hero-inner {
+        gap: var(--space-sm);
+    }
+
+    .pr-classroom-hero-switch {
+        display: none;
+    }
+
+    .pr-classroom-hero-modes {
+        grid-template-columns: minmax(0, 1fr);
+        margin-top: 0;
+    }
+
+    .pr-classroom-mode-card--hero.pr-classroom-mode-card--feature {
+        grid-column: auto;
+    }
+
+    /* 通用模式卡片在本文件后方声明 display:flex；这里以父级限定确保窄屏
+       收起规则不会被覆盖，展开/收起均保持可逆。 */
+    .pr-classroom-hero-modes .pr-classroom-mode-card--mobile-collapsed {
+        display: none;
+    }
+
+    .pr-classroom-launch-mode-toggle {
+        display: inline-flex;
+    }
+}
+
+/* 主体网格：左大屏 + 右控制台 */
+.pr-classroom-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 30%);
+    gap: var(--space-md);
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.pr-classroom-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    min-width: 0;
+    min-height: 0;
+}
+
+.pr-classroom-side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    min-height: 0;
+    min-width: 0;
+    position: sticky;
+    top: calc(56px + var(--space-md));
+    align-self: start;
+    max-height: calc(100vh - 88px);
+}
+
+.pr-classroom-body--control-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.pr-classroom-body--control-collapsed .pr-classroom-side {
+    display: none;
+}
+
+/* 响应式：平板单列 */
+@media (max-width: 1100px) {
+    .pr-classroom-body {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pr-classroom-side {
+        position: static;
+        max-height: none;
+    }
+}
+
+/* ============================================================
+ * 课堂 Header
+ * ============================================================ */
+
+.pr-classroom-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    padding: var(--space-md) var(--space-lg);
+    background-color: var(--surface-secondary-alpha);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(8px);
+}
+
+.pr-classroom-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    min-width: 0;
+    flex: 1;
+}
+
+.pr-classroom-header-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-normal);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-xl);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.pr-classroom-header-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    flex-shrink: 0;
+}
+
+.pr-classroom-header-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.pr-classroom-join-code {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-classroom-student-count {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+}
+
+.pr-classroom-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+ * 开始课堂配置卡（Hero 旁边的班级/诗篇选择区）
+ * ============================================================ */
+
+.pr-classroom-setup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-xl);
+    background-color: var(--surface-secondary-alpha);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    border-radius: var(--radius-lg);
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    /* v5.0 Task A.4：与 Hero 形成错落基线 offset，避免"容器对容器"对称 */
+    transform: none;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-card);
+}
+
+.pr-classroom-setup-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-loose);
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+    text-align: center;
+}
+
+.pr-classroom-setup-subtitle {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    text-align: center;
+    line-height: var(--leading-sm);
+}
+
+.pr-classroom-setup-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.pr-classroom-setup-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-classroom-setup-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: var(--tracking-tight);
+}
+
+/* 旧 mode-grid 保留兼容（已由 Hero 内的 hero-modes 替代） */
+.pr-classroom-mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-sm);
+}
+
+/* 模式卡基础样式 —— v5.0 Task A.4：移除 1px solid transparent 边框
+ * 边界由背景色差 + 阴影定义；active 态用 box-shadow 替代 border-color */
+.pr-classroom-mode-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background-color: var(--surface-tertiary-alpha);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    /* 模式切换：350ms ease-in-out（SubTask 2.6.2）；hover lift 保持微交互 150ms
+     * 规范 7.2：所有动效采用 Spring 物理曲线（var(--ease-out) / var(--ease-in-out)） */
+    transition:
+        background-color var(--dur-route) var(--ease-in-out),
+        box-shadow var(--dur-route) var(--ease-in-out),
+        transform var(--dur-micro) var(--ease-out);
+    text-align: left;
+    font-family: inherit;
+}
+
+/* 规范 7.3：补齐 5 态反馈链路 —— 默认/hover/active/focus-visible/loading */
+.pr-classroom-mode-card:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.pr-classroom-mode-card:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-classroom-mode-card:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+.pr-classroom-mode-card:hover {
+    background-color: var(--border-row-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+}
+
+/* 当前模式高亮：accent-primary 20% alpha 背景 + 焦点环（v5.0 Task A.4：box-shadow 替代 border-color） */
+.pr-classroom-mode-card--active {
+    background-color: var(--accent-primary-20);
+    box-shadow: 0 0 0 1px var(--accent-primary-40), var(--shadow-card);
+}
+
+.pr-classroom-mode-card--active:hover {
+    box-shadow: 0 0 0 1px var(--accent-primary-40), var(--shadow-card-hover);
+}
+
+.pr-classroom-mode-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-xs);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    flex-shrink: 0;
+}
+
+.pr-classroom-mode-card--active .pr-classroom-mode-card-icon {
+    background-color: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-classroom-mode-card-name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-classroom-mode-card-desc {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-2xs);
+}
+
+/* ============================================================
+ * 大屏预览 Stage
+ * ============================================================ */
+
+.pr-stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background-color: rgb(var(--c-surface-secondary));
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    border-radius: var(--radius-lg);
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.pr-stage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.pr-stage-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-width: 0;
+}
+
+.pr-stage-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-normal);
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+}
+
+.pr-stage-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-stage-progress-bar {
+    width: 80px;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    overflow: hidden;
+}
+
+.pr-stage-progress-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-accent-primary));
+    /* P0-D2：transition: width 触发 Layout，改用 transform: scaleX + transform-origin: left（规范 6.6） */
+    transform-origin: left center;
+    transition: transform var(--dur-large) var(--ease-out);
+}
+
+.pr-stage-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.pr-stage-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-stage-stat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(var(--c-text-tertiary));
+}
+
+/* 题目主体 */
+.pr-stage-question {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    flex: 1;
+    min-height: 0;
+}
+
+.pr-stage-question-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.pr-stage-question-stem {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-lg);
+    letter-spacing: var(--tracking-normal);
+}
+
+.pr-stage-question-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-stage-question-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--surface-tertiary-alpha);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-sm);
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+    text-align: left;
+    font-family: inherit;
+}
+
+.pr-stage-question-option:hover {
+    background-color: var(--border-row-hover);
+    transform: translateX(2px);
+}
+
+/* 规范 7.3：补齐 5 态反馈 —— active/focus-visible/disabled */
+.pr-stage-question-option:active:not(:disabled) {
+    transform: translateX(2px) scale(0.98);
+}
+
+.pr-stage-question-option:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-stage-question-option:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+.pr-stage-question-option-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-xs);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    flex-shrink: 0;
+}
+
+/* 答题进度与统计 */
+.pr-stage-responses {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    /* v5.0 Task A.2.5：移除 border-top，改用 box-shadow inset 模拟分割线 */
+    box-shadow: inset 0 1px 0 var(--border-row-alpha);
+}
+
+.pr-stage-responses-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-stage-responses-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-stage-responses-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-stage-responses-stat--correct {
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-stage-responses-stat--wrong {
+    color: rgb(var(--c-accent-error));
+}
+
+/* 答题进度条 */
+.pr-stage-progress-track {
+    display: flex;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    overflow: hidden;
+    gap: 2px;
+}
+
+.pr-stage-progress-segment {
+    height: 100%;
+    /* B3.3: 保留 width 动画 - width 由 TSX 内联 style 按对/错/待答比例动态设置，且 segment 影响 flex 流式布局，纯 CSS 无法迁移至 scaleX */
+    transition: width var(--dur-large) var(--ease-out);
+}
+
+.pr-stage-progress-segment--correct {
+    background-color: rgb(var(--c-accent-success));
+}
+
+.pr-stage-progress-segment--wrong {
+    background-color: rgb(var(--c-accent-error));
+}
+
+.pr-stage-progress-segment--pending {
+    background-color: var(--surface-tertiary-alpha);
+}
+
+/* 空状态 */
+.pr-stage-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    padding: var(--space-3xl) var(--space-md);
+    text-align: center;
+    color: rgb(var(--c-text-tertiary));
+    flex: 1;
+}
+
+.pr-stage-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-stage-empty-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-stage-empty-text {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-tertiary));
+    max-width: 320px;
+    line-height: var(--leading-sm);
+}
+
+/* ============================================================
+ * 控制面板 Control —— surface-tertiary 背景（与大屏 surface-secondary 形成透明度分层，SubTask 2.6.1）
+ * ============================================================ */
+
+.pr-control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    /* 透明度分层：大屏 surface-secondary → 控制台 surface-tertiary（规范 2.3） */
+    background-color: rgb(var(--c-surface-tertiary));
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    border-radius: var(--radius-lg);
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.pr-control-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-control-section-title {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+}
+
+/* 活跃度仪表盘 */
+.pr-control-mood {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background-color: var(--surface-tertiary-alpha);
+    border-radius: var(--radius-sm);
+}
+
+.pr-control-mood-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-control-mood-label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary));
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.pr-control-mood-value {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-control-mood-bar {
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    overflow: hidden;
+}
+
+.pr-control-mood-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: var(--radius-full);
+    /* P0-D2：transition: width 触发 Layout，改用 transform: scaleX + transform-origin: left（规范 6.6）
+       background-color 非 layout 属性一并保留 */
+    transform-origin: left center;
+    transition: transform var(--dur-large) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-control-mood-fill--focused {
+    background-color: rgb(var(--c-accent-info));
+}
+
+.pr-control-mood-fill--excited {
+    background-color: rgb(var(--c-accent-success));
+}
+
+.pr-control-mood-fill--bored {
+    background-color: rgb(var(--c-accent-warning));
+}
+
+.pr-control-mood-fill--confused {
+    background-color: rgb(var(--c-accent-error));
+}
+
+/* 认知负荷指示器 */
+.pr-control-cognitive {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background-color: var(--surface-tertiary-alpha);
+    border-radius: var(--radius-sm);
+}
+
+.pr-control-cognitive-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-control-cognitive-label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary));
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.pr-control-cognitive-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-control-cognitive-value--low {
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-control-cognitive-value--mid {
+    color: rgb(var(--c-accent-warning));
+}
+
+.pr-control-cognitive-value--high {
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-control-cognitive-bar {
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    overflow: hidden;
+}
+
+.pr-control-cognitive-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg,
+            rgb(var(--c-accent-success)) 0%,
+            rgb(var(--c-accent-warning)) 50%,
+            rgb(var(--c-accent-error)) 100%);
+    /* P0-D2：transition: width 触发 Layout，改用 transform: scaleX + transform-origin: left（规范 6.6） */
+    transform-origin: left center;
+    transition: transform var(--dur-large) var(--ease-out);
+}
+
+.pr-control-cognitive-hint {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-2xs);
+}
+
+/* 学生标签云 */
+.pr-control-students {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.pr-control-student-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 2px var(--space-xs);
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-control-student-tag--correct {
+    background-color: var(--accent-success-20);
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-control-student-tag--wrong {
+    background-color: var(--accent-error-20);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-control-student-tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: currentColor;
+    flex-shrink: 0;
+}
+
+/* 题目导航 */
+.pr-control-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-control-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: var(--space-xs);
+}
+
+.pr-control-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-xs);
+    background-color: transparent;
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+    text-align: left;
+    font-family: inherit;
+    border: none;
+    width: 100%;
+}
+
+.pr-control-nav-item:hover {
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+}
+
+/* 规范 7.3：补齐 focus-visible 态 */
+.pr-control-nav-item:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-control-nav-item--active {
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-weight: var(--weight-semibold);
+}
+
+.pr-control-nav-item-index {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    min-width: 24px;
+    flex-shrink: 0;
+}
+
+.pr-control-nav-item--active .pr-control-nav-item-index {
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-control-nav-item-stem {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-control-nav-item-status {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: rgb(var(--c-text-tertiary));
+}
+
+/* 控制按钮组 */
+.pr-control-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-top: var(--space-md);
+    /* v5.0 Task A.2.5：移除 border-top，改用 box-shadow inset 模拟分割线 */
+    box-shadow: inset 0 1px 0 var(--border-row-alpha);
+}
+
+.pr-control-actions-row {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+ * 四种模式专属样式
+ * ============================================================ */
+
+/* 集体闯关 —— 倒计时 */
+.pr-collective-race {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.pr-collective-race-timer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--accent-primary-10);
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-collective-race-timer-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-collective-race-timer--urgent {
+    background-color: var(--accent-error-20);
+    color: rgb(var(--c-accent-error));
+    animation: pr-timer-pulse 1s var(--ease-in-out) infinite;
+}
+
+@keyframes pr-timer-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* 速答 PK —— 积分榜 */
+.pr-speed-pk {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-speed-pk-leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-speed-pk-leaderboard-item {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-xs);
+    background-color: var(--surface-tertiary-alpha);
+    transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-speed-pk-leaderboard-item:hover {
+    background-color: var(--border-row-hover);
+}
+
+.pr-speed-pk-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+}
+
+.pr-speed-pk-rank--1 {
+    background-color: var(--accent-warning-20);
+    color: rgb(var(--c-accent-warning));
+}
+
+.pr-speed-pk-rank--2 {
+    background-color: var(--accent-info-20);
+    color: rgb(var(--c-accent-info));
+}
+
+.pr-speed-pk-rank--3 {
+    background-color: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-speed-pk-name {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-speed-pk-score {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--c-accent-primary));
+    font-variant-numeric: tabular-nums;
+}
+
+/* 飞花令 —— 关键字 + 擂主榜 */
+.pr-flying-flower {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.pr-flying-flower-keyword {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(135deg, var(--accent-primary-10), var(--accent-primary-20));
+    border-radius: var(--radius-md);
+}
+
+.pr-flying-flower-keyword-label {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    font-weight: var(--weight-medium);
+}
+
+.pr-flying-flower-keyword-value {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--c-accent-primary));
+    line-height: 1;
+}
+
+.pr-flying-flower-leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-flying-flower-leader-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-xs);
+    background-color: var(--surface-tertiary-alpha);
+}
+
+.pr-flying-flower-leader-name {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-flying-flower-leader-streak {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--c-accent-primary));
+    font-variant-numeric: tabular-nums;
+}
+
+/* 六阶沉浸课 —— 六阶雷达 */
+.pr-six-level {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.pr-six-level-tiers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-six-level-tier {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-xs);
+    background-color: var(--surface-tertiary-alpha);
+    transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-six-level-tier--current {
+    background-color: var(--accent-primary-10);
+}
+
+.pr-six-level-tier-name {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-six-level-tier-bar {
+    height: 4px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    overflow: hidden;
+}
+
+.pr-six-level-tier-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-accent-primary));
+    /* P0-D2：transition: width 触发 Layout，改用 transform: scaleX + transform-origin: left（规范 6.6） */
+    transform-origin: left center;
+    transition: transform var(--dur-large) var(--ease-out);
+}
+
+.pr-six-level-tier-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-secondary));
+    font-variant-numeric: tabular-nums;
+    min-width: 32px;
+    text-align: right;
+}
+
+/* ============================================================
+ * AI 副驾栏 AIAssistant
+ * ============================================================ */
+
+.pr-ai-assistant {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background-color: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius-lg);
+    max-height: 280px;
+    min-height: 120px;
+}
+
+.pr-ai-assistant-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+}
+
+.pr-ai-assistant-title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-ai-assistant-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-xs);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-ai-assistant-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.pr-ai-assistant-messages {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    padding-right: var(--space-xs);
+}
+
+.pr-ai-message {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--surface-tertiary-alpha);
+    border-radius: var(--radius-sm);
+    animation: pr-ai-msg-in var(--dur-small) var(--ease-out);
+}
+
+@keyframes pr-ai-msg-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* v5.0 Task A.2.5：原 border-left-color 改为 box-shadow inset 左侧指示条
+ * 配合规范 9.2 引用块左侧指示条策略（同 .pr-md blockquote），避免硬边框 */
+.pr-ai-message--feedback {
+    box-shadow: inset 3px 0 0 rgb(var(--c-accent-info));
+}
+
+.pr-ai-message--hint {
+    box-shadow: inset 3px 0 0 rgb(var(--c-accent-warning));
+}
+
+.pr-ai-message--discussion {
+    box-shadow: inset 3px 0 0 rgb(var(--c-accent-primary));
+}
+
+.pr-ai-message--report {
+    box-shadow: inset 3px 0 0 rgb(var(--c-accent-success));
+}
+
+.pr-ai-message-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    font-weight: var(--weight-medium);
+}
+
+.pr-ai-message-role {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px var(--space-xs);
+    border-radius: var(--radius-full);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-family: var(--font-mono);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-ai-message-content {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-sm);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.pr-ai-assistant-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-sm);
+    flex: 1;
+}
+
+/* ============================================================
+ * 课堂报告 Modal
+ * ============================================================ */
+
+.pr-report {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.pr-report-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-report-section-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.pr-report-summary {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-base);
+    padding: var(--space-md);
+    background-color: var(--surface-tertiary-alpha);
+    border-radius: var(--radius-sm);
+}
+
+.pr-report-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-sm);
+}
+
+.pr-report-metric {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background-color: var(--surface-tertiary-alpha);
+    border-radius: var(--radius-sm);
+}
+
+.pr-report-metric-label {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+}
+
+.pr-report-metric-value {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--c-text-primary));
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.pr-report-metric-value-suffix {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+    color: rgb(var(--c-text-secondary));
+    margin-left: var(--space-xs);
+}
+
+/* 掌握度对比条 */
+.pr-report-mastery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-report-mastery-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.pr-report-mastery-label {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    font-weight: var(--weight-medium);
+}
+
+.pr-report-mastery-bar {
+    display: flex;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    overflow: hidden;
+}
+
+.pr-report-mastery-before {
+    background-color: var(--accent-info-40);
+}
+
+.pr-report-mastery-after {
+    background-color: rgb(var(--c-accent-success));
+}
+
+.pr-report-mastery-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    font-variant-numeric: tabular-nums;
+}
+
+/* 亮点与改进 */
+.pr-report-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding-left: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.pr-report-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-sm);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--surface-tertiary-alpha);
+    border-radius: var(--radius-xs);
+}
+
+.pr-report-list-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.pr-report-list-item-icon--highlight {
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-report-list-item-icon--improvement {
+    color: rgb(var(--c-accent-warning));
+}
+
+/* ============================================================
+ * 单设备学生作答台
+ * ============================================================ */
+
+.pr-student-input-panel {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.34fr) minmax(0, 1fr);
+    gap: var(--space-sm) var(--space-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background:
+        linear-gradient(135deg, var(--accent-primary-10), transparent 68%),
+        rgb(var(--c-surface-primary));
+    box-shadow: inset 0 0 0 1px var(--border-primary-alpha);
+    min-width: 0;
+}
+
+.pr-student-input-header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-width: 0;
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-student-input-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-student-input-name-row {
+    min-width: 0;
+}
+
+.pr-student-input-student,
+.pr-student-input-answer-zone {
+    display: grid;
+    align-content: start;
+    gap: var(--space-sm);
+    min-width: 0;
+}
+
+.pr-student-input-section-label {
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-student-input-history-quick {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    max-height: 194px;
+    padding: 2px;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+.pr-student-input-name,
+.pr-student-input-answer {
+    width: 100%;
+    max-width: 100%;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-surface-secondary));
+    color: rgb(var(--c-text-primary));
+    font: inherit;
+    box-shadow: inset 0 0 0 1px var(--border-primary-alpha);
+    transition:
+        box-shadow var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-student-input-name {
+    min-height: 42px;
+    padding: 0 var(--space-md);
+}
+
+.pr-student-input-answer {
+    min-height: 108px;
+    padding: var(--space-sm) var(--space-md);
+    resize: vertical;
+    line-height: 1.65;
+}
+
+.pr-student-input-name::placeholder,
+.pr-student-input-answer::placeholder {
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-student-input-name:focus,
+.pr-student-input-answer:focus {
+    outline: none;
+    background: rgb(var(--c-surface-primary));
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-student-input-name:disabled,
+.pr-student-input-answer:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.pr-student-input-history-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    width: 100%;
+    min-height: 38px;
+    padding: var(--space-xs) var(--space-sm);
+    border: 0;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+    justify-content: center;
+}
+
+.pr-student-input-history-item:hover,
+.pr-student-input-history-item:focus-visible,
+.pr-student-input-history-item.is-selected {
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--accent-primary-30);
+}
+
+.pr-student-input-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    min-width: 0;
+}
+
+.pr-student-input-hint {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-student-input-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    min-height: 38px;
+    padding: var(--space-xs) var(--space-md);
+    border: 0;
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-text-inverse));
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        transform var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        opacity var(--dur-micro) var(--ease-out);
+}
+
+.pr-student-input-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-card-hover);
+}
+
+.pr-student-input-submit:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-student-input-submit:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+}
+
+.pr-student-input-score {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    background: var(--accent-success-10);
+}
+
+.pr-student-input-score-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-student-input-score-name,
+.pr-student-input-score-value {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-student-input-score-value.is-correct {
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-student-input-score-value.is-wrong {
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-student-input-score-feedback {
+    margin: 0;
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-sm);
+    line-height: 1.7;
+}
+
+.pr-student-input-score-dims {
+    display: grid;
+    gap: var(--space-xs);
+}
+
+.pr-student-input-score-dim {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 28px;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-2xs);
+}
+
+.pr-student-input-score-dim-bar {
+    height: 5px;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--surface-tertiary-alpha);
+}
+
+.pr-student-input-score-dim-fill {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: rgb(var(--c-accent-success));
+    transform-origin: left center;
+}
+
+.pr-student-input-score-dim-value {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+ * 响应式微调
+ * ============================================================ */
+
+@media (max-width: 768px) {
+    .pr-classroom-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-md);
+    }
+
+    .pr-classroom-header-meta {
+        width: 100%;
+    }
+
+    .pr-classroom-setup {
+        padding: var(--space-lg) var(--space-md);
+        margin: var(--space-md) auto;
+    }
+
+    .pr-stage {
+        padding: var(--space-md);
+    }
+
+    .pr-control {
+        padding: var(--space-md);
+    }
+
+    .pr-classroom-mode-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pr-ai-assistant {
+        max-height: 200px;
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .pr-student-input-panel {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pr-student-input-answer {
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    .pr-student-input-actions {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .pr-classroom-mode-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pr-stage-question-stem {
+        font-size: var(--text-base);
+    }
+}
+
+/* prefers-reduced-motion 降级 */
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-collective-race-timer--urgent,
+    .pr-ai-message,
+    .pr-control-mode-segment-switching,
+    .pr-control-mode-card--pending,
+    .pr-ai-assistant-streaming-waiting,
+    .pr-classroom-report-review-card {
+        animation: none;
+    }
+
+    .pr-ai-assistant-streaming {
+        animation: none;
+    }
+}
+
+/* ============================================================
+ * 报告回看卡片（?view=report 视图）
+ * ------------------------------------------------------------
+ * 设计意图：历史课堂报告精简回看，替代实时课堂舞台，
+ *   突出报告摘要 + 参与度 + 掌握度变化三个核心指标。
+ * 纸张质感（规范 4.7）：暖灰阴影 + 微噪点，传达可靠仪式感。
+ * ============================================================ */
+
+.pr-classroom-report-review {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-lg);
+}
+
+.pr-classroom-report-review-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-xl);
+    width: 100%;
+    max-width: 880px;
+    padding: var(--space-2xl) var(--space-2xl);
+    background-color: rgb(var(--c-surface-secondary));
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    border-radius: var(--radius-lg);
+    /* 规范 14.2：阴影使用 token，禁止 rgba(60,50,40,...) 非暖调 token 色值 */
+    box-shadow: var(--shadow-card-hover);
+    animation: pr-report-review-in var(--dur-medium) var(--spring-soft) both;
+}
+
+@keyframes pr-report-review-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-classroom-report-review-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    flex-shrink: 0;
+}
+
+.pr-classroom-report-review-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    min-width: 0;
+}
+
+.pr-classroom-report-review-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+    line-height: var(--leading-xl);
+}
+
+.pr-classroom-report-review-summary {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-sm);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pr-classroom-report-review-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-top: var(--space-xs);
+}
+
+.pr-classroom-report-review-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+}
+
+/* 响应式：平板/移动单列堆叠 */
+@media (max-width: 768px) {
+    .pr-classroom-report-review-card {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+        text-align: left;
+        padding: var(--space-xl);
+    }
+
+    .pr-classroom-report-review-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .pr-classroom-report-review-meta {
+        justify-content: flex-start;
+    }
+}
+
+/* ============================================================
+ * 高端组件增强（TextSwitch + GlassCard）
+ * ------------------------------------------------------------
+ * 严格遵循规范：零硬编码、透明度分层、transform/opacity 动画
+ * ============================================================ */
+
+/* Hero 关键概念轮播容器 —— 松带间距与 subtitle 拉开节奏 */
+.pr-classroom-hero-switch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-card);
+}
+
+/* 通用 stagger 会从 scale(0.96) 入场，使内部 44px 控件在动画期间实际
+ * 命中区缩到 42.24px。课堂轮播保留淡入与上浮节奏，但禁止缩放可交互区。 */
+@keyframes pr-classroom-hero-switch-enter {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-classroom-hero-switch.pr-v5-stagger-item {
+    animation-name: pr-classroom-hero-switch-enter;
+}
+
+/* TextSwitch 文本样式：accent 强调色 + 半粗字重 */
+.pr-classroom-hero-switch-text {
+    color: var(--page-classroom-hero-accent);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tight);
+}
+
+/* TextSwitch 指示点尺寸微调（与 Hero 比例协调） */
+.pr-classroom-hero-switch .pr-textswitch-dots {
+    margin-top: var(--space-xs);
+    gap: 0;
+}
+
+.pr-classroom-readiness {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: rgb(var(--c-surface-tertiary) / 0.64);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 0 0 1px rgb(var(--c-text-primary) / 0.045);
+}
+
+.pr-classroom-readiness.is-ready {
+    background: linear-gradient(135deg,
+            rgb(var(--c-accent-success) / 0.10),
+            rgb(var(--c-surface-primary) / 0.64));
+}
+
+.pr-classroom-readiness-main {
+    display: grid;
+    /* 规范 14.2：硬编码 3px 替换为 --space-xs token（紧带间距） */
+    gap: var(--space-xs);
+    min-width: 0;
+}
+
+.pr-classroom-readiness-kicker {
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    /* 注：0.14em 为全大写 kicker 专属宽字距，tokens 无匹配项，保留以维持视觉外观 */
+    letter-spacing: 0.14em;
+}
+
+.pr-classroom-readiness-main strong {
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-sm);
+}
+
+.pr-classroom-readiness-main>span:last-child {
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-xs);
+    /* 规范 14.2：line-height 1.55 替换为 --leading-sm token（1.5385，近似保持视觉） */
+    line-height: var(--leading-sm);
+}
+
+.pr-classroom-readiness-levels {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.pr-classroom-readiness-levels span {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* 规范 14.2：硬编码 4px 替换为 --space-xs token */
+    gap: var(--space-xs);
+    min-height: 28px;
+    padding: 0 var(--space-sm);
+    color: rgb(var(--c-text-tertiary));
+    background: rgb(var(--c-surface-primary) / 0.58);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-2xs);
+}
+
+.pr-classroom-readiness-levels span.has-data {
+    color: rgb(var(--c-text-primary));
+    box-shadow: inset 0 -2px 0 rgb(var(--c-accent-success) / 0.55);
+}
+
+.pr-classroom-readiness-levels b {
+    font-variant-numeric: tabular-nums;
+    color: rgb(var(--c-accent-primary));
+}
+
+@media (max-width: 620px) {
+    .pr-classroom-readiness {
+        grid-template-columns: 1fr;
+    }
+
+    .pr-classroom-readiness-levels {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* 保留 TextSwitch 自身的 44px 命中区；这里只调整视觉点，不再用 40px
+ * compact token 覆盖组件的无障碍最小操作尺寸。 */
+.pr-classroom-hero-switch .pr-textswitch-dot {
+    background: transparent;
+}
+
+.pr-classroom-hero-switch .pr-textswitch-dot::before {
+    width: 5px;
+    height: 5px;
+    background: rgb(var(--c-text-tertiary) / 0.40);
+}
+
+.pr-classroom-hero-switch .pr-textswitch-dot:hover::before {
+    background: rgb(var(--c-text-tertiary) / 0.70);
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+.pr-classroom-hero-switch .pr-textswitch-dot.is-active::before {
+    background: var(--page-classroom-hero-accent);
+    transform: translate(-50%, -50%) scale(1.15);
+}
+
+/* GlassCard 替换 .pr-classroom-setup 的样式协调
+ * 保留原始 padding/transform/max-width，让 GlassCard 的玻璃态背景增强视觉 */
+.pr-glasscard.pr-classroom-setup {
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    transform: none;
+    align-self: stretch;
+    justify-content: center;
+}
+
+/* GlassCard 内容层继承 flex 布局，确保表单正确排列 */
+.pr-classroom-setup .pr-glasscard-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    justify-content: center;
+    min-height: 100%;
+}
+
+.pr-classroom-launch-shell .pr-classroom-readiness {
+    grid-template-columns: 1fr;
+}
+
+.pr-classroom-launch-shell .pr-classroom-readiness-levels {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* 开课前摘要：填补大屏配置侧的无信息留白，并且只复用当前真实选择、题库核验和模式元数据。
+ * 它不是预测性学生画像或学习成效声明；开课前不可得的数据一律显示为等待状态。 */
+.pr-classroom-launch-brief {
+    display: grid;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background:
+        linear-gradient(135deg, rgb(var(--c-page-classroom-hero) / 0.08), transparent 62%),
+        rgb(var(--c-surface-secondary) / 0.52);
+    box-shadow: inset 0 0 0 1px rgb(var(--c-text-primary) / 0.055);
+}
+
+.pr-classroom-launch-brief-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-classroom-launch-brief-heading > div {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.pr-classroom-launch-brief-kicker {
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.12em;
+}
+
+.pr-classroom-launch-brief-heading strong {
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-sm);
+    line-height: var(--leading-sm);
+}
+
+.pr-classroom-launch-brief-state {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 4px;
+    min-height: var(--control-height-compact);
+    padding: 0 var(--space-sm);
+    border-radius: var(--radius-pill);
+    color: rgb(var(--c-text-secondary));
+    background-color: rgb(var(--c-surface-primary) / 0.7);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-classroom-launch-brief-state.is-ready {
+    color: rgb(var(--c-accent-success));
+    background-color: rgb(var(--c-accent-success) / 0.10);
+}
+
+.pr-classroom-launch-brief-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xs);
+    margin: 0;
+}
+
+.pr-classroom-launch-brief-facts > div {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+}
+
+.pr-classroom-launch-brief-facts dt {
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+}
+
+.pr-classroom-launch-brief-facts dd {
+    margin: 0;
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    line-height: var(--leading-sm);
+    /* 开课前的班级、诗篇与课堂组织是决策信息，不能用省略号隐藏。
+       右侧控制台较窄时让文本自然换行，由卡片高度承载真实状态。 */
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.pr-classroom-launch-brief-flow {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    background-color: rgb(var(--c-text-primary) / 0.055);
+    list-style: none;
+}
+
+.pr-classroom-launch-brief-flow li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    gap: 4px;
+    padding: var(--space-xs) 4px;
+    color: rgb(var(--c-text-secondary));
+    background-color: rgb(var(--c-surface-primary) / 0.78);
+    font-size: var(--text-2xs);
+    white-space: nowrap;
+}
+
+.pr-classroom-launch-brief-flow svg {
+    flex-shrink: 0;
+    color: rgb(var(--c-accent-primary));
+}
+
+@media (max-width: 620px) {
+    .pr-classroom-launch-brief-facts {
+        grid-template-columns: 1fr;
+    }
+
+    .pr-classroom-launch-brief-facts dd {
+        white-space: normal;
+    }
+}
+
+@media (max-width: 768px) {
+    .pr-glasscard.pr-classroom-setup {
+        padding: var(--space-lg) var(--space-md);
+        margin: var(--space-md) auto;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-classroom-hero-switch .pr-textswitch-dot {
+        transition: none;
+    }
+
+    .pr-glasscard.pr-classroom-setup {
+        transform: none;
+    }
+}
+
+/* ============================================================
+ * ElectricBorder 选中态电流光环（组件集成 Task 6）
+ * ------------------------------------------------------------
+ * 设计意图：选中模式卡片时，ElectricBorder 作为绝对定位 overlay
+ *   覆盖在 button 内部，canvas 电流描边溢出作为"选中光环"，
+ *   替代原有 box-shadow 焦点环，提供更具仪式感的选中反馈。
+ *
+ * 规范合规：
+ * - pointer-events: none（不影响 button 点击交互）
+ * - z-index 分层：canvas(2) 在内容(3) 之下，内容可正常交互
+ * - 容器 overflow: visible（允许 canvas 光环视觉溢出）
+ * - color 默认 rgb(197,133,59) 对齐 --c-accent-primary
+ *   （canvas strokeStyle 不支持 CSS 变量，需具体颜色值）
+ * ============================================================ */
+
+/* 模式卡片建立定位上下文 + 允许光环溢出 */
+.pr-classroom-mode-card {
+    position: relative;
+    overflow: visible;
+}
+
+/* ElectricBorder overlay：绝对定位铺满卡片，不拦截交互 */
+.pr-classroom-mode-card-eb-overlay.pr-electric-border {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+/* 卡片内容提升层级，确保在 ElectricBorder 之上可交互 */
+.pr-classroom-mode-card-icon,
+.pr-classroom-mode-card-name,
+.pr-classroom-mode-card-desc,
+.pr-classroom-mode-card-feature-details {
+    position: relative;
+    z-index: 3;
+}
+
+/* Bento 网格容器允许视觉溢出（电流光环不裁剪） */
+.pr-classroom-hero-modes {
+    overflow: visible;
+}
+
+/* prefers-reduced-motion 降级：降低光环视觉强度 */
+@media (prefers-reduced-motion: reduce) {
+    .pr-classroom-mode-card-eb-overlay.pr-electric-border {
+        opacity: 0.5;
+    }
+}
+
+/* ============================================================
+ * 课堂指挥深化：FLIP 模式切换过渡（Task 1）
+ * ------------------------------------------------------------
+ * 模式切换时主体内容先淡出（200ms ease-in），
+ * 切换完成后淡入（350ms ease-out）+ 微上移。
+ * 共享元素（标题/图标）由 flip.ts 的 FLIP 动画处理。
+ * ============================================================ */
+
+.pr-classroom-body {
+    transition:
+        opacity 350ms var(--ease-out),
+        transform 350ms var(--ease-out);
+}
+
+.pr-classroom--mode-switching .pr-classroom-body {
+    opacity: 0;
+    transform: scale(0.98);
+    transition:
+        opacity 200ms var(--ease-in),
+        transform 200ms var(--ease-in);
+}
+
+/* prefers-reduced-motion 降级：跳过模式切换动画 */
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-classroom-body,
+    .pr-classroom--mode-switching .pr-classroom-body {
+        transition: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ============================================================
+ * 课堂指挥深化：模式分段控制器（Task 1 —— 玻璃态）
+ * ============================================================ */
+
+.pr-control-mode-segment {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background-color: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-md);
+}
+
+.pr-control-mode-segment-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+    text-transform: uppercase;
+    /* 注：0.04em 为全大写 segment label 专属宽字距，tokens 无匹配项，保留以维持视觉外观 */
+    letter-spacing: 0.04em;
+}
+
+.pr-control-mode-segment-switching {
+    margin-left: auto;
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-2xs);
+    font-weight: 500;
+    animation: pr-mode-switching-pulse 1s var(--ease-in-out) infinite;
+}
+
+@keyframes pr-mode-switching-pulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.pr-control-mode-segment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xs);
+}
+
+.pr-control-mode-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-control-mode-card:hover:not(:disabled) {
+    background-color: var(--surface-tertiary-alpha);
+    transform: translateY(-1px);
+}
+
+.pr-control-mode-card:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+/* 规范 7.3：补齐 focus-visible 态 */
+.pr-control-mode-card:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-control-mode-card:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pr-control-mode-card--active {
+    background-color: var(--accent-primary-10);
+    box-shadow: 0 0 0 1px var(--accent-primary-20);
+}
+
+.pr-control-mode-card--active:hover:not(:disabled) {
+    background-color: var(--accent-primary-20);
+}
+
+.pr-control-mode-card--pending {
+    background-color: rgb(var(--c-accent-warning) / 0.08);
+    box-shadow: 0 0 0 1px rgb(var(--c-accent-warning) / 0.3);
+    animation: pr-mode-pending-pulse 1.2s var(--ease-in-out) infinite;
+}
+
+@keyframes pr-mode-pending-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 1px rgb(var(--c-accent-warning) / 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 0 2px rgb(var(--c-accent-warning) / 0.5);
+    }
+}
+
+.pr-control-mode-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-xs);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    flex-shrink: 0;
+}
+
+.pr-control-mode-card--active .pr-control-mode-card-icon {
+    background-color: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-control-mode-card-name {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    line-height: 1.3;
+}
+
+.pr-control-mode-card-meta {
+    /* 规范 14.2：硬编码 10px 替换为 --text-2xs token */
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+}
+
+.pr-control-mode-card-confirm {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 2px;
+    padding: 1px var(--space-xs);
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-accent-warning) / 0.15);
+    color: rgb(var(--c-accent-warning));
+    /* 规范 14.2：硬编码 10px 替换为 --text-2xs token */
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+}
+
+@media (max-width: 480px) {
+    .pr-control-mode-segment-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+ * 课堂指挥深化：AI 协同建议（Task 3 —— 流式输出）
+ * ============================================================ */
+
+.pr-ai-assistant-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    flex-shrink: 0;
+}
+
+.pr-ai-suggestion-btn {
+    display: inline-flex;
+    align-items: center;
+    /* 规范 14.2：硬编码 4px 替换为 --space-xs token */
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--surface-tertiary-alpha);
+    border: none;
+    border-radius: var(--radius-full);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    font-family: inherit;
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-ai-suggestion-btn:hover:not(:disabled) {
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    transform: translateY(-1px);
+}
+
+.pr-ai-suggestion-btn:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+/* 规范 7.3：补齐 focus-visible 态 */
+.pr-ai-suggestion-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-ai-suggestion-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pr-ai-suggestion-btn--active {
+    background-color: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+    box-shadow: 0 0 0 1px var(--accent-primary-40);
+}
+
+.pr-ai-suggestion-btn--adopted {
+    background-color: rgb(var(--c-accent-success) / 0.10);
+    color: rgb(var(--c-accent-success));
+}
+
+/* 流式输出区域 */
+.pr-ai-assistant-streaming {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background-color: var(--surface-secondary-alpha);
+    border-radius: var(--radius-sm);
+    border-left: 2px solid rgb(var(--c-accent-primary));
+    animation: pr-ai-stream-in var(--dur-small) var(--ease-out);
+}
+
+.pr-ai-assistant-streaming--feedback {
+    border-left-color: rgb(var(--c-accent-info));
+}
+
+.pr-ai-assistant-streaming--supplement {
+    border-left-color: rgb(var(--c-accent-success));
+}
+
+.pr-ai-assistant-streaming--followup {
+    border-left-color: rgb(var(--c-accent-primary));
+}
+
+.pr-ai-assistant-streaming--intervention {
+    border-left-color: rgb(var(--c-accent-warning));
+}
+
+@keyframes pr-ai-stream-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-ai-assistant-streaming-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+}
+
+.pr-ai-assistant-streaming-label {
+    display: inline-flex;
+    align-items: center;
+    /* 规范 14.2：硬编码 4px 替换为 --space-xs token */
+    gap: var(--space-xs);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-ai-assistant-streaming-abort,
+.pr-ai-assistant-streaming-adopt {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 2px var(--space-xs);
+    background-color: transparent;
+    border: none;
+    border-radius: var(--radius-xs);
+    /* 规范 14.2：硬编码 10px 替换为 --text-2xs token */
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    font-family: inherit;
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-ai-assistant-streaming-abort {
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-ai-assistant-streaming-abort:hover {
+    background-color: rgb(var(--c-accent-error) / 0.10);
+}
+
+.pr-ai-assistant-streaming-adopt {
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-ai-assistant-streaming-adopt:hover {
+    background-color: rgb(var(--c-accent-success) / 0.10);
+}
+
+/* 规范 7.3：补齐 focus-visible 态 */
+.pr-ai-assistant-streaming-abort:focus-visible,
+.pr-ai-assistant-streaming-adopt:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-ai-assistant-streaming-content {
+    font-size: var(--text-xs);
+    /* 规范 14.2：line-height 1.6 替换为 --leading-base token */
+    line-height: var(--leading-base);
+    color: rgb(var(--c-text-primary));
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: var(--space-xs);
+}
+
+.pr-ai-assistant-streaming-waiting {
+    display: inline-flex;
+    align-items: center;
+    /* 规范 14.2：硬编码 4px 替换为 --space-xs token */
+    gap: var(--space-xs);
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+    animation: pr-ai-streaming-waiting-pulse 1.5s var(--ease-in-out) infinite;
+}
+
+@keyframes pr-ai-streaming-waiting-pulse {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* 诗篇来源与开课核验相邻展示：真实教材不可用时，不用本地样例填充下拉框。 */
+.pr-classroom-poem-source {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    color: rgb(var(--c-text-secondary));
+    background: rgb(var(--c-accent-info) / 0.07);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 0 0 1px rgb(var(--c-accent-info) / 0.16);
+}
+
+.pr-classroom-poem-source.is-unavailable {
+    color: rgb(var(--c-accent-warning));
+    background: rgb(var(--c-accent-warning) / 0.09);
+    box-shadow: inset 0 0 0 1px rgb(var(--c-accent-warning) / 0.25);
+}
+
+.pr-classroom-poem-source.is-stale-live {
+    color: rgb(var(--c-text-secondary));
+    background: rgb(var(--c-accent-warning) / 0.06);
+    box-shadow: inset 0 0 0 1px rgb(var(--c-accent-warning) / 0.16);
+}
+
+.pr-classroom-poem-source strong,
+.pr-classroom-poem-source span {
+    display: block;
+}
+
+.pr-classroom-poem-source strong {
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-classroom-poem-source span {
+    margin-top: var(--space-2xs);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-sm);
+}
+
+.pr-classroom-poem-source button {
+    min-height: var(--control-height-compact);
+    padding: 0 var(--space-sm);
+    color: rgb(var(--c-accent-primary));
+    background: rgb(var(--c-surface-primary) / 0.74);
+    border: 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-classroom-poem-source button:focus-visible {
+    outline: 2px solid rgb(var(--c-accent-primary));
+    outline-offset: 2px;
+}
+
+/* 开课请求失败不能只留下一条会自动消失的 toast。
+ * 该面板只陈述“本次没有建立课堂”的可验证结果，不回显后端错误正文；
+ * 主按钮原地变为“重新尝试启动”，既保留上下文也避免添加第二个重复操作入口。 */
+.pr-classroom-launch-failure {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    color: rgb(var(--c-accent-warning));
+    background: rgb(var(--c-accent-warning) / 0.09);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 0 0 1px rgb(var(--c-accent-warning) / 0.28);
+}
+
+.pr-classroom-launch-failure > svg {
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.pr-classroom-launch-failure > div {
+    display: grid;
+    min-width: 0;
+    gap: var(--space-2xs);
+}
+
+.pr-classroom-launch-failure strong {
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-classroom-launch-failure span {
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-2xs);
+    line-height: var(--leading-sm);
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 620px) {
+    .pr-classroom-poem-source {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .pr-classroom-poem-source button {
+        grid-column: 2;
+        justify-self: start;
+    }
+}

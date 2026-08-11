@@ -1,0 +1,23 @@
+* text=auto eol=lf whitespace=-blank-at-eof,blank-at-eol,space-before-tab
+
+# Windows launchers keep the platform-native line ending.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets must never be line-ending normalized or text-diffed.
+*.png -text -diff
+*.jpg -text -diff
+*.jpeg -text -diff
+*.webp -text -diff
+*.gif -text -diff
+*.ico -text -diff
+*.woff2 -text -diff
+*.pptx -text -diff
+*.docx -text -diff
+*.doc -text -diff
+*.pdf -text -diff
+*.zip -text -diff
+
+# This generated notice intentionally preserves upstream license wording,
+# including whitespace present in original license texts.
+THIRD_PARTY_NOTICES.md text eol=lf -whitespace

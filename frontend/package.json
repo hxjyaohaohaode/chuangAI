@@ -1,0 +1,59 @@
+{
+  "name": "poetic-realm-v3-frontend",
+  "private": true,
+  "version": "5.0.0",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=20.19 <21"
+  },
+  "type": "module",
+  "description": "诗脉·启明 PoeticRealm AI v5.0 前端 - 面向小学古诗词教学的异构多智能体 Web 应用",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && node scripts/check-bundle-budget.mjs",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:evolution": "vitest run src/lib/evolution-predict-stream.test.ts",
+    "e2e:regression": "node e2e-regression.mjs",
+    "e2e:isolated": "node scripts/run-e2e-isolated.mjs",
+    "e2e:password": "node scripts/run-e2e-isolated.mjs --auth-mode password",
+    "audit:starmap": "node scripts/run-starmap-audit-isolated.mjs",
+    "audit:bundle": "node scripts/check-bundle-budget.mjs",
+    "link-audit": "node src/lib/link-auditor.ts",
+    "link-audit:json": "node src/lib/link-auditor.ts --json"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.7",
+    "@react-three/drei": "^9.114.3",
+    "@react-three/fiber": "^8.17.10",
+    "@tanstack/react-query": "^5.59.0",
+    "clsx": "^2.1.1",
+    "d3": "^7.9.0",
+    "highlight.js": "^11.11.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.1.0",
+    "react-router-dom": "^7.18.2",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
+    "three": "^0.169.0",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/node": "^20.19.43",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.169.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.20",
+    "playwright": "^1.61.1",
+    "postcss": "^8.5.23",
+    "tailwindcss": "^3.4.13",
+    "gsap": "^3.12.5",
+    "typescript": "^5.6.2",
+    "vite": "^6.4.3",
+    "vitest": "3.2.6"
+  }
+}

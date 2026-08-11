@@ -1,0 +1,84 @@
+/**
+ * PoeticRealm AI v5.0 / v5.1 全局样式入口
+ * 设计令牌由 tokens.css 提供；UI 组件样式由各组件 TSX 自行 import（B3.4 CSS 代码分割）；Tailwind 指令在此消费。
+ * 注意：CSS 规范要求 @import 必须先于其他规则，故所有 @import 置于顶部。
+ */
+
+/* v7 审计修复 P0-B4：原 CSS @import 已迁移至 main.tsx 的 JS import
+ * 规范 15.1 禁止 CSS @import（阻塞渲染），改由构建工具统一处理
+ * CSS 加载顺序：tokens.css → micro-interactions → a11y → textures → 组件 CSS → index.css。
+ * 无生产消费者的 brand-motion.css / scroll-driven-v5.css 已删除。 */
+
+/* v5.1：衬线斜体配对字体（Unseen / Crosswire sans+serif italic 启发）
+ * 与 Inter 形成无衬线 + 衬线斜体的张力对比
+ * v5.2 性能修正：移除 Google Fonts @import（违反规范 15.1 + 导致 FOUT/CLS 0.2657）
+ *   改用系统衬线字体回退链 —— Source Han Serif SC / STSong / SimSun 在 Windows/macOS
+ *   均预装，零网络请求、零布局偏移，视觉降级可接受（serif italic 仅用于诗题 hover 等增强场景） */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全局基础样式补充（核心重置已在 tokens.css 中定义） */
+:root {
+    color-scheme: light;
+}
+
+/* 禁用 emoji 渲染污染 —— 统一使用 SVG 图标（规范 13.1） */
+
+/* 全局通用旋转动画 —— 用于加载态图标（App.tsx Suspense fallback 等） */
+@keyframes pr-app-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.pr-app-spin {
+    animation: pr-app-spin 1s linear infinite;
+}
+
+/* 无障碍动效降级（规范 6.5）：装饰性旋转动效在 Reduce Motion 下完全移除 */
+@media (prefers-reduced-motion: reduce) {
+    .pr-app-spin {
+        animation: none;
+    }
+}
+
+/* v5.1：四段式暖渐变 body 背景（智谱清言 linear_bg_prompt_guidance 启发）
+ * 色差仅 1-2%，肉眼几乎不可辨但能感知"温度流动"
+ * 替代纯色 surface-primary，让米白底"呼吸"
+ * 叠加 fixed 渐变 + scroll 噪点，营造材质深度 */
+body {
+    background-image: var(--gradient-ambient-warm), var(--noise-texture);
+    background-repeat: no-repeat, repeat;
+    background-size: 100% 100%, 160px 160px;
+    background-attachment: fixed, scroll;
+}
+
+/* 移动/触控设备上的 fixed 大面积背景会触发昂贵重绘；保留同一视觉纹理但随页面滚动。 */
+@media (max-width: 1024px), (hover: none), (pointer: coarse) {
+    body {
+        background-attachment: scroll, scroll;
+    }
+}
+
+@media print {
+    body {
+        background-image: none !important;
+        background-attachment: scroll;
+    }
+}
+
+/* v5.1：主题切换禁用过渡（DeepSeek change-theme 启发）
+ * 切换主题瞬间禁用所有过渡，避免色块"流淌"的廉价感
+ * 添加 .pr-theme-switching 类时全局禁用过渡 */
+body.pr-theme-switching *,
+body.pr-theme-switching *::before,
+body.pr-theme-switching *::after {
+    transition: none !important;
+    animation: none !important;
+}

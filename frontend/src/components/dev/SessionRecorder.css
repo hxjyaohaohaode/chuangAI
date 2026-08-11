@@ -1,0 +1,257 @@
+/**
+ * SessionRecorder 样式（工程保障层 / 演示录屏回放）
+ *
+ * 设计规范合规：
+ * - 玻璃态浮窗：surface-glass + backdrop-blur 12px（规范 2.2）
+ * - 无边框：透明度分层 + 负空间（规范 4.1）
+ * - 暖调色板：accent-error（录制中脉动红点）/ accent-primary（待机）
+ * - 仅 transform/opacity 动画（规范 15.1）
+ * - 流体字号/间距 clamp()（规范 5.2）
+ * - prefers-reduced-motion 降级
+ */
+
+.pr-session-recorder {
+    position: fixed;
+    top: calc(var(--space-lg) + 56px);
+    right: var(--space-lg);
+    z-index: 9996;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    pointer-events: auto;
+    font-family: 'Inter', 'JetBrains Mono', monospace;
+    letter-spacing: -0.01em;
+}
+
+/* ───────── 录制主按钮 ───────── */
+
+.pr-recorder-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    background-color: rgb(var(--c-surface-elevated) / 0.85);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: var(--shadow-popover);
+    transition:
+        transform var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.pr-recorder-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-modal);
+    background-color: rgb(var(--c-surface-elevated) / 0.95);
+}
+
+.pr-recorder-toggle:active {
+    transform: scale(0.97);
+}
+
+.pr-recorder-toggle:focus-visible {
+    outline: none;
+    box-shadow:
+        var(--shadow-popover),
+        0 0 0 3px rgb(var(--c-accent-primary) / 0.20);
+}
+
+/* ───────── 录制红点 ───────── */
+
+.pr-recorder-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgb(var(--c-accent-primary));
+    flex-shrink: 0;
+    transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-recorder-dot[data-recording='true'] {
+    background-color: rgb(var(--c-accent-error));
+    animation: pr-recorder-pulse 1.2s var(--ease-in-out) infinite;
+}
+
+@keyframes pr-recorder-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgb(var(--c-accent-error) / 0.50);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(0.85);
+        box-shadow: 0 0 0 8px rgb(var(--c-accent-error) / 0);
+    }
+}
+
+/* ───────── 标签和计时器 ───────── */
+
+.pr-recorder-label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    font-variation-settings: 'wght' 500;
+    color: rgb(var(--c-text-primary));
+    white-space: nowrap;
+}
+
+.pr-session-recorder[data-state='recording'] .pr-recorder-label {
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-recorder-timer {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: rgb(var(--c-accent-error));
+    padding-left: var(--space-xs);
+    border-left: 1px solid rgb(var(--c-border-primary) / 0.20);
+    margin-left: var(--space-xs);
+}
+
+/* ───────── 备注按钮 ───────── */
+
+.pr-recorder-note-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    color: rgb(var(--c-text-secondary));
+    background-color: rgb(var(--c-surface-elevated) / 0.85);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: var(--shadow-popover);
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-recorder-note-btn:hover {
+    background-color: rgb(var(--c-surface-elevated) / 0.95);
+    transform: translateY(-1px);
+}
+
+.pr-recorder-note-btn:active {
+    transform: scale(0.97);
+}
+
+.pr-recorder-note-btn:focus-visible {
+    outline: none;
+    box-shadow:
+        var(--shadow-popover),
+        0 0 0 3px rgb(var(--c-accent-primary) / 0.20);
+}
+
+/* ───────── 事件计数 ───────── */
+
+.pr-recorder-events {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-accent-info) / 0.10);
+    color: rgb(var(--c-accent-info));
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ───────── 错误提示 ───────── */
+
+.pr-recorder-error {
+    position: absolute;
+    top: calc(100% + var(--space-sm));
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    background-color: rgb(var(--c-accent-error) / 0.10);
+    color: rgb(var(--c-accent-error));
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    max-width: 320px;
+    overflow: hidden;
+    box-shadow: var(--shadow-popover);
+    animation: pr-recorder-error-enter var(--dur-small) var(--ease-out);
+}
+
+.pr-recorder-error span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pr-recorder-error-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+    padding: 2px;
+    border-radius: var(--radius-xs);
+    transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-recorder-error-close:hover {
+    background-color: rgb(var(--c-accent-error) / 0.10);
+}
+
+@keyframes pr-recorder-error-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ───────── Reduced motion 降级 ───────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-recorder-toggle,
+    .pr-recorder-note-btn,
+    .pr-recorder-dot,
+    .pr-recorder-error {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* ───────── 小屏适配 ───────── */
+
+@media (max-width: 640px) {
+    .pr-session-recorder {
+        top: calc(var(--space-sm) + 56px);
+        right: var(--space-sm);
+    }
+
+    .pr-recorder-toggle {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--text-xs);
+    }
+
+    .pr-recorder-label {
+        font-size: var(--text-xs);
+    }
+
+    .pr-recorder-note-btn {
+        width: 28px;
+        height: 28px;
+    }
+}

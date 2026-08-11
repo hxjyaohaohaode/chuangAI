@@ -1,0 +1,681 @@
+/**
+ * 教师登录页样式
+ *
+ * 设计规范合规：
+ * - 暖调半透明背景 + 噪点纹理（非纯色）
+ * - 玻璃态卡片（surface-elevated + backdrop-blur 20px）
+ * - 无硬边框，透明度 alpha 线分隔
+ * - 流体 clamp() 尺寸
+ * - 完整三态：hover/active/focus-visible
+ * - 入场动画：opacity + translateY（GPU 加速）
+ */
+
+/* ============================================================
+ * 全屏容器
+ * ============================================================ */
+
+.pr-login {
+    /* v5.0 Task 9：移除 fixed（避免占用 fixed 层级），改为 relative + min-height: 100vh 占满视口 */
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(var(--c-surface-primary));
+    background-image: var(--noise-texture);
+    background-size: 200px 200px;
+    overflow: hidden;
+}
+
+/* ============================================================
+ * 背景装饰层 —— 暖调渐变光晕
+ * ============================================================ */
+
+.pr-login-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.pr-login-bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    will-change: transform;
+}
+
+.pr-login-bg-glow--primary {
+    width: clamp(400px, 50vw, 700px);
+    height: clamp(400px, 50vw, 700px);
+    top: -10%;
+    right: -5%;
+    background: radial-gradient(circle, rgb(var(--c-accent-primary) / 0.4), transparent 70%);
+    /* 24s 缓慢漂移呼吸 —— 氛围生命感（规范 7.6） */
+    animation: pr-login-glow-drift-a 24s var(--ease-in-out) infinite alternate;
+}
+
+.pr-login-bg-glow--secondary {
+    width: clamp(350px, 40vw, 600px);
+    height: clamp(350px, 40vw, 600px);
+    bottom: -10%;
+    left: -5%;
+    background: radial-gradient(circle, rgb(var(--c-accent-info) / 0.25), transparent 70%);
+    animation: pr-login-glow-drift-b 30s var(--ease-in-out) infinite alternate;
+}
+
+@keyframes pr-login-glow-drift-a {
+    from {
+        transform: translate(0, 0) scale(1);
+    }
+
+    to {
+        transform: translate(-6%, 8%) scale(1.08);
+    }
+}
+
+@keyframes pr-login-glow-drift-b {
+    from {
+        transform: translate(0, 0) scale(1);
+    }
+
+    to {
+        transform: translate(8%, -6%) scale(1.05);
+    }
+}
+
+/* ============================================================
+ * 诗雨氛围层 —— 垂直缓升的诗句列（规范 7.6 氛围效果）
+ * 极低透明度（4%），仅在余光中可辨；循环无缝，速度异步
+ * ============================================================ */
+
+.pr-login-poem-rain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.pr-login-poem-col {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2.2em;
+    overflow: hidden;
+    /* 上下两端渐隐，诗行如从雾中来、向雾中去 */
+    mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%);
+}
+
+.pr-login-poem-track {
+    display: flex;
+    flex-direction: column;
+    animation: pr-login-poem-rise var(--rain-duration, 60s) linear infinite;
+    animation-delay: var(--rain-delay, 0s);
+    will-change: transform;
+}
+
+.pr-login-poem-set {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(48px, 8vh, 96px);
+    padding-bottom: clamp(48px, 8vh, 96px);
+}
+
+.pr-login-poem-line {
+    font-family: var(--font-display);
+    font-size: clamp(18px, 1.6vw, 26px);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary) / 0.045);
+    /* 竖排：古典卷轴语感 */
+    writing-mode: vertical-rl;
+    letter-spacing: 0.35em;
+    user-select: none;
+    white-space: nowrap;
+}
+
+@keyframes pr-login-poem-rise {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-50%);
+    }
+}
+
+/* 窄屏隐藏诗雨（保留光晕），避免拥挤 */
+@media (max-width: 720px) {
+    .pr-login-poem-rain {
+        display: none;
+    }
+}
+
+/* ============================================================
+ * 主内容区
+ * ============================================================ */
+
+.pr-login-main {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
+    width: 100%;
+    max-width: clamp(380px, 92vw, 460px);
+    padding: var(--space-lg) var(--space-md);
+}
+
+/* ============================================================
+ * 玻璃态登录卡片
+ * ============================================================ */
+
+.pr-login-card {
+    --spot-x: 50%;
+    --spot-y: -20%;
+    position: relative;
+    width: 100%;
+    padding: clamp(var(--space-xl), 4vw, var(--space-2xl));
+    border-radius: var(--radius-lg);
+    background-color: rgb(var(--c-surface-elevated) / 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+        0 16px 48px rgb(var(--c-text-primary) / 0.08),
+        0 4px 12px rgb(var(--c-text-primary) / 0.04);
+    overflow: hidden;
+}
+
+/* 光标聚光灯 —— 卡片内部柔和光韵跟随鼠标（规范 7.4） */
+.pr-login-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(320px circle at var(--spot-x) var(--spot-y),
+            rgb(var(--c-accent-primary) / 0.055) 0%,
+            rgb(var(--c-accent-primary) / 0.02) 45%,
+            transparent 70%);
+    opacity: 1;
+    pointer-events: none;
+    transition: opacity var(--dur-medium) var(--ease-out);
+    z-index: 0;
+}
+
+/* 光标边框光 —— 仅照亮边框的流动光韵（mask 合成，规范 7.4 边框光韵） */
+.pr-login-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(240px circle at var(--spot-x) var(--spot-y),
+            rgb(var(--c-accent-primary) / 0.35) 0%,
+            rgb(var(--c-accent-primary) / 0.12) 40%,
+            transparent 65%);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 卡片内容层叠于光韵之上 */
+.pr-login-card>* {
+    position: relative;
+    z-index: 2;
+}
+
+/* 入场动画：淡入 + 上移 */
+.pr-login-enter {
+    animation: pr-login-enter 400ms var(--ease-out) both;
+}
+
+/* 卡片子元素错峰入场（规范 7.10 渐进式动效） */
+.pr-login-enter>* {
+    animation: pr-login-enter 480ms var(--ease-out) both;
+}
+
+.pr-login-enter>*:nth-child(1) {
+    animation-delay: 60ms;
+}
+
+.pr-login-enter>*:nth-child(2) {
+    animation-delay: 130ms;
+}
+
+.pr-login-enter>*:nth-child(3) {
+    animation-delay: 200ms;
+}
+
+.pr-login-enter>*:nth-child(4) {
+    animation-delay: 270ms;
+}
+
+.pr-login-enter>*:nth-child(5) {
+    animation-delay: 340ms;
+}
+
+@keyframes pr-login-enter {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+ * 品牌区
+ * ============================================================ */
+
+.pr-login-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.pr-login-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    margin-bottom: var(--space-sm);
+}
+
+.pr-login-title {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+}
+
+.pr-login-tagline {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: 0.01em;
+}
+
+/* ============================================================
+ * v8 角色选择 Tab
+ * ============================================================ */
+
+/* 身份徽标：单一教师端，取代原来的「教师/学生」双 Tab。
+   用极轻的胶囊标签陈述身份，而不是提供一个只有一项的假选择器。 */
+.pr-login-identity {
+    display: inline-flex;
+    align-items: center;
+    /* 紧带：图标与文字属于同一语义单元 */
+    gap: var(--space-xs);
+    align-self: flex-start;
+    padding: var(--space-xs) var(--space-md);
+    margin-bottom: var(--space-lg);
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-accent-primary) / 0.1);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+/* 触屏/低动效设备不持续合成大面积模糊层与诗雨；静态渐变仍保留品牌氛围。 */
+@media (hover: none), (pointer: coarse), (prefers-reduced-data: reduce) {
+    .pr-login-poem-rain {
+        display: none;
+    }
+
+    .pr-login-bg-glow {
+        filter: blur(42px);
+        opacity: 0.24;
+        animation: none;
+        will-change: auto;
+    }
+}
+
+.pr-login-auth-state {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-accent-primary) / 0.08);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-sm);
+    line-height: 1.5;
+}
+
+.pr-login-auth-state--error {
+    flex-wrap: wrap;
+    background: rgb(var(--c-accent-error) / 0.1);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-login-auth-state--error span {
+    flex: 1 1 200px;
+}
+
+.pr-login-auth-state--error button {
+    min-height: 36px;
+    padding: 0 var(--space-sm);
+    border: 1px solid currentcolor;
+    border-radius: var(--radius-xs);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+}
+
+.pr-login-auth-state--error button:hover {
+    background: rgb(var(--c-accent-error) / 0.08);
+}
+
+.pr-login-auth-state--error button:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
+}
+
+.pr-login-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-login-label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: -0.01em;
+}
+
+.pr-login-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pr-login-input-icon {
+    position: absolute;
+    left: var(--space-sm);
+    color: rgb(var(--c-text-tertiary));
+    pointer-events: none;
+    transition: color var(--dur-micro) var(--ease-out);
+}
+
+.pr-login-input {
+    width: 100%;
+    height: var(--control-height-default);
+    padding: 0 var(--space-md) 0 calc(var(--space-sm) + 16px + var(--space-sm));
+    border: 1px solid var(--border-primary-alpha);
+    border-radius: var(--radius-sm);
+    background-color: rgb(var(--c-surface-primary) / 0.6);
+    font-size: var(--text-base);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: -0.01em;
+    transition:
+        border-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-login-input::placeholder {
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-login-input:hover {
+    border-color: rgb(var(--c-border-primary) / 0.3);
+}
+
+.pr-login-input:focus {
+    outline: none;
+    border-color: rgb(var(--c-accent-primary));
+    box-shadow: 0 0 0 3px rgb(var(--c-accent-primary) / 0.12);
+    background-color: rgb(var(--c-surface-primary) / 0.9);
+}
+
+.pr-login-input:focus+.pr-login-input-icon,
+.pr-login-input-wrap:focus-within .pr-login-input-icon {
+    color: rgb(var(--c-accent-primary));
+}
+
+/* ============================================================
+ * 登录按钮
+ * ============================================================ */
+
+.pr-login-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    width: 100%;
+    height: 46px;
+    margin-top: var(--space-xs);
+    border: none;
+    border-radius: var(--radius-sm);
+    background-color: rgb(var(--c-accent-primary));
+    background-image: var(--noise-texture);
+    background-size: 100px 100px;
+    background-blend-mode: overlay;
+    color: rgb(var(--c-text-inverse));
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.pr-login-submit:hover:not(:disabled) {
+    background-color: var(--accent-primary-hover);
+    box-shadow: 0 4px 16px rgb(var(--c-accent-primary) / 0.2);
+    transform: translateY(-1px);
+}
+
+.pr-login-submit:active:not(:disabled) {
+    /* I-P1-7：active 缩放从 0.98 改为规范值 0.97（规范 7.2/14.1） */
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgb(var(--c-accent-primary) / 0.12);
+}
+
+.pr-login-submit:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px rgb(var(--c-accent-primary) / 0.4);
+}
+
+.pr-login-submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+ * 分隔线（透明度 alpha 线）
+ * ============================================================ */
+
+.pr-login-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin: var(--space-xl) 0 var(--space-md);
+}
+
+.pr-login-divider::before,
+.pr-login-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: rgb(var(--c-text-primary) / 0.08);
+}
+
+.pr-login-divider-text {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+}
+
+/* ============================================================
+ * 演示账号快捷区
+ * ============================================================ */
+
+.pr-login-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-login-demo-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-secondary-alpha);
+    border-radius: var(--radius-sm);
+    background-color: rgb(var(--c-surface-secondary) / 0.4);
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        border-color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-login-demo-btn:hover {
+    background-color: rgb(var(--c-surface-tertiary) / 0.6);
+    border-color: rgb(var(--c-accent-primary) / 0.2);
+    transform: translateX(2px);
+}
+
+.pr-login-demo-btn:active {
+    /* I-P1-6：演示账号按钮 active 缩放从 0.99 改为规范值 0.97（规范 7.2/14.1，原 0.99 过弱无反馈） */
+    transform: scale(0.97);
+}
+
+.pr-login-demo-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(var(--c-accent-primary) / 0.12);
+}
+
+.pr-login-demo-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    flex-shrink: 0;
+}
+
+.pr-login-demo-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    flex: 1;
+    text-align: left;
+}
+
+.pr-login-demo-name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: -0.01em;
+}
+
+.pr-login-demo-class {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: -0.01em;
+}
+
+.pr-login-demo-arrow {
+    color: rgb(var(--c-text-tertiary));
+    transition: color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-login-demo-btn:hover .pr-login-demo-arrow {
+    color: rgb(var(--c-accent-primary));
+    transform: translateX(2px);
+}
+
+/* ============================================================
+ * 页脚
+ * ============================================================ */
+
+.pr-login-footer {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    text-align: center;
+    letter-spacing: -0.01em;
+}
+
+/* ============================================================
+ * 响应式
+ * ============================================================ */
+
+@media (max-width: 600px) {
+    .pr-login-main {
+        max-width: 100%;
+        padding: var(--space-md) var(--space-sm);
+    }
+
+    .pr-login-card {
+        padding: var(--space-xl) var(--space-lg);
+    }
+}
+
+/* prefers-reduced-motion 降级 */
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-login-enter,
+    .pr-login-enter>* {
+        animation: none;
+    }
+
+    .pr-login-bg-glow--primary,
+    .pr-login-bg-glow--secondary,
+    .pr-login-poem-track {
+        animation: none;
+        will-change: auto;
+    }
+
+    .pr-login-poem-rain {
+        display: none;
+    }
+
+    .pr-login-submit,
+    .pr-login-demo-btn,
+    .pr-login-demo-arrow {
+        transition: none;
+    }
+}

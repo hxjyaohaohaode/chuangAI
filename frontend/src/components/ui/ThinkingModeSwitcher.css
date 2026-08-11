@@ -1,0 +1,345 @@
+/**
+ * ThinkingModeSwitcher 样式（v5.0 创新点：深度思考模式 UI 暴露）
+ *
+ * 设计依据：
+ * - 规范 2.3 第 3 层 surface-elevated 玻璃态浮层
+ * - 规范 2.4 强调色使用规则（背景 10%/20% alpha，文字 100%）
+ * - 规范 4.1 透明边框优先策略（无 1px 实色硬边框）
+ * - 规范 6.2 spring-soft 缓动曲线（浮层入场）
+ * - 规范 6.6 transform/opacity 动画硬指标
+ * - 规范 7.2 下拉菜单交互（scale 0.95→1 + opacity 0→1，250ms spring-soft）
+ * - 规范 14.5 下拉菜单 / Popover 容器规格
+ *
+ * 严格零硬编码：所有色值/尺寸/时长引用 tokens.css 的 CSS 变量
+ */
+
+/* ──────────────────────────────────────────────────────────
+ * 容器 + 触发器
+ * ────────────────────────────────────────────────────────── */
+
+.pr-thinking-switcher {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.pr-thinking-switcher__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 6px var(--space-sm);
+    min-height: var(--control-height-compact);
+    background-color: transparent;
+    border: 1px solid var(--border-primary-alpha, rgb(var(--c-border-primary) / 0.18));
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-secondary));
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        border-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.pr-thinking-switcher__trigger:hover:not(:disabled) {
+    background-color: rgb(var(--c-surface-tertiary) / 0.55);
+    border-color: rgb(var(--c-border-primary) / 0.30);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-thinking-switcher__trigger--open {
+    background-color: var(--accent-primary-10);
+    border-color: var(--accent-primary-40);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-thinking-switcher__trigger:focus-visible {
+    box-shadow: 0 0 0 3px var(--accent-primary-12, rgb(var(--c-accent-primary) / 0.12));
+    outline: none;
+}
+
+.pr-thinking-switcher__trigger:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.pr-thinking-switcher__trigger-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+}
+
+.pr-thinking-switcher__trigger-current {
+    color: rgb(var(--c-accent-primary));
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-thinking-switcher__caret {
+    transition: transform var(--dur-micro) var(--spring-soft);
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-thinking-switcher__trigger--open .pr-thinking-switcher__caret {
+    transform: rotate(180deg);
+    color: rgb(var(--c-accent-primary));
+}
+
+/* ──────────────────────────────────────────────────────────
+ * 浮层面板 —— 玻璃态 surface-elevated + backdrop-blur 20px
+ * 规范 14.5：min-width 180px / max-width 320px / radius 10px
+ * ────────────────────────────────────────────────────────── */
+
+.pr-thinking-switcher__panel {
+    position: absolute;
+    top: calc(100% + var(--space-xs));
+    right: 0;
+    z-index: var(--z-popover, 1000);
+    min-width: 240px;
+    max-width: 320px;
+    padding: var(--space-xs);
+    background: var(--surface-elevated);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: none;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-popover);
+    transform-origin: top right;
+    animation: pr-thinking-switcher-panel-in var(--dur-medium) var(--spring-soft) both;
+}
+
+@keyframes pr-thinking-switcher-panel-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* 面板顶部光晕胶囊（规范 2.2 surface-elevated 玻璃态增强） */
+.pr-thinking-switcher__panel::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 60%;
+    height: 1px;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgb(var(--c-accent-primary) / 0.22) 50%,
+        transparent 100%);
+    pointer-events: none;
+    border-radius: var(--radius-full);
+}
+
+.pr-thinking-switcher__panel-head {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-xs) var(--space-sm) var(--space-sm);
+    margin-bottom: 2px;
+}
+
+.pr-thinking-switcher__panel-title {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.3;
+}
+
+.pr-thinking-switcher__panel-desc {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: 1.4;
+    letter-spacing: var(--tracking-tight);
+}
+
+/* ──────────────────────────────────────────────────────────
+ * 选项 —— 选中态 20% alpha 背景 + 100% 文字（规范 2.4）
+ * ────────────────────────────────────────────────────────── */
+
+.pr-thinking-switcher__option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-sm);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-primary));
+    font-family: var(--font-sans);
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-thinking-switcher__option:hover {
+    background-color: rgb(var(--c-surface-tertiary) / 0.55);
+}
+
+.pr-thinking-switcher__option:focus-visible {
+    box-shadow: 0 0 0 3px var(--accent-primary-12, rgb(var(--c-accent-primary) / 0.12));
+    outline: none;
+}
+
+.pr-thinking-switcher__option--active {
+    background-color: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-thinking-switcher__option--active:hover {
+    background-color: var(--accent-primary-20);
+}
+
+.pr-thinking-switcher__option-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: rgb(var(--c-text-tertiary));
+    margin-top: 1px;
+}
+
+.pr-thinking-switcher__option--active .pr-thinking-switcher__option-icon {
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-thinking-switcher__option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.pr-thinking-switcher__option-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    line-height: 1.3;
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-thinking-switcher__option-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    border-radius: var(--radius-xs);
+    background-color: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4;
+}
+
+.pr-thinking-switcher__option-desc {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: 1.45;
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-thinking-switcher__option--active .pr-thinking-switcher__option-desc {
+    color: rgb(var(--c-accent-primary) / 0.78);
+}
+
+.pr-thinking-switcher__option-check {
+    flex-shrink: 0;
+    color: rgb(var(--c-accent-primary));
+    margin-top: 2px;
+    animation: pr-thinking-switcher-check-in var(--dur-micro) var(--spring-soft) both;
+}
+
+@keyframes pr-thinking-switcher-check-in {
+    from {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ──────────────────────────────────────────────────────────
+ * 移动端响应式（规范 5.4：所有尺寸基于视口实时计算）
+ * ────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    .pr-thinking-switcher__trigger-label {
+        /* 窄屏隐藏"思考模式"文字，仅保留当前值 */
+        font-size: 0;
+    }
+
+    .pr-thinking-switcher__trigger-label::after {
+        content: attr(data-current);
+    }
+
+    .pr-thinking-switcher__panel {
+        right: auto;
+        left: 0;
+        transform-origin: top left;
+        min-width: 220px;
+    }
+}
+
+/* ──────────────────────────────────────────────────────────
+ * 动效降级（规范 6.5 / 6.6：prefers-reduced-motion）
+ * ────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-thinking-switcher__panel {
+        animation: none !important;
+    }
+
+    .pr-thinking-switcher__caret {
+        transition: none !important;
+    }
+
+    .pr-thinking-switcher__option-check {
+        animation: none !important;
+    }
+
+    .pr-thinking-switcher__trigger,
+    .pr-thinking-switcher__option {
+        transition: none !important;
+    }
+}
+
+/* 耗时提示：次于描述文案的第三层信息，用 accent 极淡底衬托，
+   与描述之间留紧带间距，避免被读成同一句话。 */
+.pr-thinking-switcher__option-cost {
+    display: inline-block;
+    margin-left: var(--space-sm);
+    padding: 0 var(--space-xs);
+    border-radius: var(--radius-xs);
+    background: rgb(var(--c-accent-primary) / 0.1);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-2xs);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}

@@ -1,0 +1,106 @@
+# 一键启动编排文件 - 诗脉·启明 PoeticRealm AI v5.0
+# 包含 3 个服务：frontend、backend、neo4j
+# SQLite 为文件型数据库，存储在 backend/data/ 目录，无需独立服务
+services:
+  # 前端服务 - React 18 + Vite 开发服务器
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    container_name: poetic-realm-frontend
+    ports:
+      # demo 账号具有服务端签名会话；入口仍只绑定本机，避免公开暴露免密码演示档案。
+      - '127.0.0.1:5173:5173'
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    command: sh -c "corepack prepare pnpm@10.34.5 --activate && pnpm install --frozen-lockfile && pnpm dev -- --host 0.0.0.0"
+    environment:
+      - NODE_ENV=development
+      # 浏览器请求同源 /api；Vite 在 Docker 内部把它代理到 backend 服务。
+      - VITE_DEV_PROXY_TARGET=http://backend:3001
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - poetic-network
+
+  # 后端服务 - Node.js 20 + Fastify
+  backend:
+    image: node:20-alpine
+    working_dir: /app
+    container_name: poetic-realm-backend
+    # 不向宿主机发布后端端口；只允许同一 Docker 网络中的前端代理访问。
+    expose:
+      - '3001'
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+      - backend_data:/app/data
+    command: sh -c "corepack prepare pnpm@10.34.5 --activate && pnpm install --frozen-lockfile && pnpm dev"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      # 容器内需显式监听所有接口；宿主机/裸机默认仍为安全的 127.0.0.1。
+      - HOST=0.0.0.0
+      # 仅容器内部监听非回环；宿主机唯一入口 5173 已绑定 127.0.0.1。
+      - ALLOW_UNAUTHENTICATED_NON_LOOPBACK=true
+      - AUTH_MODE=demo
+      # Compose 默认面向无外部凭据的本机竞赛演示；真实模型演练可在根 .env 覆盖为 false。
+      - DEMO_MODE=${DEMO_MODE:-true}
+      # 留空会生成进程级随机密钥；容器重启后重新登录，避免仓库携带固定共享密钥。
+      - AUTH_SESSION_SECRET=${AUTH_SESSION_SECRET:-}
+      - AUTH_COOKIE_SECURE=false
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      # 禁止使用仓库内固定口令；未显式提供随机长密码时 Compose 直接拒绝启动。
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:?请在根目录 .env 中设置随机长 NEO4J_PASSWORD}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - DEEPSEEK_BASE_URL=${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      - MIMO_API_KEY=${MIMO_API_KEY:-}
+      - MIMO_BASE_URL=${MIMO_BASE_URL:-https://api.xiaomimimo.com/v1}
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - poetic-network
+
+  # 知识图谱数据库 - Neo4j 5 社区版
+  neo4j:
+    image: neo4j:5-community
+    container_name: poetic-realm-neo4j
+    # 图数据库只在 Docker 内部网络提供给 backend，不发布宿主机端口。
+    expose:
+      - '7474'
+      - '7687'
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:?请在根目录 .env 中设置随机长 NEO4J_PASSWORD}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_server_memory_heap_initial__size=256m
+      - NEO4J_server_memory_heap_max__size=512m
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O - http://localhost:7474 || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - poetic-network
+
+# 命名卷 - 持久化数据
+volumes:
+  frontend_node_modules:
+  backend_node_modules:
+  backend_data:
+  neo4j_data:
+  neo4j_logs:
+
+# 内部网络
+networks:
+  poetic-network:
+    driver: bridge

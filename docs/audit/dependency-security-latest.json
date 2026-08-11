@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-08-08T22:27:03.702Z",
+  "registry": "https://registry.npmjs.org/",
+  "status": "passed",
+  "summary": {
+    "actionRequired": 0,
+    "conditionallyNotApplicable": 0,
+    "totalAdvisories": 0
+  },
+  "metadata": {
+    "backend": {
+      "totalDependencies": 204,
+      "totalVulnerabilities": 0
+    },
+    "frontend": {
+      "totalDependencies": 239,
+      "totalVulnerabilities": 0
+    }
+  },
+  "advisories": []
+}

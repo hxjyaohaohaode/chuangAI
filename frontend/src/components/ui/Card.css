@@ -1,0 +1,205 @@
+﻿﻿﻿/**
+ * Card 组件样式（从 ui.css 拆分，B3.4 CSS 代码分割）
+ * 设计依据：规范第 14.3 章
+ */
+
+.pr-card {
+    position: relative;
+    background-color: rgb(var(--c-surface-secondary));
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    transition: transform var(--dur-small) var(--spring-soft),
+        box-shadow var(--dur-small) var(--ease-out),
+        border-color var(--dur-small) var(--ease-out);
+}
+
+/* 卡片内禁止嵌套卡片（防御性：嵌套时移除背景） */
+.pr-card .pr-card {
+    background: transparent;
+    background-image: none;
+    padding: 0;
+    border-radius: 0;
+}
+
+.pr-card--interactive {
+    cursor: pointer;
+}
+
+/* v5.0 Task A.2.2：移除卡片 hover 微边框，改用 box-shadow + transform 替代
+ * 极致无边框化：hover 态仅通过阴影扩散 + 上浮暗示可交互性（规范 4.1 / 14.3） */
+.pr-card--interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+}
+
+/* v5.0 Task 5.5：active 态缩放反馈（规范 7.2 + 14.3）—— clickable 卡片具备完整按钮交互 */
+.pr-card--interactive:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* 焦点环：键盘聚焦时显示 accent 光晕（与项目统一 :focus-visible 风格一致） */
+.pr-card--interactive:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-card--flat {
+    box-shadow: var(--shadow-card);
+}
+
+/* ============================================================
+ * v5.1 —— 高质量前端界面精髓融合（2026-07-04）
+ * ------------------------------------------------------------
+ * 设计来源：MiMo Studio 玻璃态底栏 + 智谱清言选中态渐变 + Lusion ultra 暖白
+ * 严格遵循暖调浅色基底 + 无边框优先 + 透明度驱动分层
+ * ============================================================ */
+
+/* —— 1. Ultra 暖白高光卡片（MiMo Studio 启发）
+ *   比常规 surface-secondary 更亮一档，营造"高光"浮起感
+ *   用于：今日推荐诗、当前闯关卡片、Hero 浮层
+ *   触发：className="pr-card pr-card--v51-ultra" */
+.pr-card--v51-ultra {
+    background-color: rgb(var(--c-bg-ultra-surface));
+    background-image:
+        radial-gradient(ellipse at top, rgba(255, 253, 248, 0.55) 0%, transparent 60%),
+        var(--noise-texture);
+    background-size: 100% 100%, 160px 160px;
+    background-blend-mode: normal, overlay;
+    box-shadow:
+        0 1px 2px rgba(44, 36, 26, 0.03),
+        0 4px 12px rgba(44, 36, 26, 0.05),
+        0 12px 32px rgba(44, 36, 26, 0.04);
+}
+
+.pr-card--v51-ultra.pr-card--interactive:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 2px 4px rgba(44, 36, 26, 0.04),
+        0 8px 20px rgba(44, 36, 26, 0.08),
+        0 20px 48px rgba(44, 36, 26, 0.06);
+}
+
+/* —— 2. 玻璃态卡片（MiMo Studio 启发）
+ *   配合 --shadow-glass-ambient 三层阴影 + 顶部光晕胶囊
+ *   用于：浮层面板、模态卡片、AI 副驾面板
+ *   触发：className="pr-card pr-card--v51-glass" */
+.pr-card--v51-glass {
+    position: relative;
+    background-color: var(--glass-bar-bg);
+    backdrop-filter: var(--glass-bar-blur);
+    -webkit-backdrop-filter: var(--glass-bar-blur);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    border: none;
+    box-shadow: var(--shadow-glass-ambient);
+    isolation: isolate;
+}
+
+/* 顶部居中光晕胶囊 —— 模拟"光从上方泄漏" */
+.pr-card--v51-glass::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: var(--glass-glow-capsule-width);
+    height: var(--glass-glow-capsule-height);
+    transform: translate(-50%, -50%);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, rgb(var(--c-bg-ultra-glow)) 72%, transparent);
+    filter: blur(var(--glass-glow-capsule-blur));
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.9;
+}
+
+.pr-card--v51-glass.pr-card--interactive:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        var(--shadow-glass-ambient),
+        0 12px 32px rgba(44, 36, 26, 0.08);
+}
+
+/* —— 3. 选中态渐变叠层卡片（智谱清言 bg-chat-selected-button 启发）
+ *   选中态用渐变叠层而非纯色：底部琥珀 alpha + 顶部玻璃白
+ *   用于：列表选中项、当前激活的章节卡片
+ *   触发：className="pr-card pr-card--v51-selected" */
+.pr-card--v51-selected {
+    position: relative;
+    background-image:
+        var(--selected-gradient),
+        var(--noise-texture);
+    background-size: 100% 100%, 160px 160px;
+    background-blend-mode: normal, overlay;
+    box-shadow:
+        0 0 0 1px rgb(var(--c-accent-primary) / 0.12),
+        0 4px 16px rgb(var(--c-accent-primary) / 0.08);
+}
+
+/* 选中态左侧 3px 强调色竖线（无 hard border，规范 7.1） */
+.pr-card--v51-selected::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: rgb(var(--c-accent-primary));
+    border-radius: var(--radius-full);
+    pointer-events: none;
+}
+
+/* —— 4. AI 释义区微着色卡片（智谱 agent_bg_panel 启发）
+ *   用 4% 琥珀底暗示"AI 解读"，与原文区形成语义区分
+ *   用于：AI 解读卡片、智能反馈面板
+ *   触发：className="pr-card pr-card--v51-ai" */
+.pr-card--v51-ai {
+    background-color: var(--ai-panel-bg);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+    border: none;
+    box-shadow:
+        0 0 0 1px var(--ai-panel-border),
+        var(--shadow-cool);
+}
+
+.pr-card--v51-ai.pr-card--interactive:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 0 0 1px rgb(var(--c-accent-primary) / 0.16),
+        0 4px 12px rgba(90, 138, 168, 0.06),
+        0 8px 24px rgba(44, 36, 26, 0.05);
+}
+
+/* —— 5. 纸张质感卡片（v5.0 既有 paper token，v5.1 正式接入 Card 组件）
+ *   用于：诗歌正文卡片、文档预览、阅读场景
+ *   触发：className="pr-card pr-card--v51-paper" */
+.pr-card--v51-paper {
+    background-color: var(--paper-bg);
+    background-image:
+        var(--paper-texture),
+        var(--noise-texture);
+    background-size: 100% 100%, 160px 160px;
+    background-blend-mode: normal, overlay;
+    border-radius: var(--paper-radius);
+    box-shadow: var(--paper-shadow);
+}
+
+.pr-card--v51-paper.pr-card--interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--paper-shadow-hover);
+}
+
+/* —— 6. v5.1 reduce-motion 降级（规范 6.5 / 6.6） */
+[data-reduce-motion='1'] .pr-card--v51-ultra.pr-card--interactive:hover,
+[data-reduce-motion='1'] .pr-card--v51-glass.pr-card--interactive:hover,
+[data-reduce-motion='1'] .pr-card--v51-ai.pr-card--interactive:hover,
+[data-reduce-motion='1'] .pr-card--v51-paper.pr-card--interactive:hover {
+    transform: none !important;
+}

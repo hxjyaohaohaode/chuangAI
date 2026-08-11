@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- 公开报告 token 位于路径中；在任何 JS/子资源加载前就禁止 Referer，
+       避免 capability 进入服务器、CDN 或第三方资源日志。 -->
+  <meta name="referrer" content="no-referrer" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <!-- v7 审计修复 P0-B1：字体预加载（规范 15.4 自托管，font-display: swap 确保不阻塞渲染） -->
+  <link rel="preload" href="/fonts/inter-latin-variable.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/noto-sans-sc-400.woff2" as="font" type="font/woff2" crossorigin />
+  <meta name="description" content="诗脉·启明 PoeticRealm AI v5.0 - 面向小学古诗词教学的异构多智能体 Web 应用" />
+  <title>诗脉·启明 PoeticRealm AI v5.0</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

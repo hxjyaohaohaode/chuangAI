@@ -1,0 +1,217 @@
+﻿﻿﻿/**
+ * Input 组件样式（从 ui.css 拆分，B3.4 CSS 代码分割）
+ * 设计依据：规范第 14.2 章
+ */
+
+.pr-input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.pr-input-prefix,
+.pr-input-suffix {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(var(--c-text-tertiary));
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.pr-input-prefix {
+    margin-right: var(--space-sm);
+}
+
+.pr-input-suffix {
+    margin-left: var(--space-sm);
+}
+
+.pr-input {
+    width: 100%;
+    background-color: rgb(var(--c-surface-primary));
+    border: 1px solid var(--border-primary-alpha);
+    border-radius: var(--radius-sm);
+    min-height: 40px;
+    padding: 0 var(--space-md);
+    color: rgb(var(--c-text-primary));
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-sm);
+    letter-spacing: var(--tracking-tight);
+    transition:
+        border-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pr-input::placeholder {
+    color: rgb(var(--c-text-tertiary));
+    font-style: normal;
+}
+
+.pr-input:hover:not(:disabled):not(:focus-visible) {
+    border-color: var(--border-primary-hover-alpha);
+}
+
+.pr-input:focus-visible {
+    border-color: rgb(var(--c-accent-primary));
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pr-input--error {
+    border-color: rgb(var(--c-accent-error));
+}
+
+.pr-input--error:focus-visible {
+    border-color: rgb(var(--c-accent-error));
+    box-shadow: var(--shadow-focus-error);
+}
+
+.pr-input--error-shake {
+    animation: pr-shake 0.4s var(--ease-in-out);
+}
+
+/* textarea 形态 */
+.pr-input--textarea {
+    min-height: 96px;
+    padding: var(--space-sm) var(--space-md);
+    line-height: var(--leading-base);
+    resize: vertical;
+}
+
+/* 有前缀/后缀时调整 padding */
+.pr-input-wrapper--with-prefix .pr-input {
+    padding-left: 0;
+}
+
+.pr-input-wrapper--with-suffix .pr-input {
+    padding-right: 0;
+}
+
+/* ============================================================
+ * v5.1 —— 高质量前端界面精髓融合（2026-07-04）
+ * ------------------------------------------------------------
+ * 设计来源：Grok 占位符双轴动画 + MiMo ultra 暖白 + 智谱 AI 释义区
+ * 严格遵循暖调浅色基底 + 无边框优先 + GPU 友好动画
+ * ============================================================ */
+
+/* —— 1. 占位符双轴动画（Grok 启发）
+ *   原理：placeholder 在 focus 时同时淡出（opacity）+ 上移（translateY）
+ *   实现：现代浏览器 ::placeholder 支持 transform，配合 opacity 形成双轴
+ *   触发：默认应用到所有 .pr-input（向下兼容，无 placeholder 时无副作用） */
+.pr-input::placeholder {
+    color: var(--text-h3-placeholder);
+    font-style: normal;
+    transition: var(--placeholder-transition);
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.pr-input:focus-visible::placeholder {
+    opacity: var(--placeholder-opacity-end);
+    transform: translateY(calc(var(--placeholder-translate) * 0.35));
+}
+
+/* —— 2. v5.1 ultra 暖白输入框（MiMo Studio 启发）
+ *   用于：用户答题框、AI 提问输入框 —— 与 ultra 卡片视觉协调
+ *   触发：className="pr-input pr-input--v51-ultra" */
+.pr-input--v51-ultra {
+    background-color: rgb(var(--c-bg-ultra-user-message));
+    border-color: rgba(180, 170, 155, 0.22);
+    transition:
+        border-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-input--v51-ultra:hover:not(:disabled):not(:focus-visible) {
+    background-color: rgb(var(--c-bg-ultra-surface));
+    border-color: rgba(180, 170, 155, 0.32);
+}
+
+.pr-input--v51-ultra:focus-visible {
+    background-color: rgb(var(--c-bg-ultra-glow));
+    border-color: rgb(var(--c-accent-primary));
+    box-shadow:
+        0 0 0 3px rgb(var(--c-accent-primary) / 0.12),
+        0 -2px 8px rgba(255, 253, 248, 0.45);
+}
+
+/* —— 3. AI 释义区输入框（智谱清言 agent_bg_panel 启发）
+ *   4% 琥珀底暗示"AI 输入区"，与原文输入区形成语义区分
+ *   用于：AI 副驾输入框、智能搜索框
+ *   触发：className="pr-input pr-input--v51-ai" */
+.pr-input--v51-ai {
+    background-color: var(--ai-panel-bg);
+    border-color: var(--ai-panel-border);
+    transition:
+        border-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-input--v51-ai:hover:not(:disabled):not(:focus-visible) {
+    background-color: rgb(var(--c-accent-primary) / 0.06);
+    border-color: rgb(var(--c-accent-primary) / 0.16);
+}
+
+.pr-input--v51-ai:focus-visible {
+    background-color: rgb(var(--c-accent-primary) / 0.05);
+    border-color: rgb(var(--c-accent-primary));
+    box-shadow:
+        0 0 0 3px rgb(var(--c-accent-primary) / 0.14),
+        0 2px 8px rgb(var(--c-accent-primary) / 0.08);
+}
+
+/* —— 4. v5.1 focus 态增强（应用于所有 input）
+ *   原 focus 仅 border + shadow，v5.1 增加 background 微变化
+ *   让 focus 态更"鲜活"，但不破坏可读性 */
+.pr-input:focus-visible {
+    background-color: rgb(var(--c-bg-ultra-glow));
+}
+
+/* error 态保持原背景，不被 v5.1 focus 覆盖 */
+.pr-input--error:focus-visible {
+    background-color: rgb(var(--c-surface-primary));
+}
+
+/* —— 5. textarea v5.1 增强
+ *   多行输入框 focus 时 placeholder 上移幅度减半（避免视觉混乱）
+ *   并增加轻微的 inner-shadow 暗示"凹陷"质感 */
+.pr-input--textarea:focus-visible::placeholder {
+    transform: translateY(calc(var(--placeholder-translate) * 0.2));
+}
+
+.pr-input--textarea--v51-paper {
+    background-color: var(--paper-bg-soft);
+    background-image: var(--paper-texture);
+    background-size: 100% 100%;
+    border-color: rgba(180, 170, 155, 0.20);
+    box-shadow: inset 0 1px 2px rgba(44, 36, 26, 0.03);
+}
+
+.pr-input--textarea--v51-paper:focus-visible {
+    background-color: var(--paper-bg);
+    box-shadow:
+        inset 0 1px 2px rgba(44, 36, 26, 0.03),
+        0 0 0 3px rgb(var(--c-accent-primary) / 0.12);
+}
+
+/* —— 6. v5.1 reduce-motion 降级（规范 6.5 / 6.6） */
+[data-reduce-motion='1'] .pr-input::placeholder {
+    transition: none !important;
+}
+
+[data-reduce-motion='1'] .pr-input:focus-visible::placeholder {
+    transform: none !important;
+    opacity: 0.5 !important;
+}

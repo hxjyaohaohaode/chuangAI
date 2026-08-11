@@ -1,0 +1,113 @@
+/**
+ * PixelSnow —— 确定性 DOM 雪片。
+ * 默认即完整静态兜底；只有支持容器高度单位的细指针设备才启用 CSS 动画。
+ */
+
+.pr-pixel-snow {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overflow: clip;
+    contain: layout style paint;
+    container-type: size;
+    isolation: isolate;
+    color: var(--pr-snow-color, rgb(var(--c-surface-primary)));
+    pointer-events: none;
+    user-select: none;
+}
+
+.pr-pixel-snow > [data-snow-flake] {
+    position: absolute;
+    top: var(--pr-snow-y);
+    left: var(--pr-snow-x);
+    display: block;
+    width: var(--pr-snow-size);
+    height: var(--pr-snow-size);
+    border-radius: 1px;
+    background: currentColor;
+    opacity: var(--pr-snow-opacity);
+    transform: translate3d(0, 0, 0) rotate(var(--pr-snow-rotation)) scale(var(--pr-snow-scale));
+    transform-origin: center;
+    pointer-events: none;
+}
+
+.pr-pixel-snow[data-snow-variant='round'] > [data-snow-flake] {
+    border-radius: var(--radius-full, 999px);
+}
+
+.pr-pixel-snow[data-snow-variant='snowflake'] > [data-snow-flake] {
+    border-radius: 0;
+    clip-path: polygon(
+        50% 0%,
+        61% 34%,
+        93% 25%,
+        72% 50%,
+        100% 61%,
+        64% 65%,
+        75% 100%,
+        50% 78%,
+        25% 100%,
+        36% 65%,
+        0% 61%,
+        28% 50%,
+        7% 25%,
+        39% 34%
+    );
+}
+
+@keyframes pr-pixel-snow-fall {
+    0% {
+        opacity: 0;
+        transform:
+            translate3d(0, calc(0px - var(--pr-snow-size)), 0)
+            rotate(var(--pr-snow-rotation))
+            scale(var(--pr-snow-scale));
+    }
+
+    12%,
+    82% {
+        opacity: var(--pr-snow-opacity);
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            translate3d(var(--pr-snow-drift), calc(100cqh + var(--pr-snow-size)), 0)
+            rotate(calc(var(--pr-snow-rotation) + 180deg))
+            scale(var(--pr-snow-scale));
+    }
+}
+
+@supports (height: 1cqh) {
+    @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+        .pr-pixel-snow[data-snow-motion='enabled'] > [data-snow-flake] {
+            top: 0;
+            animation-name: pr-pixel-snow-fall;
+            animation-duration: var(--pr-snow-duration);
+            animation-delay: var(--pr-snow-delay);
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            will-change: transform, opacity;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+    .pr-pixel-snow > [data-snow-flake] {
+        animation: none;
+        will-change: auto;
+    }
+}
+
+@media (forced-colors: active) {
+    .pr-pixel-snow {
+        display: none;
+    }
+}
+
+@media print {
+    .pr-pixel-snow {
+        display: none;
+    }
+}

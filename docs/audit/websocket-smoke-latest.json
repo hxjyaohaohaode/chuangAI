@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-08-11T03:16:11.148Z",
+  "baseUrl": "http://127.0.0.1:51419",
+  "status": "passed",
+  "unauthenticatedWebSocket": {
+    "rejected": true,
+    "statusCode": 401
+  },
+  "crossOriginWebSocket": {
+    "rejected": true,
+    "statusCode": 403
+  },
+  "wsUrl": "ws://127.0.0.1:51419/ws/orchestrator",
+  "connected": true,
+  "sessionStart": true,
+  "pong": true
+}

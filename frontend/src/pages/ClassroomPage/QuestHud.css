@@ -1,0 +1,361 @@
+/**
+ * 闯关 HUD 样式（大屏取向）
+ *
+ * 教室里最后一排离屏幕七八米，所以：
+ * - 关键数字用大号等宽字，远看仍可读
+ * - 关卡状态同时给形状（图标）、文字与颜色三重编码，
+ *   投影仪普遍偏色，只靠颜色区分在真实教室里会失效（规范 12.4）
+ * - 动效仅 transform/opacity，且 prefers-reduced-motion 下全部降级
+ */
+
+.pr-quest-hud {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    background: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    box-shadow:
+        0 1px 3px rgb(var(--c-text-primary) / 0.04),
+        0 4px 12px rgb(var(--c-text-primary) / 0.04);
+}
+
+/* ── 通关横幅 ── */
+
+.pr-quest-banner {
+    position: absolute;
+    inset-inline: 0;
+    top: calc(var(--space-md) * -1);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-inline: auto;
+    width: fit-content;
+    padding: 8px var(--space-lg);
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-surface-elevated));
+    font-size: var(--text-base);
+    box-shadow: 0 6px 20px rgb(var(--c-accent-primary) / 0.35);
+    animation: pr-quest-banner-in var(--dur-base) var(--ease-spring-soft) both;
+}
+
+.pr-quest-banner strong {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-quest-banner span {
+    opacity: 0.85;
+    font-size: var(--text-sm);
+}
+
+@keyframes pr-quest-banner-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+}
+
+/* ── 关卡链 ── */
+
+.pr-quest-chain {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+}
+
+.pr-quest-node {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px var(--space-xs);
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-text-primary) / 0.04);
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-xs);
+    transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-quest-node-mark {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.pr-quest-node-name {
+    font-weight: var(--weight-medium);
+    white-space: nowrap;
+}
+
+.pr-quest-node-state {
+    margin-left: auto;
+    font-size: 10px;
+    opacity: 0.75;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pr-quest-node--cleared {
+    background: rgb(var(--c-success) / 0.14);
+    color: rgb(var(--c-success));
+}
+
+.pr-quest-node--current {
+    background: rgb(var(--c-accent-primary) / 0.16);
+    color: rgb(var(--c-accent-primary));
+    font-weight: var(--weight-semibold);
+    /* 当前关额外给一圈内描边，远看也能一眼锁定 */
+    box-shadow: inset 0 0 0 1.5px rgb(var(--c-accent-primary) / 0.4);
+}
+
+.pr-quest-node--absent {
+    opacity: 0.45;
+}
+
+/* ── 当前关 + 诗力值 ── */
+
+.pr-quest-main {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.pr-quest-level {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 140px;
+}
+
+.pr-quest-level-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-quest-level-goal {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-quest-power {
+    flex: 1 1 260px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.pr-quest-power-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-xs);
+}
+
+.pr-quest-power-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-quest-power-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    color: rgb(var(--c-text-primary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-quest-power-track {
+    height: 7px;
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-text-primary) / 0.08);
+    overflow: hidden;
+}
+
+.pr-quest-power-fill {
+    height: 100%;
+    width: 100%;
+    /* scaleX 而非 width：只有 transform 走合成层，不触发布局（规范 6.2） */
+    transform-origin: left center;
+    border-radius: inherit;
+    background: linear-gradient(90deg,
+            rgb(var(--c-accent-primary) / 0.7),
+            rgb(var(--c-accent-primary)));
+    transition: transform var(--dur-base) var(--ease-spring-soft);
+}
+
+.pr-quest-power-sub {
+    font-size: 10px;
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── 连击 ── */
+
+.pr-quest-combo {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    padding: 4px var(--space-sm);
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-accent-primary) / 0.12);
+    color: rgb(var(--c-accent-primary));
+    animation: pr-quest-combo-pop var(--dur-micro) var(--ease-spring-soft) both;
+}
+
+.pr-quest-combo-num {
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    line-height: 1;
+}
+
+.pr-quest-combo-label {
+    font-size: var(--text-xs);
+}
+
+.pr-quest-combo-best {
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+@keyframes pr-quest-combo-pop {
+    from {
+        transform: scale(0.88);
+    }
+}
+
+/* ── 三榜 ── */
+
+.pr-quest-boards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-sm);
+}
+
+.pr-quest-board {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-text-primary) / 0.03);
+}
+
+.pr-quest-board-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-quest-board-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pr-quest-board-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-quest-rank {
+    flex-shrink: 0;
+    width: 13px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-quest-board-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-quest-board-score {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-quest-board-empty {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-quest-ai {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+}
+
+.pr-quest-ai-score {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    color: rgb(var(--c-text-primary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-quest-ai-gap {
+    font-size: 10px;
+    color: rgb(var(--c-text-secondary));
+}
+
+/* ── 窄屏 ── */
+
+@media (max-width: 900px) {
+    .pr-quest-node-state {
+        display: none;
+    }
+
+    .pr-quest-node {
+        justify-content: center;
+    }
+}
+
+/* ── 动效降级（规范 6.5） ── */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-quest-banner,
+    .pr-quest-combo {
+        animation: none;
+    }
+
+    .pr-quest-power-fill,
+    .pr-quest-node {
+        transition: none;
+    }
+}

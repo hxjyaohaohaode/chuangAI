@@ -1,0 +1,342 @@
+/**
+ * TabSplitPanel 样式（规范第 2、4、5、6、7、14 章）
+ *
+ * 设计要点：
+ *  - 透明度驱动暖调色板：Tab 栏用 surface-glass 玻璃态，激活态用 accent-primary alpha
+ *  - 无边框优先：区域分隔用透明度差异 + backdrop-blur，非硬边框
+ *  - 松紧得当：Tab 栏紧带（icon+label 紧贴），面板间稳带（var(--space-lg)）
+ *  - spring-soft 动画：指示器 250ms cubic-bezier(0.25, 0.1, 0.07, 1.45) 滑动
+ *  - 完整三态：hover/active/focus-visible
+ *  - GPU 友好：动画仅 transform/opacity
+ *  - 流体响应式：Tab 栏自适应宽度，移动端横向滚动
+ */
+
+/* ============================================================
+ * 容器
+ * ============================================================ */
+
+.pr-tabsplit {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
+}
+
+.pr-tabsplit--left {
+    flex-direction: row;
+    gap: var(--space-lg);
+    align-items: flex-start;
+}
+
+/* 单 Tab 模式：直接返回内容，无 Tab 栏 */
+.pr-tabsplit-single {
+    width: 100%;
+}
+
+/* ============================================================
+ * Tab 栏（玻璃态吸顶）
+ * ============================================================ */
+
+.pr-tabsplit-tablist {
+    position: relative;
+    display: flex;
+    /* 玻璃态背景：surface-glass + backdrop-blur 12px（规范 2.2） */
+    background: var(--surface-glass, rgb(var(--c-surface-primary) / 0.55));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-lg, 12px);
+    padding: 4px;
+    /* 透明度差异分隔，非硬边框（规范 4.1） */
+    box-shadow:
+        0 1px 3px rgb(var(--c-text-primary) / 0.04),
+        0 2px 8px rgb(var(--c-text-primary) / 0.03);
+    overflow: hidden;
+}
+
+.pr-tabsplit--sticky .pr-tabsplit-tablist {
+    /* 吸顶：sticky top，z-index 确保浮在内容之上 */
+    position: sticky;
+    top: var(--space-sm, 8px);
+    z-index: 20;
+    /* 吸顶时增强玻璃态（规范 2.2：吸顶毛玻璃 backdrop-blur 12px） */
+    background: var(--surface-glass, rgb(var(--c-surface-primary) / 0.55));
+}
+
+.pr-tabsplit--left .pr-tabsplit-tablist {
+    flex-direction: column;
+    flex-shrink: 0;
+    width: clamp(140px, 18%, 200px);
+    /* 左侧栏模式：sticky top，跟随滚动 */
+    position: sticky;
+    top: var(--space-md, 16px);
+    max-height: calc(100vh - 2 * var(--space-lg, 48px));
+    overflow-y: auto;
+}
+
+.pr-tabsplit-tablist-inner {
+    display: flex;
+    gap: 2px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.pr-tabsplit--left .pr-tabsplit-tablist-inner {
+    flex-direction: column;
+}
+
+/* ============================================================
+ * Tab 按钮
+ * ============================================================ */
+
+.pr-tabsplit-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs, 4px);
+    padding: var(--space-sm, 8px) var(--space-md, 16px);
+    min-height: 36px;
+    border: none;
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    font-family: inherit;
+    font-size: var(--text-sm, 13px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    border-radius: var(--radius-md, 8px);
+    transition:
+        color 150ms cubic-bezier(0.2, 0, 0, 1),
+        background-color 150ms cubic-bezier(0.2, 0, 0, 1),
+        transform 100ms cubic-bezier(0.3, 200, 20, 0);
+    white-space: nowrap;
+    flex: 1;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pr-tabsplit--left .pr-tabsplit-tab {
+    justify-content: flex-start;
+    flex: none;
+    width: 100%;
+}
+
+/* hover 态：surface-tertiary alpha 背景（规范 7.2） */
+.pr-tabsplit-tab:not(.is-disabled):hover {
+    background: rgb(var(--c-surface-tertiary) / 0.55);
+    color: rgb(var(--c-text-primary));
+}
+
+/* active 态：按压回弹（规范 7.2） */
+.pr-tabsplit-tab:not(.is-disabled):active {
+    transform: scale(0.97);
+}
+
+/* focus-visible 态：accent-primary 40% alpha 光晕（规范 7.2） */
+.pr-tabsplit-tab:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(var(--c-accent-primary) / 0.12);
+}
+
+/* 激活态：accent-primary 文字色 + 微淡背景（规范 2.4） */
+.pr-tabsplit-tab.is-active {
+    color: rgb(var(--c-accent-primary));
+    background: rgb(var(--c-accent-primary) / 0.10);
+    font-weight: 600;
+}
+
+.pr-tabsplit-tab.is-active:hover {
+    background: rgb(var(--c-accent-primary) / 0.15);
+}
+
+/* 禁用态 */
+.pr-tabsplit-tab.is-disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+ * Tab 图标
+ * ============================================================ */
+
+.pr-tabsplit-tab-icon {
+    flex-shrink: 0;
+    color: inherit;
+    transition: transform 150ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.pr-tabsplit-tab.is-active .pr-tabsplit-tab-icon {
+    transform: scale(1.1);
+}
+
+/* ============================================================
+ * Tab 标签
+ * ============================================================ */
+
+.pr-tabsplit-tab-label {
+    display: inline-block;
+    line-height: 1.4;
+}
+
+/* ============================================================
+ * Tab 徽标
+ * ============================================================ */
+
+.pr-tabsplit-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: 9px;
+    font-size: var(--text-2xs, 10px);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.pr-tabsplit-tab-badge.is-info {
+    background: rgb(var(--c-accent-info) / 0.15);
+    color: rgb(var(--c-accent-info));
+}
+
+.pr-tabsplit-tab-badge.is-success {
+    background: rgb(var(--c-accent-success) / 0.15);
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-tabsplit-tab-badge.is-warning {
+    background: rgb(var(--c-accent-warning) / 0.15);
+    color: rgb(var(--c-accent-warning));
+}
+
+.pr-tabsplit-tab-badge.is-error {
+    background: rgb(var(--c-accent-error) / 0.15);
+    color: rgb(var(--c-accent-error));
+}
+
+/* ============================================================
+ * 滑动指示器（透明度驱动的下划线/左划线）
+ * ============================================================ */
+
+.pr-tabsplit-indicator {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    /* 默认：底部下划线 */
+    bottom: 0;
+    left: var(--pr-tabsplit-indicator-left, 0);
+    width: var(--pr-tabsplit-indicator-width, 0);
+    height: 2px;
+    background: rgb(var(--c-accent-primary) / 0.85);
+    border-radius: 1px;
+    transition:
+        left 250ms cubic-bezier(0.25, 0.1, 0.07, 1.45),
+        width 250ms cubic-bezier(0.25, 0.1, 0.07, 1.45),
+        top 250ms cubic-bezier(0.25, 0.1, 0.07, 1.45),
+        height 250ms cubic-bezier(0.25, 0.1, 0.07, 1.45);
+}
+
+.pr-tabsplit--left .pr-tabsplit-indicator {
+    /* 左侧栏模式：左侧竖线 */
+    left: 0;
+    top: var(--pr-tabsplit-indicator-top, 0);
+    width: 2px;
+    height: var(--pr-tabsplit-indicator-height, 0);
+    bottom: auto;
+}
+
+/* ============================================================
+ * 面板区
+ * ============================================================ */
+
+.pr-tabsplit-panels {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.pr-tabsplit-panel {
+    width: 100%;
+    /* 默认隐藏 */
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition:
+        opacity 200ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 250ms cubic-bezier(0.25, 0.1, 0.07, 1.45);
+}
+
+.pr-tabsplit-panel.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* hidden 属性兜底（确保不可见面板不占空间） */
+.pr-tabsplit-panel[hidden] {
+    display: none;
+}
+
+/* ============================================================
+ * 响应式
+ * ============================================================ */
+
+@media (max-width: 767px) {
+    .pr-tabsplit {
+        gap: var(--space-md, 16px);
+    }
+
+    .pr-tabsplit--left {
+        flex-direction: column;
+    }
+
+    .pr-tabsplit--left .pr-tabsplit-tablist {
+        width: 100%;
+        max-height: none;
+        position: relative;
+        top: auto;
+    }
+
+    .pr-tabsplit--left .pr-tabsplit-tablist-inner {
+        flex-direction: row;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .pr-tabsplit--left .pr-tabsplit-tablist-inner::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pr-tabsplit--left .pr-tabsplit-tab {
+        flex: 0 0 auto;
+    }
+
+    .pr-tabsplit--left .pr-tabsplit-indicator {
+        left: var(--pr-tabsplit-indicator-left, 0);
+        top: auto;
+        bottom: 0;
+        width: var(--pr-tabsplit-indicator-width, 0);
+        height: 2px;
+    }
+}
+
+/* ============================================================
+ * 无障碍：prefers-reduced-motion 降级
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-tabsplit-tab,
+    .pr-tabsplit-tab-icon,
+    .pr-tabsplit-indicator,
+    .pr-tabsplit-panel {
+        transition-duration: 0ms !important;
+    }
+
+    .pr-tabsplit-panel {
+        transform: none !important;
+    }
+}

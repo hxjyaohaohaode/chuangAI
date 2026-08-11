@@ -1,0 +1,401 @@
+﻿﻿﻿﻿﻿﻿﻿﻿/**
+ * Modal 组件样式（从 ui.css 拆分，B3.4 CSS 代码分割）
+ * 设计依据：规范第 14.4 章
+ */
+
+.pr-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-modal);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    padding:
+        max(var(--space-lg), env(safe-area-inset-top))
+        max(var(--space-lg), env(safe-area-inset-right))
+        max(var(--space-lg), env(safe-area-inset-bottom))
+        max(var(--space-lg), env(safe-area-inset-left));
+}
+
+.pr-modal-overlay--entering {
+    animation: pr-modal-overlay-in var(--dur-small) var(--ease-out) both;
+}
+
+.pr-modal-overlay--leaving {
+    /* P0-D6：遮罩延迟 100ms 后淡出（规范 14.4，让 panel 先离场再淡出遮罩） */
+    animation: pr-modal-overlay-out var(--dur-small) var(--ease-in) both;
+    animation-delay: 100ms;
+}
+
+.pr-modal-panel {
+    position: relative;
+    background: var(--surface-glass-heavy);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: none;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-modal);
+    width: 100%;
+    max-height: calc(100vh - var(--space-3xl));
+    max-height: calc(100dvh - var(--space-3xl));
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    z-index: var(--z-modal);
+}
+
+.pr-modal-panel--entering {
+    animation: pr-modal-panel-in var(--dur-large) var(--spring-soft) both;
+}
+
+.pr-modal-panel--leaving {
+    animation: pr-modal-panel-out var(--dur-small) var(--ease-in) both;
+}
+
+.pr-modal-panel--sm {
+    max-width: 400px;
+}
+
+.pr-modal-panel--md {
+    max-width: 560px;
+}
+
+.pr-modal-panel--lg {
+    max-width: 720px;
+}
+
+.pr-modal-panel--full {
+    max-width: calc(100vw - var(--space-3xl));
+    max-height: calc(100vh - var(--space-2xl));
+    max-height: calc(100dvh - var(--space-2xl));
+}
+
+.pr-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+}
+
+.pr-modal-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-normal);
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+    line-height: var(--leading-xl);
+}
+
+.pr-modal-body {
+    padding: 0 var(--space-lg) var(--space-lg);
+    font-size: var(--text-base);
+    line-height: var(--leading-base);
+    color: rgb(var(--c-text-primary));
+}
+
+/* 底部操作区由组件统一承载，避免各业务弹窗以内联样式各自实现。
+ * 密集型弹窗可在自己的面板类上将 body 设为可滚动区，并让该操作区稳定保留。 */
+.pr-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    padding: 0 var(--space-lg) var(--space-lg);
+}
+
+@media (max-width: 767px) {
+    .pr-modal-overlay {
+        align-items: flex-start;
+        overflow-y: auto;
+    }
+
+    .pr-modal-panel {
+        margin: auto 0;
+        max-width: none;
+    }
+
+    .pr-modal-header,
+    .pr-modal-body,
+    .pr-modal-footer {
+        padding-left: var(--space-md);
+        padding-right: var(--space-md);
+    }
+}
+
+.pr-modal-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-tertiary));
+    cursor: pointer;
+    transition: background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-modal-close:hover {
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-modal-close:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* ============================================================
+ * v5.1 —— 高质量前端界面精髓融合（2026-07-04）
+ * ------------------------------------------------------------
+ * 设计意图：将高质量前端界面参考中的玻璃态、暖白材质、顶部光晕胶囊、
+ *   渐变文字、编号导航、CTA 圆点吞噬等精髓融入 Modal 弹层。
+ * 严格零硬编码：所有色值/尺寸/时长引用 tokens.css 的 CSS 变量。
+ * ============================================================ */
+
+/* —— 1. 默认面板 v5.1 顶部光晕胶囊（MiMo Studio 启发）
+ *   模态顶部居中的横向光晕胶囊，强化"玻璃态浮层"的材质深度
+ *   使用 ::before 伪元素，避免侵入 panel 内容流 */
+.pr-modal-panel::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: var(--glass-glow-capsule-width);
+    height: var(--glass-glow-capsule-height);
+    transform: translate(-50%, -50%);
+    background: color-mix(in srgb, rgb(var(--c-bg-ultra-glow)) 72%, transparent);
+    filter: blur(var(--glass-glow-capsule-blur));
+    pointer-events: none;
+    z-index: -1;
+    border-radius: var(--radius-full);
+}
+
+/* —— 2. v5.1 ultra 暖白面板变体（MiMo Studio bg-ultra 启发）
+ *   替代默认 glass-heavy，应用 ultra 暖白基底 + 顶部径向高光
+ *   适用于内容密集型模态（如表单、设置面板），可读性优于纯玻璃态 */
+.pr-modal-panel--v51-ultra {
+    background-color: rgb(var(--c-bg-ultra-surface));
+    background-image:
+        radial-gradient(ellipse at top, rgb(var(--c-bg-ultra-glow) / 0.55) 0%, transparent 60%),
+        var(--noise-texture);
+    background-size: 100% 100%, 160px 160px;
+    backdrop-filter: blur(24px) saturate(120%);
+    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    box-shadow: var(--shadow-glass-ambient), var(--shadow-modal);
+}
+
+/* —— 3. v5.1 渐变文字标题变体（MiMo Studio gradient-label 启发）
+ *   标题应用琥珀金渐变文字，用于强调型模态（如确认对话框、成就提示） */
+.pr-modal-title--v51-gradient {
+    background-image: var(--gradient-text-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* —— 4. v5.1 编号导航 modal（Unseen / Crosswire numbered-nav 启发）
+ *   用于多步骤模态（如向导、引导），自动生成步骤编号
+ *   用法：在 panel 上加 pr-modal-panel--v51-numbered，
+ *        每个 .pr-modal-step 自动获得编号 */
+.pr-modal-panel--v51-numbered {
+    counter-reset: modal-step;
+}
+
+.pr-modal-panel--v51-numbered .pr-modal-step {
+    counter-increment: modal-step;
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+}
+
+.pr-modal-panel--v51-numbered .pr-modal-step::before {
+    content: counter(modal-step, decimal-leading-zero);
+    font-family: var(--font-serif-italic);
+    font-style: italic;
+    font-weight: 400;
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tight);
+    flex-shrink: 0;
+    min-width: 1.5em;
+}
+
+/* —— 5. v5.1 CTA 圆点吞噬关闭按钮（Lusion 启发）
+ *   关闭按钮 hover 时圆点从右侧滑入并放大吞噬，强化交互反馈 */
+.pr-modal-close--v51-cta {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: background-color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy);
+}
+
+.pr-modal-close--v51-cta::before {
+    content: '';
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    transform: translate(0, -50%) scale(1);
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-bg-ultra-glow));
+    z-index: -1;
+    transition: transform var(--dur-small) var(--ease-out),
+        background var(--dur-micro) var(--ease-out);
+}
+
+.pr-modal-close--v51-cta:hover::before {
+    transform: translate(var(--cta-dot-translate), -50%) scale(var(--cta-dot-scale));
+    background: rgb(var(--c-accent-primary-hover));
+}
+
+.pr-modal-close--v51-cta:hover {
+    color: rgb(var(--c-text-inverse));
+    transform: translateY(-1px);
+}
+
+.pr-modal-close--v51-cta:active {
+    /* P0-D7：active 缩放修正为规范值 0.97（原 0.9 偏离规范 7.2/14.1） */
+    transform: scale(0.97);
+}
+
+/* —— 6. v5.1 AI 释义区变体（智谱清言 ai-panel 启发）
+ *   用于 AI 对话相关的模态（如 AI 解释、AI 生成预览）
+ *   应用极淡的强调色背景 + 微妙边框 */
+.pr-modal-panel--v51-ai {
+    background-color: var(--ai-panel-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    box-shadow:
+        0 0 0 1px var(--ai-panel-border),
+        var(--shadow-glass-ambient),
+        var(--shadow-modal);
+}
+
+.pr-modal-panel--v51-ai .pr-modal-title {
+    color: rgb(var(--c-accent-primary));
+}
+
+/* —— 7. v5.1 选中态边栏（智谱清言 selected-gradient 启发）
+ *   用于模态内列表项的选中态：渐变叠层 + 左侧 3px 强调色竖线
+ *   替代传统的 background-color 高亮 */
+.pr-modal-list-item--v51-selected {
+    position: relative;
+    background-image: var(--selected-gradient), var(--noise-texture);
+    background-size: 100% 100%, 160px 160px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 0 1px rgb(var(--c-accent-primary) / 0.12);
+}
+
+.pr-modal-list-item--v51-selected::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: rgb(var(--c-accent-primary));
+    border-radius: var(--radius-full);
+}
+
+/* —— 8. v5.1 隧道缩放过渡（Lusion tunnel-transition 启发）
+ *   用于多步模态切换时的过渡：旧内容隧道缩放淡出，新内容反向进入
+ *   配合 JS 添加 .is-tunneling 类触发 */
+.pr-modal-panel.is-tunneling {
+    transform: scale(var(--tunnel-scale-max));
+    opacity: var(--tunnel-opacity-min);
+    transition: transform var(--dur-medium) var(--ease-in),
+        opacity var(--dur-medium) var(--ease-in);
+}
+
+.pr-modal-panel.is-tunnel-entering {
+    transform: scale(calc(1 / var(--tunnel-scale-max)));
+    opacity: 0;
+    transition: none;
+}
+
+.pr-modal-panel.is-tunnel-settled {
+    transform: scale(1);
+    opacity: 1;
+    transition: transform var(--dur-medium) var(--ease-out),
+        opacity var(--dur-medium) var(--ease-out);
+}
+
+/* —— 9. v5.1 行尾渐隐遮罩（Grok row-fade-mask 启发）
+ *   用于模态内长文本的行尾渐隐，暗示可滚动 */
+.pr-modal-body--v51-row-fade {
+    -webkit-mask-image: var(--mask-row-fade);
+    mask-image: var(--mask-row-fade);
+}
+
+/* —— 10. v5.1 footer v5.1 玻璃态分隔（MiMo Studio 启发）
+ *   替代默认 footer 的内联 style，应用玻璃态分隔 + 顶部光晕 */
+.pr-modal-footer--v51-glass {
+    padding: var(--space-md) var(--space-lg) var(--space-lg);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    position: relative;
+    isolation: isolate;
+}
+
+.pr-modal-footer--v51-glass::before {
+    content: '';
+    position: absolute;
+    left: var(--space-lg);
+    right: var(--space-lg);
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgb(var(--c-accent-primary) / 0.18) 50%,
+            transparent 100%);
+}
+
+/* —— 11. v5.1 reduce-motion 降级（规范 6.5 / 6.6） */
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-modal-panel--entering,
+    .pr-modal-panel--leaving,
+    .pr-modal-overlay--entering,
+    .pr-modal-overlay--leaving {
+        animation: none !important;
+    }
+
+    .pr-modal-close--v51-cta::before,
+    .pr-modal-close--v51-cta:hover::before {
+        transition: none !important;
+        transform: none !important;
+    }
+
+    .pr-modal-panel.is-tunneling,
+    .pr-modal-panel.is-tunnel-entering,
+    .pr-modal-panel.is-tunnel-settled {
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+}
+
+/* —— 12. v5.1 主题切换禁用过渡（DeepSeek change-theme 启发）
+ *   与 body.pr-theme-switching 协同，确保模态内元素也禁用过渡 */
+body.pr-theme-switching .pr-modal-panel,
+body.pr-theme-switching .pr-modal-panel::before,
+body.pr-theme-switching .pr-modal-close,
+body.pr-theme-switching .pr-modal-close::before {
+    transition: none !important;
+}

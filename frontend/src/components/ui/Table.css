@@ -1,0 +1,66 @@
+/**
+ * Table 组件样式（从 ui.css 拆分，B3.4 CSS 代码分割）
+ * 设计依据：规范第 14.6 / 9.2 章
+ * 规范 13.1：零硬编码 —— padding 引用 --space-sm（8px）替代硬编码 10px
+ */
+
+.pr-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.pr-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: none;
+    font-size: var(--text-sm);
+    line-height: var(--leading-sm);
+}
+
+.pr-table thead tr {
+    background: transparent;
+}
+
+.pr-table thead th {
+    /* v5.0 Task A.2.3：移除表头 border-bottom 分割线，改用 surface-tertiary 透明度差
+         * 表头视觉锚点通过背景色差 + 字重 + 字色三重信号完成（规范 4.1 / 14.6） */
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-tight);
+    text-align: left;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    white-space: nowrap;
+}
+
+.pr-table tbody td {
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    color: rgb(var(--c-text-primary));
+    vertical-align: middle;
+}
+
+.pr-table tbody tr {
+    border: none;
+    transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-table tbody tr:nth-child(odd) {
+    background: transparent;
+}
+
+.pr-table tbody tr:nth-child(even) {
+    background: var(--border-row-even);
+}
+
+.pr-table tbody tr:hover {
+    background: var(--border-row-hover);
+}
+
+.pr-table-td--numeric,
+.pr-table th.is-numeric {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}

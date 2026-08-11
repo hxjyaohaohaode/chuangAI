@@ -1,0 +1,31 @@
+/**
+ * Counter 组件样式
+ * 使用设计 token，零硬编码
+ */
+
+.pr-counter {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'cv11' 1;
+    color: rgb(var(--c-text-primary));
+    line-height: 1;
+    letter-spacing: var(--tracking-normal);
+}
+
+.pr-counter__value {
+    font-weight: var(--weight-bold);
+    font-variation-settings: 'wght' var(--weight-bold);
+}
+
+.pr-counter__prefix,
+.pr-counter__suffix {
+    font-size: 0.6em;
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: var(--tracking-tight);
+}
+
+/* prefers-reduced-motion 降级已在 JS 中处理（直接显示目标值） */

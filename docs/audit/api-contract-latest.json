@@ -1,0 +1,4160 @@
+{
+  "generatedAt": "2026-08-10T07:17:09.476Z",
+  "summary": {
+    "frontendCalls": 210,
+    "backendEndpoints": 219,
+    "matched": 210,
+    "missingPaths": 0,
+    "methodMismatches": 0,
+    "backendNotCalled": 17
+  },
+  "missingPaths": [],
+  "methodMismatches": [],
+  "matched": [
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/ai/tts",
+        "canonicalPath": "/api/ai/tts",
+        "file": "frontend/src/lib/api.ts",
+        "line": 511,
+        "call": "fetch"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/ai.ts",
+        "method": "POST",
+        "path": "/tts",
+        "line": 263,
+        "prefix": "/api/ai",
+        "fullPath": "/api/ai/tts",
+        "canonicalPath": "/api/ai/tts"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/agents/orchestrate",
+        "canonicalPath": "/api/agents/orchestrate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 631,
+        "call": "fetchStreamResponse"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/orchestrate",
+        "line": 1316,
+        "prefix": "/api/agents",
+        "fullPath": "/api/agents/orchestrate",
+        "canonicalPath": "/api/agents/orchestrate"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/knowledge-graph/full",
+        "canonicalPath": "/api/knowledge-graph/full",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1400,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/knowledge-graph.ts",
+        "method": "GET",
+        "path": "/full",
+        "line": 124,
+        "prefix": "/api/knowledge-graph",
+        "fullPath": "/api/knowledge-graph/full",
+        "canonicalPath": "/api/knowledge-graph/full"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/knowledge-graph/mastery-colored",
+        "canonicalPath": "/api/knowledge-graph/mastery-colored",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1411,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/knowledge-graph.ts",
+        "method": "GET",
+        "path": "/mastery-colored",
+        "line": 135,
+        "prefix": "/api/knowledge-graph",
+        "fullPath": "/api/knowledge-graph/mastery-colored",
+        "canonicalPath": "/api/knowledge-graph/mastery-colored"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/knowledge-graph/dark-matter/:param",
+        "canonicalPath": "/api/knowledge-graph/dark-matter/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1427,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/knowledge-graph.ts",
+        "method": "GET",
+        "path": "/dark-matter/:classId",
+        "line": 175,
+        "prefix": "/api/knowledge-graph",
+        "fullPath": "/api/knowledge-graph/dark-matter/:classId",
+        "canonicalPath": "/api/knowledge-graph/dark-matter/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/knowledge-graph/student/:param/gaps",
+        "canonicalPath": "/api/knowledge-graph/student/:param/gaps",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1431,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/knowledge-graph.ts",
+        "method": "GET",
+        "path": "/student/:studentId/gaps",
+        "line": 210,
+        "prefix": "/api/knowledge-graph",
+        "fullPath": "/api/knowledge-graph/student/:studentId/gaps",
+        "canonicalPath": "/api/knowledge-graph/student/:param/gaps"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/knowledge-graph/poem/:param/related",
+        "canonicalPath": "/api/knowledge-graph/poem/:param/related",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1435,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/knowledge-graph.ts",
+        "method": "GET",
+        "path": "/poem/:poemId/related",
+        "line": 245,
+        "prefix": "/api/knowledge-graph",
+        "fullPath": "/api/knowledge-graph/poem/:poemId/related",
+        "canonicalPath": "/api/knowledge-graph/poem/:param/related"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/stats",
+        "canonicalPath": "/api/dashboard/stats",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1441,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/stats",
+        "line": 337,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/stats",
+        "canonicalPath": "/api/dashboard/stats"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/bloom-radar",
+        "canonicalPath": "/api/dashboard/bloom-radar",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1457,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/bloom-radar",
+        "line": 376,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/bloom-radar",
+        "canonicalPath": "/api/dashboard/bloom-radar"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/alerts",
+        "canonicalPath": "/api/dashboard/alerts",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1463,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/alerts",
+        "line": 410,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/alerts",
+        "canonicalPath": "/api/dashboard/alerts"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/weekly-progress",
+        "canonicalPath": "/api/dashboard/weekly-progress",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1469,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/weekly-progress",
+        "line": 429,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/weekly-progress",
+        "canonicalPath": "/api/dashboard/weekly-progress"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/classes",
+        "canonicalPath": "/api/classroom/classes",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1477,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/classes",
+        "line": 567,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/classes",
+        "canonicalPath": "/api/classroom/classes"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/readiness",
+        "canonicalPath": "/api/classroom/readiness",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1483,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/readiness",
+        "line": 576,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/readiness",
+        "canonicalPath": "/api/classroom/readiness"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/start",
+        "canonicalPath": "/api/classroom/start",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1489,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/start",
+        "line": 601,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/start",
+        "canonicalPath": "/api/classroom/start"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/:param/status",
+        "canonicalPath": "/api/classroom/:param/status",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1496,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/:lessonId/status",
+        "line": 722,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/status",
+        "canonicalPath": "/api/classroom/:param/status"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/question/replace",
+        "canonicalPath": "/api/classroom/:param/question/replace",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1504,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/question/replace",
+        "line": 1341,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/question/replace",
+        "canonicalPath": "/api/classroom/:param/question/replace"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/question/flag",
+        "canonicalPath": "/api/classroom/:param/question/flag",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1521,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/question/flag",
+        "line": 1310,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/question/flag",
+        "canonicalPath": "/api/classroom/:param/question/flag"
+      }
+    },
+    {
+      "call": {
+        "method": "PATCH",
+        "path": "/api/classroom/:param/mode",
+        "canonicalPath": "/api/classroom/:param/mode",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1528,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "PATCH",
+        "path": "/:lessonId/mode",
+        "line": 768,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/mode",
+        "canonicalPath": "/api/classroom/:param/mode"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/next",
+        "canonicalPath": "/api/classroom/:param/next",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1535,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/next",
+        "line": 805,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/next",
+        "canonicalPath": "/api/classroom/:param/next"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/submit",
+        "canonicalPath": "/api/classroom/:param/submit",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1549,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/submit",
+        "line": 846,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/submit",
+        "canonicalPath": "/api/classroom/:param/submit"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/hint",
+        "canonicalPath": "/api/classroom/:param/hint",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1559,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/hint",
+        "line": 1109,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/hint",
+        "canonicalPath": "/api/classroom/:param/hint"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/discuss",
+        "canonicalPath": "/api/classroom/:param/discuss",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1569,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/discuss",
+        "line": 1159,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/discuss",
+        "canonicalPath": "/api/classroom/:param/discuss"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/end",
+        "canonicalPath": "/api/classroom/:param/end",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1579,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/end",
+        "line": 1391,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/end",
+        "canonicalPath": "/api/classroom/:param/end"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/:param/report",
+        "canonicalPath": "/api/classroom/:param/report",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1586,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/:lessonId/report",
+        "line": 1483,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/report",
+        "canonicalPath": "/api/classroom/:param/report"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/join/:param",
+        "canonicalPath": "/api/classroom/join/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1592,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/join/:joinCode",
+        "line": 1522,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/join/:joinCode",
+        "canonicalPath": "/api/classroom/join/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/explain/:param",
+        "canonicalPath": "/api/classroom/explain/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1598,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/explain/:poemId",
+        "line": 1551,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/explain/:poemId",
+        "canonicalPath": "/api/classroom/explain/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/dance/start",
+        "canonicalPath": "/api/classroom/:param/dance/start",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1607,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/dance/start",
+        "line": 2121,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/dance/start",
+        "canonicalPath": "/api/classroom/:param/dance/start"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/:param/dance/timeline",
+        "canonicalPath": "/api/classroom/:param/dance/timeline",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1614,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/:lessonId/dance/timeline",
+        "line": 2153,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/dance/timeline",
+        "canonicalPath": "/api/classroom/:param/dance/timeline"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/dance/event",
+        "canonicalPath": "/api/classroom/:param/dance/event",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1632,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/dance/event",
+        "line": 2176,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/dance/event",
+        "canonicalPath": "/api/classroom/:param/dance/event"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/schedule/next",
+        "canonicalPath": "/api/classroom/:param/schedule/next",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1641,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/schedule/next",
+        "line": 1612,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/schedule/next",
+        "canonicalPath": "/api/classroom/:param/schedule/next"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/schedule/override",
+        "canonicalPath": "/api/classroom/:param/schedule/override",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1651,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/schedule/override",
+        "line": 1648,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/schedule/override",
+        "canonicalPath": "/api/classroom/:param/schedule/override"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/:param/schedule/status",
+        "canonicalPath": "/api/classroom/:param/schedule/status",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1661,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/:lessonId/schedule/status",
+        "line": 1681,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/schedule/status",
+        "canonicalPath": "/api/classroom/:param/schedule/status"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/ai/suggest",
+        "canonicalPath": "/api/classroom/:param/ai/suggest",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1684,
+        "call": "fetchStreamResponse"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/ai/suggest",
+        "line": 1703,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/ai/suggest",
+        "canonicalPath": "/api/classroom/:param/ai/suggest"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/ai/supplement",
+        "canonicalPath": "/api/classroom/:param/ai/supplement",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1773,
+        "call": "fetchStreamResponse"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/ai/supplement",
+        "line": 1790,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/ai/supplement",
+        "canonicalPath": "/api/classroom/:param/ai/supplement"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/ai/followup",
+        "canonicalPath": "/api/classroom/:param/ai/followup",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1863,
+        "call": "fetchStreamResponse"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/ai/followup",
+        "line": 1863,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/ai/followup",
+        "canonicalPath": "/api/classroom/:param/ai/followup"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/ai/intervention",
+        "canonicalPath": "/api/classroom/:param/ai/intervention",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1939,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/ai/intervention",
+        "line": 1945,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/ai/intervention",
+        "canonicalPath": "/api/classroom/:param/ai/intervention"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/ai/mark-adopted",
+        "canonicalPath": "/api/classroom/:param/ai/mark-adopted",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1948,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/ai/mark-adopted",
+        "line": 2092,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/ai/mark-adopted",
+        "canonicalPath": "/api/classroom/:param/ai/mark-adopted"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/after-action-report/generate",
+        "canonicalPath": "/api/classroom/:param/after-action-report/generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1960,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/after-action-report/generate",
+        "line": 1985,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/after-action-report/generate",
+        "canonicalPath": "/api/classroom/:param/after-action-report/generate"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/:param/after-action-report",
+        "canonicalPath": "/api/classroom/:param/after-action-report",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1967,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/:lessonId/after-action-report",
+        "line": 2049,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/after-action-report",
+        "canonicalPath": "/api/classroom/:param/after-action-report"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/sessions/:param/smart-score",
+        "canonicalPath": "/api/classroom/sessions/:param/smart-score",
+        "file": "frontend/src/lib/api.ts",
+        "line": 1975,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/sessions/:sessionId/smart-score",
+        "line": 2453,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/sessions/:sessionId/smart-score",
+        "canonicalPath": "/api/classroom/sessions/:param/smart-score"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/sessions/:param/comment",
+        "canonicalPath": "/api/classroom/sessions/:param/comment",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2005,
+        "call": "fetchStreamResponse"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/sessions/:sessionId/comment",
+        "line": 2672,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/sessions/:sessionId/comment",
+        "canonicalPath": "/api/classroom/sessions/:param/comment"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/sessions/:param/virtual-opponent",
+        "canonicalPath": "/api/classroom/sessions/:param/virtual-opponent",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2136,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/sessions/:sessionId/virtual-opponent",
+        "line": 2794,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/sessions/:sessionId/virtual-opponent",
+        "canonicalPath": "/api/classroom/sessions/:param/virtual-opponent"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/appreciation/:param",
+        "canonicalPath": "/api/appreciation/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2155,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/appreciation.ts",
+        "method": "GET",
+        "path": "/:poemId",
+        "line": 244,
+        "prefix": "/api/appreciation",
+        "fullPath": "/api/appreciation/:poemId",
+        "canonicalPath": "/api/appreciation/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/upload",
+        "canonicalPath": "/api/grading/upload",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2188,
+        "call": "fetch"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/upload",
+        "line": 628,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/upload",
+        "canonicalPath": "/api/grading/upload"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/grading/students",
+        "canonicalPath": "/api/grading/students",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2217,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "GET",
+        "path": "/students",
+        "line": 578,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/students",
+        "canonicalPath": "/api/grading/students"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/grading/questions",
+        "canonicalPath": "/api/grading/questions",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2222,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "GET",
+        "path": "/questions",
+        "line": 591,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/questions",
+        "canonicalPath": "/api/grading/questions"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/grading/history",
+        "canonicalPath": "/api/grading/history",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2227,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "GET",
+        "path": "/history",
+        "line": 606,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/history",
+        "canonicalPath": "/api/grading/history"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/recognize",
+        "canonicalPath": "/api/grading/recognize",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2233,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/recognize",
+        "line": 777,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/recognize",
+        "canonicalPath": "/api/grading/recognize"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/grade",
+        "canonicalPath": "/api/grading/grade",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2240,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/grade",
+        "line": 863,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/grade",
+        "canonicalPath": "/api/grading/grade"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/review",
+        "canonicalPath": "/api/grading/review",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2247,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/review",
+        "line": 1036,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/review",
+        "canonicalPath": "/api/grading/review"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/grading/batch/:param",
+        "canonicalPath": "/api/grading/batch/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2254,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "GET",
+        "path": "/batch/:batchId",
+        "line": 1175,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/batch/:batchId",
+        "canonicalPath": "/api/grading/batch/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "DELETE",
+        "path": "/api/grading/batch/:param",
+        "canonicalPath": "/api/grading/batch/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2258,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "DELETE",
+        "path": "/batch/:batchId",
+        "line": 1246,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/batch/:batchId",
+        "canonicalPath": "/api/grading/batch/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/:param/score-multi-dim",
+        "canonicalPath": "/api/grading/:param/score-multi-dim",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2267,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/:id/score-multi-dim",
+        "line": 1280,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/:id/score-multi-dim",
+        "canonicalPath": "/api/grading/:param/score-multi-dim"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/batch-score",
+        "canonicalPath": "/api/grading/batch-score",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2281,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/batch-score",
+        "line": 1328,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/batch-score",
+        "canonicalPath": "/api/grading/batch-score"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/ocr",
+        "canonicalPath": "/api/grading/ocr",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2293,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/ocr",
+        "line": 1377,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/ocr",
+        "canonicalPath": "/api/grading/ocr"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/ocr-batch",
+        "canonicalPath": "/api/grading/ocr-batch",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2303,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/ocr-batch",
+        "line": 1407,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/ocr-batch",
+        "canonicalPath": "/api/grading/ocr-batch"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/grading/:param/attribute",
+        "canonicalPath": "/api/grading/:param/attribute",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2315,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/grading.ts",
+        "method": "POST",
+        "path": "/:id/attribute",
+        "line": 1435,
+        "prefix": "/api/grading",
+        "fullPath": "/api/grading/:id/attribute",
+        "canonicalPath": "/api/grading/:param/attribute"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/workbench/poems",
+        "canonicalPath": "/api/workbench/poems",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2330,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "GET",
+        "path": "/poems",
+        "line": 314,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/poems",
+        "canonicalPath": "/api/workbench/poems"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/workbench/generate",
+        "canonicalPath": "/api/workbench/generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2336,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/generate",
+        "line": 339,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/generate",
+        "canonicalPath": "/api/workbench/generate"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/workbench/refine",
+        "canonicalPath": "/api/workbench/refine",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2343,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/refine",
+        "line": 408,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/refine",
+        "canonicalPath": "/api/workbench/refine"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/workbench/questions",
+        "canonicalPath": "/api/workbench/questions",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2350,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "GET",
+        "path": "/questions",
+        "line": 537,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/questions",
+        "canonicalPath": "/api/workbench/questions"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/workbench/export",
+        "canonicalPath": "/api/workbench/export",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2356,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/export",
+        "line": 966,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/export",
+        "canonicalPath": "/api/workbench/export"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/workbench/publish",
+        "canonicalPath": "/api/workbench/publish",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2364,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/publish",
+        "line": 1020,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/publish",
+        "canonicalPath": "/api/workbench/publish"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/workbench/questions",
+        "canonicalPath": "/api/workbench/questions",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2408,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "GET",
+        "path": "/questions",
+        "line": 537,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/questions",
+        "canonicalPath": "/api/workbench/questions"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/workbench/questions/:param/favorite",
+        "canonicalPath": "/api/workbench/questions/:param/favorite",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2420,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/questions/:id/favorite",
+        "line": 638,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/questions/:id/favorite",
+        "canonicalPath": "/api/workbench/questions/:param/favorite"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/workbench/questions/:param/duplicate",
+        "canonicalPath": "/api/workbench/questions/:param/duplicate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2432,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/questions/:id/duplicate",
+        "line": 664,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/questions/:id/duplicate",
+        "canonicalPath": "/api/workbench/questions/:param/duplicate"
+      }
+    },
+    {
+      "call": {
+        "method": "DELETE",
+        "path": "/api/workbench/questions/:param",
+        "canonicalPath": "/api/workbench/questions/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2443,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "DELETE",
+        "path": "/questions/:id",
+        "line": 747,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/questions/:id",
+        "canonicalPath": "/api/workbench/questions/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "PATCH",
+        "path": "/api/workbench/questions/:param",
+        "canonicalPath": "/api/workbench/questions/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2454,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "PATCH",
+        "path": "/questions/:id",
+        "line": 703,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/questions/:id",
+        "canonicalPath": "/api/workbench/questions/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/workbench/questions/:param/verification",
+        "canonicalPath": "/api/workbench/questions/:param/verification",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2466,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "GET",
+        "path": "/questions/:id/verification",
+        "line": 778,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/questions/:id/verification",
+        "canonicalPath": "/api/workbench/questions/:param/verification"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/workbench/export",
+        "canonicalPath": "/api/workbench/export",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2477,
+        "call": "fetchBlob"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/export",
+        "line": 966,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/export",
+        "canonicalPath": "/api/workbench/export"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/workbench/smart-compose",
+        "canonicalPath": "/api/workbench/smart-compose",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2501,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/workbench.ts",
+        "method": "POST",
+        "path": "/smart-compose",
+        "line": 859,
+        "prefix": "/api/agents",
+        "fullPath": "/api/workbench/smart-compose",
+        "canonicalPath": "/api/workbench/smart-compose"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/students",
+        "canonicalPath": "/api/students",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2518,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/students.ts",
+        "method": "GET",
+        "path": "/",
+        "line": 49,
+        "prefix": "/api/students",
+        "fullPath": "/api/students",
+        "canonicalPath": "/api/students"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/students/:param/weak-points",
+        "canonicalPath": "/api/students/:param/weak-points",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2530,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/students.ts",
+        "method": "GET",
+        "path": "/:id/weak-points",
+        "line": 97,
+        "prefix": "/api/students",
+        "fullPath": "/api/students/:id/weak-points",
+        "canonicalPath": "/api/students/:param/weak-points"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/memory",
+        "canonicalPath": "/api/memory",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2551,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/memory.ts",
+        "method": "GET",
+        "path": "/",
+        "line": 94,
+        "prefix": "/api/memory",
+        "fullPath": "/api/memory",
+        "canonicalPath": "/api/memory"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/memory",
+        "canonicalPath": "/api/memory",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2556,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/memory.ts",
+        "method": "POST",
+        "path": "/",
+        "line": 135,
+        "prefix": "/api/memory",
+        "fullPath": "/api/memory",
+        "canonicalPath": "/api/memory"
+      }
+    },
+    {
+      "call": {
+        "method": "PATCH",
+        "path": "/api/memory/:param",
+        "canonicalPath": "/api/memory/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2562,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/memory.ts",
+        "method": "PATCH",
+        "path": "/:id",
+        "line": 165,
+        "prefix": "/api/memory",
+        "fullPath": "/api/memory/:id",
+        "canonicalPath": "/api/memory/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "DELETE",
+        "path": "/api/memory/:param",
+        "canonicalPath": "/api/memory/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2568,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/memory.ts",
+        "method": "DELETE",
+        "path": "/:id",
+        "line": 191,
+        "prefix": "/api/memory",
+        "fullPath": "/api/memory/:id",
+        "canonicalPath": "/api/memory/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "DELETE",
+        "path": "/api/memory",
+        "canonicalPath": "/api/memory",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2583,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/memory.ts",
+        "method": "DELETE",
+        "path": "/",
+        "line": 202,
+        "prefix": "/api/memory",
+        "fullPath": "/api/memory",
+        "canonicalPath": "/api/memory"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/copilot/chat",
+        "canonicalPath": "/api/copilot/chat",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2592,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "POST",
+        "path": "/chat",
+        "line": 361,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/chat",
+        "canonicalPath": "/api/copilot/chat"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/copilot/sessions",
+        "canonicalPath": "/api/copilot/sessions",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2602,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "GET",
+        "path": "/sessions",
+        "line": 481,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/sessions",
+        "canonicalPath": "/api/copilot/sessions"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/copilot/sessions/:param",
+        "canonicalPath": "/api/copilot/sessions/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2608,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "GET",
+        "path": "/sessions/:id",
+        "line": 504,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/sessions/:id",
+        "canonicalPath": "/api/copilot/sessions/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "DELETE",
+        "path": "/api/copilot/sessions/:param",
+        "canonicalPath": "/api/copilot/sessions/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2612,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "DELETE",
+        "path": "/sessions/:id",
+        "line": 537,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/sessions/:id",
+        "canonicalPath": "/api/copilot/sessions/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/copilot/quick-action",
+        "canonicalPath": "/api/copilot/quick-action",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2619,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "POST",
+        "path": "/quick-action",
+        "line": 554,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/quick-action",
+        "canonicalPath": "/api/copilot/quick-action"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/copilot/feedback",
+        "canonicalPath": "/api/copilot/feedback",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2626,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "POST",
+        "path": "/feedback",
+        "line": 584,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/feedback",
+        "canonicalPath": "/api/copilot/feedback"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/copilot/agent-labels",
+        "canonicalPath": "/api/copilot/agent-labels",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2636,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "GET",
+        "path": "/agent-labels",
+        "line": 621,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/agent-labels",
+        "canonicalPath": "/api/copilot/agent-labels"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/copilot/thinking-mode",
+        "canonicalPath": "/api/copilot/thinking-mode",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2641,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "GET",
+        "path": "/thinking-mode",
+        "line": 879,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/thinking-mode",
+        "canonicalPath": "/api/copilot/thinking-mode"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/copilot/thinking-mode",
+        "canonicalPath": "/api/copilot/thinking-mode",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2647,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "POST",
+        "path": "/thinking-mode",
+        "line": 889,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/thinking-mode",
+        "canonicalPath": "/api/copilot/thinking-mode"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/copilot/stream-chat",
+        "canonicalPath": "/api/copilot/stream-chat",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2689,
+        "call": "fetchStreamResponse"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "POST",
+        "path": "/stream-chat",
+        "line": 643,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/stream-chat",
+        "canonicalPath": "/api/copilot/stream-chat"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/orchestrator/execute",
+        "canonicalPath": "/api/orchestrator/execute",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2820,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/orchestrator/routes.ts",
+        "method": "POST",
+        "path": "/execute",
+        "line": 153,
+        "prefix": "/api/orchestrator",
+        "fullPath": "/api/orchestrator/execute",
+        "canonicalPath": "/api/orchestrator/execute"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/orchestrator/pause",
+        "canonicalPath": "/api/orchestrator/pause",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2827,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/orchestrator/routes.ts",
+        "method": "POST",
+        "path": "/pause",
+        "line": 239,
+        "prefix": "/api/orchestrator",
+        "fullPath": "/api/orchestrator/pause",
+        "canonicalPath": "/api/orchestrator/pause"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/orchestrator/resume",
+        "canonicalPath": "/api/orchestrator/resume",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2834,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/orchestrator/routes.ts",
+        "method": "POST",
+        "path": "/resume",
+        "line": 264,
+        "prefix": "/api/orchestrator",
+        "fullPath": "/api/orchestrator/resume",
+        "canonicalPath": "/api/orchestrator/resume"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/orchestrator/abort",
+        "canonicalPath": "/api/orchestrator/abort",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2841,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/orchestrator/routes.ts",
+        "method": "POST",
+        "path": "/abort",
+        "line": 289,
+        "prefix": "/api/orchestrator",
+        "fullPath": "/api/orchestrator/abort",
+        "canonicalPath": "/api/orchestrator/abort"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/orchestrator/modify",
+        "canonicalPath": "/api/orchestrator/modify",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2848,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/orchestrator/routes.ts",
+        "method": "POST",
+        "path": "/modify",
+        "line": 314,
+        "prefix": "/api/orchestrator",
+        "fullPath": "/api/orchestrator/modify",
+        "canonicalPath": "/api/orchestrator/modify"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/orchestrator/sessions/:param",
+        "canonicalPath": "/api/orchestrator/sessions/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2855,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/orchestrator/routes.ts",
+        "method": "GET",
+        "path": "/sessions/:id",
+        "line": 344,
+        "prefix": "/api/orchestrator",
+        "fullPath": "/api/orchestrator/sessions/:id",
+        "canonicalPath": "/api/orchestrator/sessions/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/orchestrator/sessions/:param/trace",
+        "canonicalPath": "/api/orchestrator/sessions/:param/trace",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2859,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/orchestrator/routes.ts",
+        "method": "GET",
+        "path": "/sessions/:id/trace",
+        "line": 381,
+        "prefix": "/api/orchestrator",
+        "fullPath": "/api/orchestrator/sessions/:id/trace",
+        "canonicalPath": "/api/orchestrator/sessions/:param/trace"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/templates",
+        "canonicalPath": "/api/report/templates",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2867,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/templates",
+        "line": 452,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/templates",
+        "canonicalPath": "/api/report/templates"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/generate",
+        "canonicalPath": "/api/report/generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2871,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/generate",
+        "line": 471,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/generate",
+        "canonicalPath": "/api/report/generate"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/:param",
+        "canonicalPath": "/api/report/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2878,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/:reportId",
+        "line": 704,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/:reportId",
+        "canonicalPath": "/api/report/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report",
+        "canonicalPath": "/api/report",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2897,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/",
+        "line": 975,
+        "prefix": "/api/report",
+        "fullPath": "/api/report",
+        "canonicalPath": "/api/report"
+      }
+    },
+    {
+      "call": {
+        "method": "DELETE",
+        "path": "/api/report/:param",
+        "canonicalPath": "/api/report/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2905,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "DELETE",
+        "path": "/:reportId",
+        "line": 1046,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/:reportId",
+        "canonicalPath": "/api/report/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/:param/export",
+        "canonicalPath": "/api/report/:param/export",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2917,
+        "call": "fetchBlob"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/:reportId/export",
+        "line": 734,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/:reportId/export",
+        "canonicalPath": "/api/report/:param/export"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/:param/charts",
+        "canonicalPath": "/api/report/:param/charts",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2942,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/:reportId/charts",
+        "line": 798,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/:reportId/charts",
+        "canonicalPath": "/api/report/:param/charts"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/:param/preview",
+        "canonicalPath": "/api/report/:param/preview",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2948,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/:reportId/preview",
+        "line": 847,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/:reportId/preview",
+        "canonicalPath": "/api/report/:param/preview"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/export/:param",
+        "canonicalPath": "/api/report/export/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 2963,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/export/:reportId",
+        "line": 1088,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/export/:reportId",
+        "canonicalPath": "/api/report/export/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/history",
+        "canonicalPath": "/api/report/history",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3013,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/history",
+        "line": 633,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/history",
+        "canonicalPath": "/api/report/history"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/classes/:param/bloom-distribution",
+        "canonicalPath": "/api/diagnosis/classes/:param/bloom-distribution",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3069,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/classes/:classId/bloom-distribution",
+        "line": 396,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/classes/:classId/bloom-distribution",
+        "canonicalPath": "/api/diagnosis/classes/:param/bloom-distribution"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/classes/:param/heatmap",
+        "canonicalPath": "/api/diagnosis/classes/:param/heatmap",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3075,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/classes/:classId/heatmap",
+        "line": 427,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/classes/:classId/heatmap",
+        "canonicalPath": "/api/diagnosis/classes/:param/heatmap"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/students/:param/profile",
+        "canonicalPath": "/api/diagnosis/students/:param/profile",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3081,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/students/:studentId/profile",
+        "line": 457,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/students/:studentId/profile",
+        "canonicalPath": "/api/diagnosis/students/:param/profile"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/classes/:param/dark-matter",
+        "canonicalPath": "/api/diagnosis/classes/:param/dark-matter",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3087,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/classes/:classId/dark-matter",
+        "line": 488,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/classes/:classId/dark-matter",
+        "canonicalPath": "/api/diagnosis/classes/:param/dark-matter"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/classes/:param/dark-matter/report",
+        "canonicalPath": "/api/diagnosis/classes/:param/dark-matter/report",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3093,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/classes/:classId/dark-matter/report",
+        "line": 519,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/classes/:classId/dark-matter/report",
+        "canonicalPath": "/api/diagnosis/classes/:param/dark-matter/report"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/students/:param/gaps",
+        "canonicalPath": "/api/diagnosis/students/:param/gaps",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3099,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/students/:studentId/gaps",
+        "line": 560,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/students/:studentId/gaps",
+        "canonicalPath": "/api/diagnosis/students/:param/gaps"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/students/:param/learning-path",
+        "canonicalPath": "/api/diagnosis/students/:param/learning-path",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3105,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/students/:studentId/learning-path",
+        "line": 595,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/students/:studentId/learning-path",
+        "canonicalPath": "/api/diagnosis/students/:param/learning-path"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/classes/:param/prescription/:param",
+        "canonicalPath": "/api/diagnosis/classes/:param/prescription/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3111,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/classes/:classId/prescription/:patternId",
+        "line": 625,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/classes/:classId/prescription/:patternId",
+        "canonicalPath": "/api/diagnosis/classes/:param/prescription/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/classes/:param/suggestions",
+        "canonicalPath": "/api/diagnosis/classes/:param/suggestions",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3120,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/classes/:classId/suggestions",
+        "line": 656,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/classes/:classId/suggestions",
+        "canonicalPath": "/api/diagnosis/classes/:param/suggestions"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/students/:param/learning-path",
+        "canonicalPath": "/api/diagnosis/students/:param/learning-path",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3129,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/students/:studentId/learning-path",
+        "line": 595,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/students/:studentId/learning-path",
+        "canonicalPath": "/api/diagnosis/students/:param/learning-path"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/students/:param/prescription",
+        "canonicalPath": "/api/diagnosis/students/:param/prescription",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3150,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/students/:studentId/prescription",
+        "line": 860,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/students/:studentId/prescription",
+        "canonicalPath": "/api/diagnosis/students/:param/prescription"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/recitation/poems",
+        "canonicalPath": "/api/recitation/poems",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3179,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/recitation.ts",
+        "method": "GET",
+        "path": "/poems",
+        "line": 317,
+        "prefix": "/api/recitation",
+        "fullPath": "/api/recitation/poems",
+        "canonicalPath": "/api/recitation/poems"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/recitation/tts/generate",
+        "canonicalPath": "/api/recitation/tts/generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3190,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/recitation.ts",
+        "method": "POST",
+        "path": "/tts/generate",
+        "line": 371,
+        "prefix": "/api/recitation",
+        "fullPath": "/api/recitation/tts/generate",
+        "canonicalPath": "/api/recitation/tts/generate"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/recitation/asr/transcribe",
+        "canonicalPath": "/api/recitation/asr/transcribe",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3224,
+        "call": "fetch"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/recitation.ts",
+        "method": "POST",
+        "path": "/asr/transcribe",
+        "line": 450,
+        "prefix": "/api/recitation",
+        "fullPath": "/api/recitation/asr/transcribe",
+        "canonicalPath": "/api/recitation/asr/transcribe"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/recitation/evaluate",
+        "canonicalPath": "/api/recitation/evaluate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3258,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/recitation.ts",
+        "method": "POST",
+        "path": "/evaluate",
+        "line": 587,
+        "prefix": "/api/recitation",
+        "fullPath": "/api/recitation/evaluate",
+        "canonicalPath": "/api/recitation/evaluate"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/recitation/history/:param",
+        "canonicalPath": "/api/recitation/history/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3270,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/recitation.ts",
+        "method": "GET",
+        "path": "/history/:studentId",
+        "line": 737,
+        "prefix": "/api/recitation",
+        "fullPath": "/api/recitation/history/:studentId",
+        "canonicalPath": "/api/recitation/history/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/recitation/leaderboard/:param",
+        "canonicalPath": "/api/recitation/leaderboard/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3281,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/recitation.ts",
+        "method": "GET",
+        "path": "/leaderboard/:classId",
+        "line": 757,
+        "prefix": "/api/recitation",
+        "fullPath": "/api/recitation/leaderboard/:classId",
+        "canonicalPath": "/api/recitation/leaderboard/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/recitation/audio/:param",
+        "canonicalPath": "/api/recitation/audio/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3292,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/recitation.ts",
+        "method": "GET",
+        "path": "/audio/:recitationId",
+        "line": 836,
+        "prefix": "/api/recitation",
+        "fullPath": "/api/recitation/audio/:recitationId",
+        "canonicalPath": "/api/recitation/audio/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "DELETE",
+        "path": "/api/recitation/:param",
+        "canonicalPath": "/api/recitation/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3303,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/recitation.ts",
+        "method": "DELETE",
+        "path": "/:recitationId",
+        "line": 866,
+        "prefix": "/api/recitation",
+        "fullPath": "/api/recitation/:recitationId",
+        "canonicalPath": "/api/recitation/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/poem-content/:param",
+        "canonicalPath": "/api/poem-content/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3330,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/poem-content.ts",
+        "method": "GET",
+        "path": "/:poemId",
+        "line": 202,
+        "prefix": "/api/poem-content",
+        "fullPath": "/api/poem-content/:poemId",
+        "canonicalPath": "/api/poem-content/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/settings/credentials",
+        "canonicalPath": "/api/settings/credentials",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3345,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/settings.ts",
+        "method": "GET",
+        "path": "/credentials",
+        "line": 217,
+        "prefix": "/api/settings",
+        "fullPath": "/api/settings/credentials",
+        "canonicalPath": "/api/settings/credentials"
+      }
+    },
+    {
+      "call": {
+        "method": "PUT",
+        "path": "/api/settings/credentials/:param",
+        "canonicalPath": "/api/settings/credentials/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3351,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/settings.ts",
+        "method": "PUT",
+        "path": "/credentials/:id",
+        "line": 222,
+        "prefix": "/api/settings",
+        "fullPath": "/api/settings/credentials/:id",
+        "canonicalPath": "/api/settings/credentials/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/settings/credentials/:param/test",
+        "canonicalPath": "/api/settings/credentials/:param/test",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3358,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/settings.ts",
+        "method": "POST",
+        "path": "/credentials/:id/test",
+        "line": 249,
+        "prefix": "/api/settings",
+        "fullPath": "/api/settings/credentials/:id/test",
+        "canonicalPath": "/api/settings/credentials/:param/test"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/illustration/scene/:param",
+        "canonicalPath": "/api/illustration/scene/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3383,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/illustration.ts",
+        "method": "GET",
+        "path": "/scene/:sceneId",
+        "line": 123,
+        "prefix": "/api/illustration",
+        "fullPath": "/api/illustration/scene/:sceneId",
+        "canonicalPath": "/api/illustration/scene/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/lesson-plan/:param/export",
+        "canonicalPath": "/api/lesson-plan/:param/export",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3414,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "POST",
+        "path": "/:id/export",
+        "line": 900,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/:id/export",
+        "canonicalPath": "/api/lesson-plan/:param/export"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/lesson-plan/list",
+        "canonicalPath": "/api/lesson-plan/list",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3438,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "GET",
+        "path": "/list",
+        "line": 457,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/list",
+        "canonicalPath": "/api/lesson-plan/list"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/lesson-plan/:param",
+        "canonicalPath": "/api/lesson-plan/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3449,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "GET",
+        "path": "/:id",
+        "line": 493,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/:id",
+        "canonicalPath": "/api/lesson-plan/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/lesson-plan/generate",
+        "canonicalPath": "/api/lesson-plan/generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3468,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "POST",
+        "path": "/generate",
+        "line": 514,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/generate",
+        "canonicalPath": "/api/lesson-plan/generate"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/lesson-plan/save",
+        "canonicalPath": "/api/lesson-plan/save",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3482,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "POST",
+        "path": "/save",
+        "line": 603,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/save",
+        "canonicalPath": "/api/lesson-plan/save"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/lesson-plan/poems/search",
+        "canonicalPath": "/api/lesson-plan/poems/search",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3507,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "GET",
+        "path": "/poems/search",
+        "line": 642,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/poems/search",
+        "canonicalPath": "/api/lesson-plan/poems/search"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/lesson-plan/poems/:param/detail",
+        "canonicalPath": "/api/lesson-plan/poems/:param/detail",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3514,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "GET",
+        "path": "/poems/:id/detail",
+        "line": 672,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/poems/:id/detail",
+        "canonicalPath": "/api/lesson-plan/poems/:param/detail"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/lesson-plan/objectives/generate",
+        "canonicalPath": "/api/lesson-plan/objectives/generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3521,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "POST",
+        "path": "/objectives/generate",
+        "line": 690,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/objectives/generate",
+        "canonicalPath": "/api/lesson-plan/objectives/generate"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/lesson-plan/layered-design/generate",
+        "canonicalPath": "/api/lesson-plan/layered-design/generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3532,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "POST",
+        "path": "/layered-design/generate",
+        "line": 718,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/layered-design/generate",
+        "canonicalPath": "/api/lesson-plan/layered-design/generate"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/lesson-plan/lessons/generate",
+        "canonicalPath": "/api/lesson-plan/lessons/generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3543,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "POST",
+        "path": "/lessons/generate",
+        "line": 745,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/lessons/generate",
+        "canonicalPath": "/api/lesson-plan/lessons/generate"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/lesson-plan/lessons/:param/refine",
+        "canonicalPath": "/api/lesson-plan/lessons/:param/refine",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3566,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "POST",
+        "path": "/lessons/:id/refine",
+        "line": 820,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/lessons/:id/refine",
+        "canonicalPath": "/api/lesson-plan/lessons/:param/refine"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/lesson-plan/lessons/:param/resources",
+        "canonicalPath": "/api/lesson-plan/lessons/:param/resources",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3590,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan.ts",
+        "method": "GET",
+        "path": "/lessons/:id/resources",
+        "line": 881,
+        "prefix": "/api/lesson-plan",
+        "fullPath": "/api/lesson-plan/lessons/:id/resources",
+        "canonicalPath": "/api/lesson-plan/lessons/:param/resources"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/lesson-plans/templates",
+        "canonicalPath": "/api/lesson-plans/templates",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3616,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan-templates.ts",
+        "method": "GET",
+        "path": "/templates",
+        "line": 363,
+        "prefix": "/api/lesson-plans",
+        "fullPath": "/api/lesson-plans/templates",
+        "canonicalPath": "/api/lesson-plans/templates"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/lesson-plans/templates/:param",
+        "canonicalPath": "/api/lesson-plans/templates/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3632,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/lesson-plan-templates.ts",
+        "method": "GET",
+        "path": "/templates/:id",
+        "line": 408,
+        "prefix": "/api/lesson-plans",
+        "fullPath": "/api/lesson-plans/templates/:id",
+        "canonicalPath": "/api/lesson-plans/templates/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/error-notebook/list",
+        "canonicalPath": "/api/error-notebook/list",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3716,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/error-notebook.ts",
+        "method": "GET",
+        "path": "/list",
+        "line": 208,
+        "prefix": "/api/error-notebook",
+        "fullPath": "/api/error-notebook/list",
+        "canonicalPath": "/api/error-notebook/list"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/error-notebook/:param",
+        "canonicalPath": "/api/error-notebook/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3728,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/error-notebook.ts",
+        "method": "GET",
+        "path": "/:id",
+        "line": 259,
+        "prefix": "/api/error-notebook",
+        "fullPath": "/api/error-notebook/:id",
+        "canonicalPath": "/api/error-notebook/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/error-notebook/review",
+        "canonicalPath": "/api/error-notebook/review",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3738,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/error-notebook.ts",
+        "method": "POST",
+        "path": "/review",
+        "line": 278,
+        "prefix": "/api/error-notebook",
+        "fullPath": "/api/error-notebook/review",
+        "canonicalPath": "/api/error-notebook/review"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/error-notebook/stats",
+        "canonicalPath": "/api/error-notebook/stats",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3752,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/error-notebook.ts",
+        "method": "GET",
+        "path": "/stats",
+        "line": 363,
+        "prefix": "/api/error-notebook",
+        "fullPath": "/api/error-notebook/stats",
+        "canonicalPath": "/api/error-notebook/stats"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/creation/tasks",
+        "canonicalPath": "/api/creation/tasks",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3766,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "GET",
+        "path": "/tasks",
+        "line": 430,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/tasks",
+        "canonicalPath": "/api/creation/tasks"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/tasks/create",
+        "canonicalPath": "/api/creation/tasks/create",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3773,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/tasks/create",
+        "line": 450,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/tasks/create",
+        "canonicalPath": "/api/creation/tasks/create"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/collaborate/start",
+        "canonicalPath": "/api/creation/collaborate/start",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3780,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/collaborate/start",
+        "line": 484,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/collaborate/start",
+        "canonicalPath": "/api/creation/collaborate/start"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/collaborate/iterate",
+        "canonicalPath": "/api/creation/collaborate/iterate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3787,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/collaborate/iterate",
+        "line": 559,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/collaborate/iterate",
+        "canonicalPath": "/api/creation/collaborate/iterate"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/vision-describe",
+        "canonicalPath": "/api/creation/vision-describe",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3794,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/vision-describe",
+        "line": 642,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/vision-describe",
+        "canonicalPath": "/api/creation/vision-describe"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/rewrite",
+        "canonicalPath": "/api/creation/rewrite",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3801,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/rewrite",
+        "line": 688,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/rewrite",
+        "canonicalPath": "/api/creation/rewrite"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/creation/works",
+        "canonicalPath": "/api/creation/works",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3823,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "GET",
+        "path": "/works",
+        "line": 734,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/works",
+        "canonicalPath": "/api/creation/works"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/works/submit",
+        "canonicalPath": "/api/creation/works/submit",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3830,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/works/submit",
+        "line": 754,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/works/submit",
+        "canonicalPath": "/api/creation/works/submit"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/works/:param/like",
+        "canonicalPath": "/api/creation/works/:param/like",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3837,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/works/:id/like",
+        "line": 832,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/works/:id/like",
+        "canonicalPath": "/api/creation/works/:param/like"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/works/:param/grade",
+        "canonicalPath": "/api/creation/works/:param/grade",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3844,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/works/:id/grade",
+        "line": 892,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/works/:id/grade",
+        "canonicalPath": "/api/creation/works/:param/grade"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/creation/works/:param/recreate",
+        "canonicalPath": "/api/creation/works/:param/recreate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3851,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "POST",
+        "path": "/works/:id/recreate",
+        "line": 1011,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/works/:id/recreate",
+        "canonicalPath": "/api/creation/works/:param/recreate"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/creation/works/wall",
+        "canonicalPath": "/api/creation/works/wall",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3871,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/creation.ts",
+        "method": "GET",
+        "path": "/works/wall",
+        "line": 860,
+        "prefix": "/api/creation",
+        "fullPath": "/api/creation/works/wall",
+        "canonicalPath": "/api/creation/works/wall"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/culture/poems/:param/background",
+        "canonicalPath": "/api/culture/poems/:param/background",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3883,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/culture.ts",
+        "method": "GET",
+        "path": "/poems/:poemId/background",
+        "line": 256,
+        "prefix": "/api/culture",
+        "fullPath": "/api/culture/poems/:poemId/background",
+        "canonicalPath": "/api/culture/poems/:param/background"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/culture/poems/:param/images",
+        "canonicalPath": "/api/culture/poems/:param/images",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3893,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/culture.ts",
+        "method": "GET",
+        "path": "/poems/:poemId/images",
+        "line": 295,
+        "prefix": "/api/culture",
+        "fullPath": "/api/culture/poems/:poemId/images",
+        "canonicalPath": "/api/culture/poems/:param/images"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/culture/images/:param",
+        "canonicalPath": "/api/culture/images/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3903,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/culture.ts",
+        "method": "GET",
+        "path": "/images/:imageId",
+        "line": 341,
+        "prefix": "/api/culture",
+        "fullPath": "/api/culture/images/:imageId",
+        "canonicalPath": "/api/culture/images/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/culture/imagery/:param",
+        "canonicalPath": "/api/culture/imagery/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3913,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/culture.ts",
+        "method": "GET",
+        "path": "/imagery/:imageName",
+        "line": 363,
+        "prefix": "/api/culture",
+        "fullPath": "/api/culture/imagery/:imageName",
+        "canonicalPath": "/api/culture/imagery/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/culture/imagery/:param/refresh",
+        "canonicalPath": "/api/culture/imagery/:param/refresh",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3920,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/culture.ts",
+        "method": "POST",
+        "path": "/imagery/:imageName/refresh",
+        "line": 391,
+        "prefix": "/api/culture",
+        "fullPath": "/api/culture/imagery/:imageName/refresh",
+        "canonicalPath": "/api/culture/imagery/:param/refresh"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/culture/immersive/start",
+        "canonicalPath": "/api/culture/immersive/start",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3930,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/culture.ts",
+        "method": "POST",
+        "path": "/immersive/start",
+        "line": 445,
+        "prefix": "/api/culture",
+        "fullPath": "/api/culture/immersive/start",
+        "canonicalPath": "/api/culture/immersive/start"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/culture/immersive/:param/status",
+        "canonicalPath": "/api/culture/immersive/:param/status",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3941,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/culture.ts",
+        "method": "GET",
+        "path": "/immersive/:poemId/status",
+        "line": 473,
+        "prefix": "/api/culture",
+        "fullPath": "/api/culture/immersive/:poemId/status",
+        "canonicalPath": "/api/culture/immersive/:param/status"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/culture/immersive/stop",
+        "canonicalPath": "/api/culture/immersive/stop",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3951,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/culture.ts",
+        "method": "POST",
+        "path": "/immersive/stop",
+        "line": 497,
+        "prefix": "/api/culture",
+        "fullPath": "/api/culture/immersive/stop",
+        "canonicalPath": "/api/culture/immersive/stop"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/evolution/genealogy",
+        "canonicalPath": "/api/evolution/genealogy",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3965,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/evolution.ts",
+        "method": "GET",
+        "path": "/genealogy",
+        "line": 143,
+        "prefix": "/api/evolution",
+        "fullPath": "/api/evolution/genealogy",
+        "canonicalPath": "/api/evolution/genealogy"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/evolution/patterns",
+        "canonicalPath": "/api/evolution/patterns",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3978,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/evolution.ts",
+        "method": "GET",
+        "path": "/patterns",
+        "line": 163,
+        "prefix": "/api/evolution",
+        "fullPath": "/api/evolution/patterns",
+        "canonicalPath": "/api/evolution/patterns"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/evolution/ab-tests",
+        "canonicalPath": "/api/evolution/ab-tests",
+        "file": "frontend/src/lib/api.ts",
+        "line": 3987,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/evolution.ts",
+        "method": "GET",
+        "path": "/ab-tests",
+        "line": 185,
+        "prefix": "/api/evolution",
+        "fullPath": "/api/evolution/ab-tests",
+        "canonicalPath": "/api/evolution/ab-tests"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/evolution/predict",
+        "canonicalPath": "/api/evolution/predict",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4025,
+        "call": "fetchStreamResponse"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/evolution.ts",
+        "method": "POST",
+        "path": "/predict",
+        "line": 367,
+        "prefix": "/api/evolution",
+        "fullPath": "/api/evolution/predict",
+        "canonicalPath": "/api/evolution/predict"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/evolution/predict",
+        "canonicalPath": "/api/evolution/predict",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4187,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/evolution.ts",
+        "method": "GET",
+        "path": "/predict",
+        "line": 239,
+        "prefix": "/api/evolution",
+        "fullPath": "/api/evolution/predict",
+        "canonicalPath": "/api/evolution/predict"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/copilot/thinking-chains",
+        "canonicalPath": "/api/copilot/thinking-chains",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4219,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "GET",
+        "path": "/thinking-chains",
+        "line": 804,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/thinking-chains",
+        "canonicalPath": "/api/copilot/thinking-chains"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/copilot/thinking-chains/:param",
+        "canonicalPath": "/api/copilot/thinking-chains/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4233,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/copilot.ts",
+        "method": "GET",
+        "path": "/thinking-chains/:id",
+        "line": 834,
+        "prefix": "/api/copilot",
+        "fullPath": "/api/copilot/thinking-chains/:id",
+        "canonicalPath": "/api/copilot/thinking-chains/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/diagnosis/students/:param/profile-3d",
+        "canonicalPath": "/api/diagnosis/students/:param/profile-3d",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4252,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "GET",
+        "path": "/students/:studentId/profile-3d",
+        "line": 686,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/students/:studentId/profile-3d",
+        "canonicalPath": "/api/diagnosis/students/:param/profile-3d"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/diagnosis/students/:param/profile-3d/refresh",
+        "canonicalPath": "/api/diagnosis/students/:param/profile-3d/refresh",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4259,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/diagnosis.ts",
+        "method": "POST",
+        "path": "/students/:studentId/profile-3d/refresh",
+        "line": 723,
+        "prefix": "/api/diagnosis",
+        "fullPath": "/api/diagnosis/students/:studentId/profile-3d/refresh",
+        "canonicalPath": "/api/diagnosis/students/:param/profile-3d/refresh"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/class/:param/hotspot",
+        "canonicalPath": "/api/dashboard/class/:param/hotspot",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4270,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/class/:classId/hotspot",
+        "line": 612,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/class/:classId/hotspot",
+        "canonicalPath": "/api/dashboard/class/:param/hotspot"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/dashboard/class/:param/hotspot/refresh",
+        "canonicalPath": "/api/dashboard/class/:param/hotspot/refresh",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4277,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "POST",
+        "path": "/class/:classId/hotspot/refresh",
+        "line": 632,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/class/:classId/hotspot/refresh",
+        "canonicalPath": "/api/dashboard/class/:param/hotspot/refresh"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/alerts/trend",
+        "canonicalPath": "/api/dashboard/alerts/trend",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4300,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/alerts/trend",
+        "line": 462,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/alerts/trend",
+        "canonicalPath": "/api/dashboard/alerts/trend"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/dashboard/alerts/:param/resolve",
+        "canonicalPath": "/api/dashboard/alerts/:param/resolve",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4307,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "POST",
+        "path": "/alerts/:alertId/resolve",
+        "line": 518,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/alerts/:alertId/resolve",
+        "canonicalPath": "/api/dashboard/alerts/:param/resolve"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/dashboard/alerts/batch-resolve",
+        "canonicalPath": "/api/dashboard/alerts/batch-resolve",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4315,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "POST",
+        "path": "/alerts/batch-resolve",
+        "line": 544,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/alerts/batch-resolve",
+        "canonicalPath": "/api/dashboard/alerts/batch-resolve"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/export/:param",
+        "canonicalPath": "/api/report/export/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4326,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/export/:reportId",
+        "line": 1088,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/export/:reportId",
+        "canonicalPath": "/api/report/export/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/share",
+        "canonicalPath": "/api/report/share",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4345,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/share",
+        "line": 1160,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/share",
+        "canonicalPath": "/api/report/share"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/shared/:param",
+        "canonicalPath": "/api/report/shared/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4356,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/shared/:token",
+        "line": 1204,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/shared/:token",
+        "canonicalPath": "/api/report/shared/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/shared",
+        "canonicalPath": "/api/report/shared",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4363,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/shared",
+        "line": 1228,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/shared",
+        "canonicalPath": "/api/report/shared"
+      }
+    },
+    {
+      "call": {
+        "method": "DELETE",
+        "path": "/api/report/shared/:param",
+        "canonicalPath": "/api/report/shared/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4370,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "DELETE",
+        "path": "/shared/:token",
+        "line": 1244,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/shared/:token",
+        "canonicalPath": "/api/report/shared/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/classroom/:param/quest",
+        "canonicalPath": "/api/classroom/:param/quest",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4386,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "GET",
+        "path": "/:lessonId/quest",
+        "line": 1218,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/quest",
+        "canonicalPath": "/api/classroom/:param/quest"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/quest/teams",
+        "canonicalPath": "/api/classroom/:param/quest/teams",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4395,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/quest/teams",
+        "line": 1232,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/quest/teams",
+        "canonicalPath": "/api/classroom/:param/quest/teams"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/classroom/:param/quest/ai-turn",
+        "canonicalPath": "/api/classroom/:param/quest/ai-turn",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4410,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/classroom.ts",
+        "method": "POST",
+        "path": "/:lessonId/quest/ai-turn",
+        "line": 1271,
+        "prefix": "/api/classroom",
+        "fullPath": "/api/classroom/:lessonId/quest/ai-turn",
+        "canonicalPath": "/api/classroom/:param/quest/ai-turn"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/home-school/weekly",
+        "canonicalPath": "/api/report/home-school/weekly",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4422,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/home-school/weekly",
+        "line": 1305,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/home-school/weekly",
+        "canonicalPath": "/api/report/home-school/weekly"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/home-school/:param/latest",
+        "canonicalPath": "/api/report/home-school/:param/latest",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4433,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/home-school/:studentId/latest",
+        "line": 1336,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/home-school/:studentId/latest",
+        "canonicalPath": "/api/report/home-school/:param/latest"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/home-school/:param/feedback",
+        "canonicalPath": "/api/report/home-school/:param/feedback",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4443,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/home-school/:reportId/feedback",
+        "line": 1360,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/home-school/:reportId/feedback",
+        "canonicalPath": "/api/report/home-school/:param/feedback"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/home-school/:param/note",
+        "canonicalPath": "/api/report/home-school/:param/note",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4457,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/home-school/:reportId/note",
+        "line": 1391,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/home-school/:reportId/note",
+        "canonicalPath": "/api/report/home-school/:param/note"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/home-school/class/:param",
+        "canonicalPath": "/api/report/home-school/class/:param",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4473,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "GET",
+        "path": "/home-school/class/:classId",
+        "line": 1276,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/home-school/class/:classId",
+        "canonicalPath": "/api/report/home-school/class/:param"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/home-school/:param/publish",
+        "canonicalPath": "/api/report/home-school/:param/publish",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4479,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/home-school/:reportId/publish",
+        "line": 1423,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/home-school/:reportId/publish",
+        "canonicalPath": "/api/report/home-school/:param/publish"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/home-school/:param/feedback/read",
+        "canonicalPath": "/api/report/home-school/:param/feedback/read",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4486,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/home-school/:reportId/feedback/read",
+        "line": 1446,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/home-school/:reportId/feedback/read",
+        "canonicalPath": "/api/report/home-school/:param/feedback/read"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/home-school/:param/activity/:param/complete",
+        "canonicalPath": "/api/report/home-school/:param/activity/:param/complete",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4496,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report.ts",
+        "method": "POST",
+        "path": "/home-school/:reportId/activity/:activityId/complete",
+        "line": 1469,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/home-school/:reportId/activity/:activityId/complete",
+        "canonicalPath": "/api/report/home-school/:param/activity/:param/complete"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/stats",
+        "canonicalPath": "/api/dashboard/stats",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4515,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/stats",
+        "line": 337,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/stats",
+        "canonicalPath": "/api/dashboard/stats"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/alerts",
+        "canonicalPath": "/api/dashboard/alerts",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4523,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/alerts",
+        "line": 410,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/alerts",
+        "canonicalPath": "/api/dashboard/alerts"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/bloom-radar",
+        "canonicalPath": "/api/dashboard/bloom-radar",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4533,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/bloom-radar",
+        "line": 376,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/bloom-radar",
+        "canonicalPath": "/api/dashboard/bloom-radar"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/class-hotspot",
+        "canonicalPath": "/api/dashboard/class-hotspot",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4541,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/class-hotspot",
+        "line": 569,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/class-hotspot",
+        "canonicalPath": "/api/dashboard/class-hotspot"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/innovation",
+        "canonicalPath": "/api/dashboard/innovation",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4549,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/innovation",
+        "line": 654,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/innovation",
+        "canonicalPath": "/api/dashboard/innovation"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/dashboard/weekly-progress",
+        "canonicalPath": "/api/dashboard/weekly-progress",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4557,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/dashboard.ts",
+        "method": "GET",
+        "path": "/weekly-progress",
+        "line": 429,
+        "prefix": "/api/dashboard",
+        "fullPath": "/api/dashboard/weekly-progress",
+        "canonicalPath": "/api/dashboard/weekly-progress"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/ai/chat",
+        "canonicalPath": "/api/ai/chat",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4630,
+        "call": "fetchStreamResponse"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/ai.ts",
+        "method": "POST",
+        "path": "/chat",
+        "line": 376,
+        "prefix": "/api/ai",
+        "fullPath": "/api/ai/chat",
+        "canonicalPath": "/api/ai/chat"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/ai/image-generate",
+        "canonicalPath": "/api/ai/image-generate",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4823,
+        "call": "fetch"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/ai.ts",
+        "method": "POST",
+        "path": "/image-generate",
+        "line": 217,
+        "prefix": "/api/ai",
+        "fullPath": "/api/ai/image-generate",
+        "canonicalPath": "/api/ai/image-generate"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/ai/asr",
+        "canonicalPath": "/api/ai/asr",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4922,
+        "call": "fetch"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/ai.ts",
+        "method": "POST",
+        "path": "/asr",
+        "line": 304,
+        "prefix": "/api/ai",
+        "fullPath": "/api/ai/asr",
+        "canonicalPath": "/api/ai/asr"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/auth/status",
+        "canonicalPath": "/api/auth/status",
+        "file": "frontend/src/lib/auth-session.ts",
+        "line": 146,
+        "call": "authenticatedFetch"
+      },
+      "endpoint": {
+        "file": "backend/src/security/auth.ts",
+        "method": "GET",
+        "path": "/status",
+        "line": 452,
+        "prefix": "/api/auth",
+        "fullPath": "/api/auth/status",
+        "canonicalPath": "/api/auth/status"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "canonicalPath": "/api/auth/login",
+        "file": "frontend/src/lib/auth-session.ts",
+        "line": 157,
+        "call": "authenticatedFetch"
+      },
+      "endpoint": {
+        "file": "backend/src/security/auth.ts",
+        "method": "POST",
+        "path": "/login",
+        "line": 467,
+        "prefix": "/api/auth",
+        "fullPath": "/api/auth/login",
+        "canonicalPath": "/api/auth/login"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/auth/logout",
+        "canonicalPath": "/api/auth/logout",
+        "file": "frontend/src/lib/auth-session.ts",
+        "line": 169,
+        "call": "authenticatedFetch"
+      },
+      "endpoint": {
+        "file": "backend/src/security/auth.ts",
+        "method": "POST",
+        "path": "/logout",
+        "line": 502,
+        "prefix": "/api/auth",
+        "fullPath": "/api/auth/logout",
+        "canonicalPath": "/api/auth/logout"
+      }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/health",
+        "canonicalPath": "/api/health",
+        "file": "frontend/src/lib/demo-mode.ts",
+        "line": 163,
+        "call": "fetch"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/health.ts",
+        "method": "GET",
+        "path": "/health",
+        "line": 10,
+        "prefix": "/api",
+        "fullPath": "/api/health",
+        "canonicalPath": "/api/health"
+      }
+    }
+  ],
+  "backendNotCalled": [
+    {
+      "file": "backend/src/orchestrator/routes.ts",
+      "method": "POST",
+      "path": "/parse",
+      "line": 111,
+      "prefix": "/api/orchestrator",
+      "fullPath": "/api/orchestrator/parse",
+      "canonicalPath": "/api/orchestrator/parse"
+    },
+    {
+      "file": "backend/src/orchestrator/routes.ts",
+      "method": "GET",
+      "path": "/sessions",
+      "line": 402,
+      "prefix": "/api/orchestrator",
+      "fullPath": "/api/orchestrator/sessions",
+      "canonicalPath": "/api/orchestrator/sessions"
+    },
+    {
+      "file": "backend/src/orchestrator/websocket/handlers.ts",
+      "method": "GET",
+      "path": "/orchestrator",
+      "line": 63,
+      "prefix": "/ws",
+      "fullPath": "/ws/orchestrator",
+      "canonicalPath": "/ws/orchestrator"
+    },
+    {
+      "file": "backend/src/routes/classroom.ts",
+      "method": "POST",
+      "path": "/sessions",
+      "line": 2221,
+      "prefix": "/api/classroom",
+      "fullPath": "/api/classroom/sessions",
+      "canonicalPath": "/api/classroom/sessions"
+    },
+    {
+      "file": "backend/src/routes/classroom.ts",
+      "method": "GET",
+      "path": "/sessions/:sessionId",
+      "line": 2334,
+      "prefix": "/api/classroom",
+      "fullPath": "/api/classroom/sessions/:sessionId",
+      "canonicalPath": "/api/classroom/sessions/:param"
+    },
+    {
+      "file": "backend/src/routes/classroom.ts",
+      "method": "POST",
+      "path": "/sessions/:sessionId/score",
+      "line": 2376,
+      "prefix": "/api/classroom",
+      "fullPath": "/api/classroom/sessions/:sessionId/score",
+      "canonicalPath": "/api/classroom/sessions/:param/score"
+    },
+    {
+      "file": "backend/src/routes/dashboard.ts",
+      "method": "POST",
+      "path": "/alerts/trend/refresh",
+      "line": 496,
+      "prefix": "/api/dashboard",
+      "fullPath": "/api/dashboard/alerts/trend/refresh",
+      "canonicalPath": "/api/dashboard/alerts/trend/refresh"
+    },
+    {
+      "file": "backend/src/routes/diagnosis.ts",
+      "method": "POST",
+      "path": "/students/:studentId/learning-path",
+      "line": 763,
+      "prefix": "/api/diagnosis",
+      "fullPath": "/api/diagnosis/students/:studentId/learning-path",
+      "canonicalPath": "/api/diagnosis/students/:param/learning-path"
+    },
+    {
+      "file": "backend/src/routes/diagnosis.ts",
+      "method": "POST",
+      "path": "/students/:studentId/prescription",
+      "line": 907,
+      "prefix": "/api/diagnosis",
+      "fullPath": "/api/diagnosis/students/:studentId/prescription",
+      "canonicalPath": "/api/diagnosis/students/:param/prescription"
+    },
+    {
+      "file": "backend/src/routes/diagnosis.ts",
+      "method": "GET",
+      "path": "/students/:studentId/radar",
+      "line": 1000,
+      "prefix": "/api/diagnosis",
+      "fullPath": "/api/diagnosis/students/:studentId/radar",
+      "canonicalPath": "/api/diagnosis/students/:param/radar"
+    },
+    {
+      "file": "backend/src/routes/diagnosis.ts",
+      "method": "GET",
+      "path": "/classes/:classId/radar",
+      "line": 1040,
+      "prefix": "/api/diagnosis",
+      "fullPath": "/api/diagnosis/classes/:classId/radar",
+      "canonicalPath": "/api/diagnosis/classes/:param/radar"
+    },
+    {
+      "file": "backend/src/routes/evolution.ts",
+      "method": "GET",
+      "path": "/ab-test",
+      "line": 206,
+      "prefix": "/api/evolution",
+      "fullPath": "/api/evolution/ab-test",
+      "canonicalPath": "/api/evolution/ab-test"
+    },
+    {
+      "file": "backend/src/routes/grading.ts",
+      "method": "GET",
+      "path": "/files/:fileId",
+      "line": 1203,
+      "prefix": "/api/grading",
+      "fullPath": "/api/grading/files/:fileId",
+      "canonicalPath": "/api/grading/files/:param"
+    },
+    {
+      "file": "backend/src/routes/health.ts",
+      "method": "GET",
+      "path": "/health/db",
+      "line": 20,
+      "prefix": "/api",
+      "fullPath": "/api/health/db",
+      "canonicalPath": "/api/health/db"
+    },
+    {
+      "file": "backend/src/routes/illustration.ts",
+      "method": "GET",
+      "path": "/scenes",
+      "line": 149,
+      "prefix": "/api/illustration",
+      "fullPath": "/api/illustration/scenes",
+      "canonicalPath": "/api/illustration/scenes"
+    },
+    {
+      "file": "backend/src/routes/lesson-plan.ts",
+      "method": "GET",
+      "path": "/templates",
+      "line": 428,
+      "prefix": "/api/lesson-plan",
+      "fullPath": "/api/lesson-plan/templates",
+      "canonicalPath": "/api/lesson-plan/templates"
+    },
+    {
+      "file": "backend/src/routes/recitation.ts",
+      "method": "GET",
+      "path": "/audio/*",
+      "line": 915,
+      "prefix": "/api/recitation",
+      "fullPath": "/api/recitation/audio/*",
+      "canonicalPath": "/api/recitation/audio/*"
+    }
+  ]
+}

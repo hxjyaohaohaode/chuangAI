@@ -1,0 +1,2094 @@
+{
+  "gate": "FAIL",
+  "generatedAt": "2026-08-11T03:53:16.140Z",
+  "totalPoems": 148,
+  "integrityErrors": [],
+  "statusCounts": {
+    "VERIFIED": 0,
+    "UNVERIFIED": 148,
+    "INCOMPLETE": 0,
+    "STALE": 0
+  },
+  "scopeBoundary": "数量是收录量，不是教材口径。只有逐首 VERIFIED 且 catalogScope=TEXTBOOK_CORE 的记录可计入教材核心覆盖。",
+  "reviewRegister": {
+    "state": "PRESERVED",
+    "rows": 148,
+    "populatedSourceRows": 0,
+    "populatedReviewRows": 0,
+    "backupPath": null
+  },
+  "poems": [
+    {
+      "id": "tongbian-001",
+      "title": "咏鹅",
+      "poet": "骆宾王",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "f5a149933061e7a9ea697918fa1e26d8ac8d6a36368ccfb8aed189271ee56fe4",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-002",
+      "title": "春晓",
+      "poet": "孟浩然",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "c7bd1bdb42ad6dfc69fec52c1002f2fe2bae45753c2033ab7b0ddc55e475299e",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-003",
+      "title": "静夜思",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "1b76d5a58f0834578eacc29151f91020c7b5d73bb667e962e63893af36329659",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-004",
+      "title": "悯农（其二）",
+      "poet": "李绅",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "8209a246dbdaaa56082771c67e28a7aea09d914d4ef21cc9d3c9a251f40394ff",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-005",
+      "title": "登鹳雀楼",
+      "poet": "王之涣",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "669195775f20e532cd016d4d03db435b631e6f51df47c521d1e3b48532ed65b9",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-006",
+      "title": "望庐山瀑布",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "f4616ea5e2de371b474e6f8f42df8c298bd85c3e77ab595feec2dfe221a483e9",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-007",
+      "title": "江雪",
+      "poet": "柳宗元",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a88450692e84276ffea48bd7ea323d1daf81894d75fd65356866e84fab6b2f86",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-008",
+      "title": "望天门山",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "7cbafdb0b7ff86cd9d87666917c1fe1c540130ce84b042f2c622e9554d69259a",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-009",
+      "title": "饮湖上初晴后雨",
+      "poet": "苏轼",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "9ec76df5af688f1ddf293daba740f08a2e789fedeb2d1961a5f3e52cd88306f1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-010",
+      "title": "元日",
+      "poet": "王安石",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "ac5dcc869049b96627cf72e25137008af38cef0f6c534cb64c0b778c59082b3c",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-011",
+      "title": "九月九日忆山东兄弟",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "9c1fcc3714656f35d9ab84545fc917bcae163f10120710a96b2a07eb899d481c",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-012",
+      "title": "暮江吟",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a4c7cdb9b8705a5d2f24ed4cc77094f441cd21d4ffb6a1ed84d37226a814785c",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-013",
+      "title": "题西林壁",
+      "poet": "苏轼",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "434f22ecd6263a8f9f126262690406239ef0cddfc02d0e5d1493cda358c16764",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-014",
+      "title": "枫桥夜泊",
+      "poet": "张继",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "464486a3c3e8102e1f331e963418176973fec4d4d7e6cd8cde5956bf6e0d35a6",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-015",
+      "title": "示儿",
+      "poet": "陆游",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "ab78b18d12064cae4f186633d816725edeec496b5daebd63b297138f32f61c2b",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-016",
+      "title": "闻官军收河南河北",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "b92730b03d32e1366f3871d28aa600964c613e8597718a64d60cee20e7ef1fa0",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-017",
+      "title": "黄鹤楼送孟浩然之广陵",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "30d06f25c41fc1ef2e8f8216541b84bc98621a164ced798cc61de2ffe7cbee21",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-018",
+      "title": "草",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "e5421f93653ebb3a5801b53df071bd03250e29bb0ebe4ac14e765c5ef7d8743d",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-019",
+      "title": "小池",
+      "poet": "杨万里",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "26b358e7c306f1a0fa545c98b57552340ba4f82e461d2bf84a4270f2243909f3",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-020",
+      "title": "泊船瓜洲",
+      "poet": "王安石",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "70d1ea1f174ba0b1a87f4f367c259a868cd6c064912304a79b187d06d47fc169",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-021",
+      "title": "江南",
+      "poet": "汉乐府",
+      "dynasty": "汉",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "87131117614e8054d71210c7c686bbff955087f875958f51f81725c30ea5ae53",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-022",
+      "title": "画",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "8867afc6b787f6f695d00ae41515baa2af8ba45ed11a7a1262c9bbb16af05fbd",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-023",
+      "title": "古朗月行（节选）",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a81a5b4e5283882a961f5a0b5c9293f0502d416b59a4ddccc7de10ced04caec4",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-024",
+      "title": "风",
+      "poet": "李峤",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "f3dd60d7fe02868b378e60b857849398c7ca48b5e73b09fc8367c07c0d730012",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-025",
+      "title": "寻隐者不遇",
+      "poet": "贾岛",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "d664fd17295cd1f8f45107db9186dd062696fd89d2944e86cedf5c9939010c1c",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-026",
+      "title": "画鸡",
+      "poet": "唐寅",
+      "dynasty": "明",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "d3aa1044206fef6c1fcb6a1515eef629ac309e86a26193da31ba6d2063860da4",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-027",
+      "title": "赠汪伦",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "70184ab3f649d84a902ac7ee41a346e046bd2b51bc02195502df8aa0870e712a",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-028",
+      "title": "池上",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "692f620a345fef2369537255a64b7b8f7b335db25d040ca439854751bc948b30",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-029",
+      "title": "山村咏怀",
+      "poet": "邵雍",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "68a12f2b4185e4d4559160240509430b927a5d4236aa333d23abab29076211f7",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-030",
+      "title": "悯农（其一）",
+      "poet": "李绅",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "3bffc1c71909e43cdaac3c947a4736ef3e9de23392f67f66d6896b6a8329a48c",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-031",
+      "title": "梅花",
+      "poet": "王安石",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "5c46d6a11fcba9408ac0c7eef87c72d5d081ea40436f6d30d7125045cfb14dba",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-032",
+      "title": "小儿垂钓",
+      "poet": "胡令能",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "503617811074e05c383f4584611e77aad9ce770ec209e6769d318a9f695f1b0e",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-033",
+      "title": "夜宿山寺",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "57d03fb6f433833f9069b189cf1c152ec0ddaa77643300766b654b863d604232",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-034",
+      "title": "敕勒歌",
+      "poet": "北朝民歌",
+      "dynasty": "南北朝",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "d84c2643b642606e9eeb4dda7aeef3510d28cad78aaf02fc3ce546d67a5b5f84",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-035",
+      "title": "咏柳",
+      "poet": "贺知章",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "9f00858cdc3bb72461665cc365eda168999979b5b00d82deb6cd5b6262fd5339",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-036",
+      "title": "绝句",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "56550c91c9faebabdd9c35bcce3f41d7bf4c0fd3fe1f1742d85ecf81c829db8e",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-037",
+      "title": "村居",
+      "poet": "高鼎",
+      "dynasty": "清",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "d4f0a603d722becc736cf4492c6b137533d14f1baceae2bed9bd9517b1b28b68",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-038",
+      "title": "舟夜书所见",
+      "poet": "查慎行",
+      "dynasty": "清",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "31a353ce2fa3f7dfa1ff26154e8cfd57e3e8b0ac30e28c22055afba0fc800db7",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-039",
+      "title": "咏华山",
+      "poet": "寇准",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "4f16776471d716a2b39299583c4ceb5623647e79954526268bc851dec77feb86",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-040",
+      "title": "江上渔者",
+      "poet": "范仲淹",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a8635f5e4f6f5be476aef3ae2468bb7eb538d0138438bb0a028f42d354e7332c",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-041",
+      "title": "鹿柴",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "2b7127d0aff4f2586b0b9ae4fee5fa87ec91c173fda8ba40bbf009bdf5867d45",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-042",
+      "title": "相思",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "21ade1c9d327f76fea154ce1534845e18f216976208308ddc6bf352303691c8a",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-043",
+      "title": "竹里馆",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "792f1e6c6846126979dec1a626d6788432ea0d50257a6dc358d6e1fc5b4780c1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-044",
+      "title": "所见",
+      "poet": "袁枚",
+      "dynasty": "清",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "3a62adc93595aba7c6413ad9a18ea2a9099d56fc59eb1aebe6db7132ee7f7fe3",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-045",
+      "title": "独坐敬亭山",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "935ab49362ea86cdaaed38124adb878b5e0375904386c317f8ad7beedf07ad0e",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-046",
+      "title": "村夜",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a90fa2ce13a89bcf01d3ca26b481e4e388b1bfe4bd9c6e6342080b2ee548c630",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-047",
+      "title": "蜂",
+      "poet": "罗隐",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "2d5dd54bb68f18455bf5b81867157afb04b99423c9433002abc6c5401e5ba3ca",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-048",
+      "title": "江畔独步寻花（其六）",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "fa2eb4172804a7f1c367a15efe4a45bf3f3c605725b8723e310fae97d2ff7774",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-050",
+      "title": "山行",
+      "poet": "杜牧",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "c5f21cbd840dc60c3e65651b2adbcd69db7c7d7440cf7f768bbe114fcf8f8378",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-051",
+      "title": "赠刘景文",
+      "poet": "苏轼",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "0805e595b5ad5c0664f951fd1cd90c5d97cc37e83c5dd2001f0b3a89298771d9",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-052",
+      "title": "夜书所见",
+      "poet": "叶绍翁",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "00075146d8f276e618d13c293cab9bf311efd5ae174ca95c174083cffa8b8ca6",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-055",
+      "title": "望洞庭",
+      "poet": "刘禹锡",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "9de67e81a926c46dcbf7506f42e2734224f6d22287217426d4085d968f4d305a",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-057",
+      "title": "夜雨寄北",
+      "poet": "李商隐",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "79337dcd8432188b757b11376e295458ba39aa404a5724b51d1f0d26566a1674",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-058",
+      "title": "嫦娥",
+      "poet": "李商隐",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "bd38d07c4082e159babf446aefbd7c8413a78028d79d786a58e279fe6cfa84e0",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-059",
+      "title": "乞巧",
+      "poet": "林杰",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "5b698b32282940f912f18ff3579e0e90163e8ecb061a13e65c610eb1068adfb2",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-061",
+      "title": "清明",
+      "poet": "杜牧",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "7fe9b953e17f75768c9003eea489aae4dbea4a1b690840bc98fa9c79037c9277",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-062",
+      "title": "滁州西涧",
+      "poet": "韦应物",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "2b67cd8eb2263332647f171f5fe66af2589df4ab741dae614df23bef383be4ec",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-063",
+      "title": "早春呈水部张十八员外",
+      "poet": "韩愈",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "b68f2a48965c0f75d5eb3679e403dcbadeaea2834ebeee3a3052a0aceca6bac1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-064",
+      "title": "春日",
+      "poet": "朱熹",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "3d3ca48ec13f9e51941d1ddef0843b921a6224ae4ff37ae6c213814148a78a2d",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-065",
+      "title": "春雪",
+      "poet": "韩愈",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "637bf1ee70ca6b1a1eb6c3f2732c6e597f6bbf22045ff64d5c0901736db9400a",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-066",
+      "title": "送元二使安西",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "8b14c77faf810766bac1fa570cb529afe52ed7a67a5382be124c5797d42ef729",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-067",
+      "title": "芙蓉楼送辛渐",
+      "poet": "王昌龄",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "1a95f1c72759eaf4191ed5eb3173a05bf45e1fa71bfa8402f90ea1908296cc34",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-069",
+      "title": "大林寺桃花",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "8b49cb27afa97ca932042764d87d3eb81586a560a1610ef91fce411a2a56cb05",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-072",
+      "title": "雪梅",
+      "poet": "卢梅坡",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "11d08f0fbbb906fc3b2c06cf77f4f6ba32facf7a3f462ae65cfd36ce09898b03",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-073",
+      "title": "惠崇春江晚景",
+      "poet": "苏轼",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "355b5110d486618cfd8240d09f11ddfdcbdfe932a38d9bb18f2edc6532cf94ab",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-074",
+      "title": "三衢道中",
+      "poet": "曾几",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "bbdf2ac547e3152a70f6bb5210b74ce4e6bbef2ead5fc2d48acf5e3fc1585d6f",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-075",
+      "title": "忆江南",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "be8e6c3b242e603097906bfc9a3aa6cf29de250a7f557a41faf1d6a66613f288",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-078",
+      "title": "出塞",
+      "poet": "王昌龄",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "7a229f9636fd35995bf5b70bad97ef663040b8f6e18a8231527696c8ad5e9af4",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-079",
+      "title": "凉州词",
+      "poet": "王翰",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "4cd52bc4457f7e366ef04ed3d6821991dd3e4288d7a9dcabb45d8754df79f23e",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-080",
+      "title": "夏日绝句",
+      "poet": "李清照",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "6e665a9a94c94f47002f2d31cee2fdd8b1d04e3de9461faaafb80a7756b275c1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-083",
+      "title": "塞下曲",
+      "poet": "卢纶",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "95f0a6bc7783029d8c0196bb0ef28cab80820d80133daacb936d6772fa630a55",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-084",
+      "title": "墨梅",
+      "poet": "王冕",
+      "dynasty": "元",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "dbedd1ab78d03c935f1985e9bed90c41e8356700df7e36aadfa308052f1bf65b",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-085",
+      "title": "卜算子·咏梅",
+      "poet": "毛泽东",
+      "dynasty": "现代",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "9b51623817f33d70d097ee10f815a7111e4d7144966981160b0c92812e1a4e6b",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-086",
+      "title": "别董大",
+      "poet": "高适",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a4c40242478c66b871669dd322306a86774a377c7122e3ce25221dd57d71cae9",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-087",
+      "title": "题临安邸",
+      "poet": "林升",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "fae2fa7b5e0ab44dcc9db251ba481cc5cef1172ea2967671848ab4a76ef92f80",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-088",
+      "title": "己亥杂诗",
+      "poet": "龚自珍",
+      "dynasty": "清",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "06204882bc4e6601b1a083a374db38096791a02f9ad2237e4b88f7953b825d0f",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-089",
+      "title": "秋夜将晓出篱门迎凉有感",
+      "poet": "陆游",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a4074101993140cecc36fadea23bdaab3a7e8215f0af6653c4fcce04afb25ca1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-090",
+      "title": "四时田园杂兴（其三十一）",
+      "poet": "范成大",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "57b5053c0c32015228df40d39b6e927b05a0a9c755aeb6617a638d88f5146be7",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-091",
+      "title": "稚子弄冰",
+      "poet": "杨万里",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "1262e242b43710d74227fcffbf0e822e330f212ec954a0b18b4c37db52b451f2",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-092",
+      "title": "村晚",
+      "poet": "雷震",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "e13deb09573d635a860f8cb9637e5810ba6aeef0eeadbb7b5bcbaeeee776ad53",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-093",
+      "title": "宿新市徐公店",
+      "poet": "杨万里",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "14711940e18887f641b7baf61a7257d87239099fa72f7c8e94dade7a728c6eb9",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-095",
+      "title": "清平乐·村居",
+      "poet": "辛弃疾",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "8d92f74501cdfcfc7735cadc4aab63e5c98dc28024c13cb70a480ee7aa20d3fa",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-096",
+      "title": "菩萨蛮·书江西造口壁",
+      "poet": "辛弃疾",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "279d450756668661b703c80432117cf14e91c952a6155193e193d7a00baf9460",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-097",
+      "title": "西江月·夜行黄沙道中",
+      "poet": "辛弃疾",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "e903f3a018e4f4b03bdd4e1475208308f8d7cbd23fd3092f9d9b683c9f5a9b2c",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-098",
+      "title": "七律·长征",
+      "poet": "毛泽东",
+      "dynasty": "现代",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "5c486cf9c286571bbe6442abf678e52a2c403f175ddf0f7f67182149ebe1ce32",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-099",
+      "title": "沁园春·雪",
+      "poet": "毛泽东",
+      "dynasty": "现代",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "513dcc3c91e6378fbb91e1e4842609930ca0ca6c8d0a3c2f357235a417f36067",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-102",
+      "title": "游园不值",
+      "poet": "叶绍翁",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "4de2f679109b761f5d2d65136b0f94187571fc6bd9339941d4ae87548c2f1d8f",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-103",
+      "title": "石灰吟",
+      "poet": "于谦",
+      "dynasty": "明",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "199ae91e613d02dd6a030cce033c94e60a62bb106c0d2a6ef657070581ca384f",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-104",
+      "title": "竹石",
+      "poet": "郑燮",
+      "dynasty": "清",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "d7b2c967b0b17b69888bdaadbb23eeb9147cb390b05392c00a2a60c4f1a7afcb",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-107",
+      "title": "己亥杂诗（其一二五）",
+      "poet": "龚自珍",
+      "dynasty": "清",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "351dd426cc7b1ce3c74d464e47d0b059391b0d581fa0105e7b97987bbde26bed",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-116",
+      "title": "观沧海",
+      "poet": "曹操",
+      "dynasty": "汉",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "b87e7473bc84e37664c1eefd49853a0211768390da63a671d519ca90a1f15001",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-117",
+      "title": "龟虽寿",
+      "poet": "曹操",
+      "dynasty": "汉",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "2d480a2392bb24ff13715d87530456b73d6ecf6466a43d9cc902541916805297",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-118",
+      "title": "短歌行",
+      "poet": "曹操",
+      "dynasty": "汉",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "cde53a65514ab85117f2acfd05692360aa5e0fa6e4bf391addaeb72d9664f8a6",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-119",
+      "title": "饮酒（其五）",
+      "poet": "陶渊明",
+      "dynasty": "东晋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "dd2473fb680f1a4db137a11ff44c37af2aabecdbb87bb85642ba4334105396be",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-120",
+      "title": "归园田居（其三）",
+      "poet": "陶渊明",
+      "dynasty": "东晋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "0cd4120a3f977cd47c2e75a5a4c7aa8e6f444d4b5d3616a79d426bb5452cc2d1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-121",
+      "title": "送杜少府之任蜀州",
+      "poet": "王勃",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "3ade40163c874a184218ba1885397d471e333d274e5a6149e2cdd0ae94b935f1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-122",
+      "title": "望洞庭湖赠张丞相",
+      "poet": "孟浩然",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a23d096efc45ab73eec909feca2bb6b60e2b638d01b60fa57ae182cfc1b712bb",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-123",
+      "title": "使至塞上",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "03ac5398675b3c8f49bfb4489d3eb5553099b4985f1d1f0b98d9f03a4b4dd84b",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-124",
+      "title": "黄鹤楼",
+      "poet": "崔颢",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "e6c9b5764c65a180c409fc66e789b0c613867c3de3d4b33d5c6e4e9788af8a48",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-125",
+      "title": "行路难（其一）",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "d31dbfd81982700598725fb95c8aa209722834ddfc0f098990eac8896548317d",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-126",
+      "title": "茅屋为秋风所破歌",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "edad38d22ab9180a72c73fe98fde20ffefc21d0bb892c4a54101da1f18c742d2",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-127",
+      "title": "卖炭翁",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "ba06a925146f13698fdb9575325beefd8ba63f99e1e5ff1dbf0463271d663f91",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-128",
+      "title": "酬乐天扬州初逢席上见赠",
+      "poet": "刘禹锡",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "8600e866df825108cdef5de136f7f425a9e2cf3f497e7d4e4763643ba80d69f8",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-129",
+      "title": "赤壁",
+      "poet": "杜牧",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "ade52319519259820863a7555447ace28cbdd068ccaaf1a0e43179f6a9a2b319",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-130",
+      "title": "泊秦淮",
+      "poet": "杜牧",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "897a604a287f28d64c14785c28ef1cf4f207c1089bef55b9eb4643ca257e8af5",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-132",
+      "title": "无题",
+      "poet": "李商隐",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "037170e4438a5e27f9ca58ac342c90976d571326bc72a97990f53c39807ee909",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s01",
+      "title": "长歌行",
+      "poet": "汉乐府",
+      "dynasty": "汉",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "241c8f572440de73a20902d794b2565e774d42bc313acd83e2cc3db9e4ce7716",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s02",
+      "title": "七步诗",
+      "poet": "曹植",
+      "dynasty": "三国",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "d629b3a6cd6a783a8a5b99983cb1e873aec0686b7daf39ea50b06f0a2f973411",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s03",
+      "title": "回乡偶书",
+      "poet": "贺知章",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "bab951d3a8ebbfe0faa93d3f6fd3fa5b2ac7f3f27c95e9126b8333ccce7c3750",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s04",
+      "title": "凉州词（王之涣）",
+      "poet": "王之涣",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "8b6c083a933ab75c8220416f4c9f9982eb215a521fddaf07a851158b3155d83e",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s05",
+      "title": "从军行",
+      "poet": "王昌龄",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "cb3387ababf6b9334e0b4e506dd4585e1b2655102c6c0f09c9463971a319dbb1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s06",
+      "title": "采莲曲",
+      "poet": "王昌龄",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "089f6df15fbbc042549540a61a29e0127999c5c30dd5605f7ae63a75619e771e",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s07",
+      "title": "送别",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "de4e8e3c08e9c24584392cd0d9b4d2f3b71eaef26fbc6bf2715b77df5e5a8f91",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s08",
+      "title": "送灵澈上人",
+      "poet": "刘长卿",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "57e23e3d6d4cbbab1890f2a80b7e1c379988ab480aeb89cb66ceb844f9ee7a6b",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s09",
+      "title": "早发白帝城",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "7a30a2808884ee7688d993151b6d13e30a5bdcc810f97db51ec27523717344f8",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s10",
+      "title": "渡荆门送别",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "c843808e8d9eeb270e4dd87c4cf7ca60d6f8f47cf4bc41fe11184866705506e3",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s11",
+      "title": "送友人",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "9b600409c5d025fd302b50e7d0a0489304e48d00598c5c179cc8ddb407812896",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s12",
+      "title": "登金陵凤凰台",
+      "poet": "李白",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "f37f2f574408b86f7a507b5fc7f7c33797ecd5b5e09aea80005d73eab0165a02",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s13",
+      "title": "春望",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "4dc6ca771e98e86a81089cc8de6bced81c3c47371e634df1e7f39adc9e275677",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s14",
+      "title": "春夜喜雨",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "386bd047d86f4c7b9456144b9b022294e2d4e2784c456b29a9e905ff002723bc",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s15",
+      "title": "登高",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "105e606b36228f3e5b41d03700f6aa4cda3c72007a97223d808e6ecd1f6f05af",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s16",
+      "title": "登岳阳楼",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "198976c19424eb36dd1beb8268d5a9e05213952118c09c62f645646412f709a2",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s17",
+      "title": "江南逢李龟年",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "09fee0187f2b513f025332d2caed0c6f176e5174db175c8ebe837cee125d78e3",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s18",
+      "title": "八阵图",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "de60e74da98cbc836d74ec12ba421256fd4444ff7e458ba39a1082a7a53e547b",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s19",
+      "title": "蜀相",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "4872d5e9b3ca27e4e0e30f7bea817d33f36361458cc162b459baf687722fb044",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s20",
+      "title": "客至",
+      "poet": "杜甫",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "6d644ee249c6e4c569da47f72dbc00f09f94468ae5ba741965dbc9edce34f64b",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s21",
+      "title": "钱塘湖春行",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "37dc59787477f6110331a8059ac2ff2c134400d5a211580d7bea6228efd5e3e2",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s22",
+      "title": "问刘十九",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "8ab8f81140c60531fd74790690acd5032ccba92c4c3c42b30e278547d7c351f7",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s23",
+      "title": "赋得古原草送别",
+      "poet": "白居易",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "bdea1db5b12c436de0ec6d71be4fd315c24df498a4141565500b1334063b7067",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s24",
+      "title": "江南春",
+      "poet": "杜牧",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "86ec9671462928a75b6e2b17bd5b5042236e600ed720bd44c9e4257423e44268",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s25",
+      "title": "秋夕",
+      "poet": "杜牧",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "33dfa56ac6bfa770d5aafb5ef48ef0f4dba304592ccaff5a6f98fc93582dc4c4",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s26",
+      "title": "寄扬州韩绰判官",
+      "poet": "杜牧",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "0ebf5ba2fa09e7fe0988b75c945fcdf528a47179a3eeee3374145d85d0f21b2e",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s27",
+      "title": "锦瑟",
+      "poet": "李商隐",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "79aeae32b8ee08401020e1dfb0142760dad9af4ca97a64ae701f8260c92d290a",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s28",
+      "title": "贾生",
+      "poet": "李商隐",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "1e72c863371457f6c16a13d29b1432057610c2f90f90eb9f046446c8df7202ff",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s29",
+      "title": "晓出净慈寺送林子方",
+      "poet": "杨万里",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "e922aee30389bdcf2b00f5c719d3621477a94caf8114fb2cb173152bead4a914",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s30",
+      "title": "浪淘沙（其七）",
+      "poet": "刘禹锡",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "c2fe79c95236b775fe589a0c48bb5caca729330a21587b63c5de4b18bbfb1462",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s31",
+      "title": "四时田园杂兴（其二十五）",
+      "poet": "范成大",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "25caa1988c856d5a1dfc3b84fe385b29785679112b2a2d4d78a333e50f3dc369",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s32",
+      "title": "蝉",
+      "poet": "虞世南",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "686fb57610ac16a8124b3cc61e290ea8bdebb53e8711daa311405b2ef965b189",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s33",
+      "title": "山居秋暝",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "49c942155a9a89931be443902c421699a80fc6e828c081a19b1b59d8e7c1a632",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s34",
+      "title": "长相思·山一程",
+      "poet": "纳兰性德",
+      "dynasty": "清",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "79e411a4dbdbf4e81cafbd077b30e111a3890ff1668e3f0929b67d6509d914c6",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s35",
+      "title": "渔歌子",
+      "poet": "张志和",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "7b3dbae55771666e3e6296cc5ac672b438ebfe221ef1612c8844d26cb6ef71f9",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s36",
+      "title": "观书有感（其一）",
+      "poet": "朱熹",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "13f9c693edb93cb3bc64b77ccdc0e4df9b4363f5676e851e3aa0db1325cd1e0f",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s37",
+      "title": "观书有感（其二）",
+      "poet": "朱熹",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "fad3a6ba240c0bfcb013c4b4e48bf34f08c153bc2b5081a6285d2ad4552df35d",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s38",
+      "title": "鸟鸣涧",
+      "poet": "王维",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "916a1484ab5c065d48645296095390d66156e49bffb7b7210c0418f528749b71",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s39",
+      "title": "游子吟",
+      "poet": "孟郊",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "2122019b4e0f6b3c1ab1f5928f48d55cee5edc94aee946325c99108f8adf3510",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s40",
+      "title": "乡村四月",
+      "poet": "翁卷",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "a16ee40645cdeaf894dfde0fead6e580586db7bd2eb8e4706c4c25879f4b56f1",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s41",
+      "title": "宿建德江",
+      "poet": "孟浩然",
+      "dynasty": "唐",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "0ae3979af6eadab3bae5b3d2666c5330f5f62f8eb7d11055b45c8ecda11f2e18",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    },
+    {
+      "id": "tongbian-s42",
+      "title": "六月二十七日望湖楼醉书",
+      "poet": "苏轼",
+      "dynasty": "宋",
+      "verification": {
+        "status": "UNVERIFIED",
+        "catalogScope": "UNCLASSIFIED",
+        "contentSha256": "53d6d4f01464c000346ad31660e0f74ff1a675912e347f80266fd2254fb77cd9",
+        "reviewedAt": null,
+        "sourceTitles": [],
+        "message": "该诗尚未完成逐首双信源与语文教师复核，不得标注为教材已验证内容。"
+      }
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+/* Deterministic Grid avoids under-filled CSS columns; enhancement never hides content. */
+
+.pr-masonry {
+    --masonry-columns: 1;
+    --masonry-gap: 12px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(var(--masonry-columns), minmax(0, 1fr));
+    align-items: start;
+    gap: var(--masonry-gap);
+}
+
+.pr-masonry-item {
+    display: block;
+    min-width: 0;
+    width: 100%;
+}
+
+.pr-masonry-item > * {
+    overflow: hidden;
+    border-radius: var(--radius-sm, 10px);
+    box-shadow:
+        rgb(var(--c-text-primary, 44 36 26) / 0.04) 0 2px 8px,
+        rgb(var(--c-text-primary, 44 36 26) / 0.06) 0 8px 24px -8px;
+}
+
+.pr-masonry--enhanced .pr-masonry-item[data-masonry-fade='true'] {
+    animation: pr-masonry-enter var(--masonry-item-duration) var(--masonry-item-timing) backwards;
+    animation-delay: var(--masonry-item-delay);
+}
+
+@keyframes pr-masonry-enter {
+    from {
+        opacity: 0.35;
+        filter: blur(4px);
+        transform: translate3d(var(--masonry-enter-x), var(--masonry-enter-y), 0) scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pr-masonry-item[data-masonry-hover='true'] {
+        transition: transform var(--dur-micro, 160ms) var(--ease-out, ease-out);
+    }
+
+    .pr-masonry-item[data-masonry-hover='true']:hover {
+        transform: scale(var(--masonry-hover-scale));
+    }
+}
+
+@media (min-width: 400px) {
+    .pr-masonry:not([data-masonry-columns='1']) {
+        --masonry-columns: 2;
+    }
+}
+
+@media (min-width: 600px) {
+    .pr-masonry:not([data-masonry-columns='1']):not([data-masonry-columns='2']) {
+        --masonry-columns: 3;
+    }
+}
+
+@media (min-width: 1000px) {
+    .pr-masonry:not([data-masonry-columns='1']):not([data-masonry-columns='2']):not([data-masonry-columns='3']) {
+        --masonry-columns: 4;
+    }
+}
+
+@media (min-width: 1500px) {
+    .pr-masonry:not([data-masonry-columns='1']):not([data-masonry-columns='2']):not([data-masonry-columns='3']):not([data-masonry-columns='4']) {
+        --masonry-columns: 5;
+    }
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+    .pr-masonry--enhanced .pr-masonry-item[data-masonry-fade='true'] {
+        animation: none;
+        filter: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .pr-masonry-item > * {
+        box-shadow: none;
+        outline: 1px solid CanvasText;
+    }
+}

@@ -1,0 +1,90 @@
+/** GlowBorder 的独立、低噪声视觉层。 */
+
+.pr-glowborder {
+    position: relative;
+    display: grid;
+    min-inline-size: 0;
+    border-radius: var(--pr-glow-radius, 12px);
+    isolation: isolate;
+    padding: 1px;
+    background:
+        linear-gradient(135deg, var(--pr-glow-one), var(--pr-glow-two) 48%, var(--pr-glow-three)) border-box;
+    box-shadow:
+        0 1px 2px rgb(var(--c-text-primary, 44 36 26) / .05),
+        0 8px 24px rgb(var(--c-text-primary, 44 36 26) / .06);
+    transition: box-shadow var(--dur-medium, 280ms) var(--ease-out, ease), transform var(--dur-medium, 280ms) var(--ease-out, ease);
+}
+
+.pr-glowborder::before {
+    position: absolute;
+    z-index: -1;
+    inset: calc(-1 * max(2px, var(--pr-glow-blur, 8px)));
+    border-radius: inherit;
+    background:
+        radial-gradient(ellipse at 18% 10%, var(--pr-glow-one), transparent 46%),
+        radial-gradient(ellipse at 88% 84%, var(--pr-glow-two), transparent 50%);
+    filter: blur(var(--pr-glow-blur, 8px));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-medium, 280ms) var(--ease-out, ease);
+}
+
+.pr-glowborder::after {
+    position: absolute;
+    z-index: 0;
+    inset: 1px;
+    border-radius: var(--pr-glow-content-radius, 11px);
+    background:
+        linear-gradient(115deg, transparent 34%, rgb(var(--c-surface-primary, 255 252 248) / .24) 50%, transparent 66%);
+    background-size: calc(100% + var(--pr-glow-beam-size, 25%)) 100%;
+    background-position: 120% 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.pr-glowborder:hover,
+.pr-glowborder.is-active {
+    box-shadow:
+        0 2px 6px rgb(var(--c-text-primary, 44 36 26) / .07),
+        0 12px 32px rgb(var(--c-text-primary, 44 36 26) / .10);
+}
+
+.pr-glowborder:hover::before,
+.pr-glowborder.is-active::before {
+    opacity: calc(.22 * var(--pr-glow-opacity, 1) * var(--pr-glow-visibility, .7));
+}
+
+.pr-glowborder.is-active::after {
+    opacity: var(--pr-glow-fill-opacity, .5);
+}
+
+.pr-glowborder.is-animated::after {
+    animation: pr-glowborder-sweep 1800ms cubic-bezier(.2, .75, .2, 1) both;
+}
+
+.pr-glowborder-content {
+    position: relative;
+    z-index: 1;
+    min-inline-size: 0;
+    border-radius: var(--pr-glow-content-radius, 11px);
+}
+
+@keyframes pr-glowborder-sweep {
+    0% { opacity: 0; background-position: 120% 0; }
+    18% { opacity: var(--pr-glow-fill-opacity, .5); }
+    82% { opacity: var(--pr-glow-fill-opacity, .5); }
+    100% { opacity: 0; background-position: -120% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-glowborder,
+    .pr-glowborder::before,
+    .pr-glowborder::after {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    .pr-glowborder.is-active::after {
+        opacity: calc(var(--pr-glow-fill-opacity, .5) * .45);
+    }
+}

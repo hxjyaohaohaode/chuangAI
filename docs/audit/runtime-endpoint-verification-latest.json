@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-11T03:16:11.151Z",
+  "baseUrl": "http://127.0.0.1:51419",
+  "status": "passed",
+  "http": {
+    "verifiedDeclarations": 214,
+    "mainDestructiveRoutes": 206,
+    "memoryGovernanceRoutes": 5,
+    "authenticationRoutes": 3,
+    "failures": 0
+  },
+  "websocket": {
+    "verifiedDeclarations": 1,
+    "unauthenticatedRejected": true,
+    "crossOriginRejected": true,
+    "authenticatedHandshake": true,
+    "sessionStart": true,
+    "pingPong": true
+  },
+  "sse": {
+    "status": "passed",
+    "normalFrames": 62,
+    "terminalFrame": true,
+    "cancelledAfterFirstFrame": true,
+    "serverHealthyAfterCancellation": true
+  },
+  "authenticationLifecycle": {
+    "status": "passed",
+    "publicStatus": true,
+    "invalidAccountRejected": true,
+    "signedSessionRecognized": true,
+    "csrfRejected": true,
+    "logoutRevoked": true
+  }
+}

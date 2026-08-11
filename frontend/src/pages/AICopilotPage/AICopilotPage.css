@@ -1,0 +1,3028 @@
+﻿/**
+ * AI 副驾页面样式 v6（Task 24 全面重做）
+ *
+ * 严格依据《界面设计规范.md》第 2、4、5、6、7、9、11、14 章实现
+ *
+ * 设计要点：
+ * - 零硬编码：所有色值/尺寸/时长引用 tokens.css 的 CSS 变量
+ * - 无边框优先：区域分隔用透明度差异 + backdrop-blur
+ * - 流体尺寸：关键路径用 clamp()，响应 600-2400px 视口无断裂
+ * - 完整三态：所有可交互元素具备 hover/active/focus-visible
+ * - GPU 友好：动画仅使用 transform 与 opacity
+ * - 三列布局：左 240px / 中 1fr / 右 320px，平板双列，移动单列
+ * - 底部浮动操作栏：surface-glass + backdrop-blur 12px
+ * - 可折叠左栏：折叠后 48px 窄条
+ * - 卡片式对话：用户右对齐 surface-secondary，助手左对齐玻璃态
+ */
+
+/* ============================================================
+ * 主布局 —— 三栏 + 底部浮动操作栏
+ * ============================================================ */
+
+.pr-copilot.pr-copilot-v6 {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    width: 100%;
+    min-height: 0;
+    /* v6：占据父容器可用高度，让三栏布局可内部滚动 */
+    height: 100%;
+}
+
+.pr-copilot-body {
+    display: grid;
+    /* v7：缩窄左右栏，给中栏对话区更大空间，消除"小家子气"观感 */
+    grid-template-columns: clamp(180px, 16vw, 220px) minmax(0, 1fr) clamp(260px, 22vw, 300px);
+    gap: var(--space-md);
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+}
+
+.pr-copilot-col {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* 左栏：会话历史 —— 可折叠（48px 窄条） */
+.pr-copilot-col--left {
+    transition: grid-template-columns var(--dur-medium) var(--spring-soft);
+}
+
+/* 中栏：对话区 —— 卡片式消息流 + 输入区 */
+.pr-copilot-col--center {
+    background: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 1px 2px rgb(var(--c-text-primary) / 0.03),
+        0 2px 4px rgb(var(--c-text-primary) / 0.04),
+        0 4px 8px rgb(var(--c-text-primary) / 0.05);
+    overflow: hidden;
+}
+
+/* 右栏：物料库 —— 拖拽上下文 */
+.pr-copilot-col--right {
+    background: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+/* 响应式：平板双列（左+中合并，右列下移） */
+@media (max-width: 1400px) {
+    .pr-copilot-body {
+        grid-template-columns: 220px minmax(0, 1fr);
+    }
+
+    .pr-copilot-col--right {
+        grid-column: 1 / -1;
+        max-height: 360px;
+    }
+}
+
+/* 响应式：移动单列 */
+@media (max-width: 900px) {
+    .pr-copilot.pr-copilot-v6 {
+        height: auto;
+    }
+
+    .pr-copilot-body {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pr-copilot-col--center {
+        order: 1;
+        min-height: 680px;
+    }
+
+    .pr-copilot-col--left {
+        order: 2;
+        max-height: 280px;
+    }
+
+    .pr-copilot-col--right {
+        order: 3;
+        max-height: 320px;
+    }
+
+}
+
+/*
+ * 小屏首次进入副驾时，先让教师能写下教学任务，再阅读建议与调整模型参数。
+ * 这只影响空会话：已有对话仍维持消息流在上、输入区在下的连续交流节奏；
+ * 桌面端也不受影响，三栏和底部参数栏保持原样。
+ */
+@media (max-width: 600px) {
+    .pr-copilot-chat.has-empty-state .pr-copilot-chat-input-area {
+        order: -1;
+    }
+
+    .pr-copilot-chat.has-empty-state .pr-copilot-chat-messages {
+        flex: 0 1 auto;
+        min-height: 0;
+    }
+
+    .pr-copilot-chat.has-empty-state .pr-copilot-chat-empty {
+        height: auto;
+        padding: var(--space-lg) var(--space-md);
+        gap: var(--space-md);
+    }
+
+    .pr-copilot-chat.has-empty-state .pr-copilot-chat-empty-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .pr-copilot-chat.has-empty-state .pr-copilot-chat-empty-icon svg {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* ============================================================
+ * 主动通知浮层 —— 顶部滑入
+ * ============================================================ */
+
+.pr-proactive-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    background: var(--surface-elevated);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+        0 4px 16px rgb(var(--c-text-primary) / 0.08),
+        0 8px 32px rgb(var(--c-text-primary) / 0.06);
+    animation: pr-proactive-bar-in var(--dur-medium) var(--spring-soft);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.pr-proactive-bar::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent-primary-40);
+    z-index: 0;
+}
+
+.pr-proactive-bar--info::before {
+    background: rgb(var(--c-accent-info));
+}
+
+.pr-proactive-bar--warning::before {
+    background: rgb(var(--c-accent-warning));
+}
+
+.pr-proactive-bar--critical::before {
+    background: rgb(var(--c-accent-error));
+}
+
+@keyframes pr-proactive-bar-in {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-proactive-bar-body {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.pr-proactive-bar-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    flex-shrink: 0;
+}
+
+.pr-proactive-bar--info .pr-proactive-bar-icon {
+    background: var(--accent-info-10);
+    color: rgb(var(--c-accent-info));
+}
+
+.pr-proactive-bar--warning .pr-proactive-bar-icon {
+    background: var(--accent-warning-10);
+    color: rgb(var(--c-accent-warning));
+}
+
+.pr-proactive-bar--critical .pr-proactive-bar-icon {
+    background: var(--accent-error-10);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-proactive-bar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.pr-proactive-bar-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-sm);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-proactive-bar-desc {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-xs);
+    letter-spacing: var(--tracking-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-proactive-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-shrink: 0;
+}
+
+.pr-proactive-bar-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out);
+}
+
+.pr-proactive-bar-detail:hover {
+    background: var(--accent-primary-20);
+}
+
+.pr-proactive-bar-detail:active {
+    transform: scale(0.97);
+}
+
+.pr-proactive-bar-detail:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-proactive-bar-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-tertiary));
+    cursor: pointer;
+    transition: color var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out);
+}
+
+.pr-proactive-bar-close:hover {
+    color: rgb(var(--c-text-primary));
+    background: var(--surface-tertiary-alpha);
+}
+
+.pr-proactive-bar-close:active {
+    transform: scale(0.97);
+}
+
+.pr-proactive-bar-close:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* ============================================================
+ * 会话历史侧边栏（左栏）
+ * ============================================================ */
+
+.pr-copilot-history {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    background: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    /* 折叠时内边距收拢。与侧边栏同理，这是布局收缩而非装饰动效；
+       面板内容随之重排，用 transform 无法表达。 */
+    transition: padding var(--dur-medium) var(--spring-soft);
+}
+
+/* 折叠态：仅 48px 窄条 */
+.pr-copilot-history.is-collapsed {
+    padding: var(--space-sm);
+}
+
+.pr-copilot-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-row-alpha);
+    flex-shrink: 0;
+}
+
+.pr-copilot-history.is-collapsed .pr-copilot-history-header {
+    padding: 0;
+    border-bottom: none;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-copilot-history-header-title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-copilot-history-header-title h3 {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-copilot-history-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.pr-copilot-history.is-collapsed .pr-copilot-history-header-actions {
+    flex-direction: column;
+    width: 100%;
+}
+
+.pr-copilot-history-new-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-history.is-collapsed .pr-copilot-history-new-btn {
+    width: 100%;
+    padding: var(--space-xs);
+}
+
+.pr-copilot-history-new-btn:hover {
+    background: var(--accent-primary-20);
+}
+
+.pr-copilot-history-new-btn:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-history-new-btn:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-copilot-history-collapse-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-tertiary));
+    cursor: pointer;
+    transition: color var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-history.is-collapsed .pr-copilot-history-collapse-btn {
+    width: 100%;
+}
+
+.pr-copilot-history-collapse-btn:hover {
+    color: rgb(var(--c-text-primary));
+    background: var(--surface-tertiary-alpha);
+}
+
+.pr-copilot-history-collapse-btn:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-history-collapse-btn:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* 搜索框 */
+.pr-copilot-history-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    flex-shrink: 0;
+}
+
+.pr-copilot-history-search-icon {
+    position: absolute;
+    left: calc(var(--space-md) + var(--space-xs));
+    color: rgb(var(--c-text-tertiary));
+    pointer-events: none;
+}
+
+.pr-copilot-history-search-input {
+    width: 100%;
+    padding: var(--space-xs) var(--space-sm) var(--space-xs) calc(var(--space-sm) * 2 + 14px);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-xs);
+    font-family: inherit;
+    transition: box-shadow var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-history-search-input::placeholder {
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-copilot-history-search-input:hover {
+    background: var(--surface-tertiary-light);
+}
+
+.pr-copilot-history-search-input:focus {
+    background: var(--surface-primary, rgb(var(--c-surface-primary)));
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-copilot-history-search-clear {
+    position: absolute;
+    right: calc(var(--space-md) + var(--space-xs));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-full);
+    color: rgb(var(--c-text-tertiary));
+    cursor: pointer;
+    transition: color var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-history-search-clear:hover {
+    color: rgb(var(--c-text-primary));
+    background: var(--surface-tertiary-alpha);
+}
+
+.pr-copilot-history-search-clear:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-history-search-clear:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* 列表区 */
+.pr-copilot-history-list-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-xs) var(--space-sm);
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-primary-alpha) transparent;
+}
+
+.pr-copilot-history-list-wrapper::-webkit-scrollbar {
+    width: 4px;
+}
+
+.pr-copilot-history-list-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pr-copilot-history-list-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-primary-alpha);
+    border-radius: var(--radius-full);
+}
+
+.pr-copilot-history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-copilot-history.is-collapsed .pr-copilot-history-list {
+    align-items: center;
+}
+
+/* 单条会话项 */
+.pr-copilot-history-item {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    border-radius: var(--radius-sm);
+    transition: background var(--dur-micro) var(--ease-out);
+    content-visibility: auto;
+    contain-intrinsic-size: 64px;
+}
+
+.pr-copilot-history-item.is-active {
+    background: var(--accent-primary-10);
+}
+
+.pr-copilot-history-item.is-active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: var(--space-xs);
+    bottom: var(--space-xs);
+    width: 3px;
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-accent-primary));
+}
+
+.pr-copilot-history-item:hover {
+    background: var(--surface-tertiary-alpha);
+}
+
+.pr-copilot-history-item.is-active:hover {
+    background: var(--accent-primary-20);
+}
+
+.pr-copilot-history-item.is-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* 折叠态：仅显示图标按钮 */
+.pr-copilot-history-item.is-collapsed {
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
+    justify-content: center;
+}
+
+.pr-copilot-history-item-collapsed-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-secondary));
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-history-item-collapsed-btn:hover {
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-copilot-history-item-collapsed-btn:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-history-item.is-active .pr-copilot-history-item-collapsed-btn {
+    color: rgb(var(--c-accent-primary));
+    background: var(--accent-primary-10);
+}
+
+.pr-copilot-history-item-collapsed-btn:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* 展开态：标题 + 预览 + 时间 + 删除按钮 */
+.pr-copilot-history-item-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    background: transparent;
+    color: rgb(var(--c-text-primary));
+    cursor: pointer;
+    text-align: left;
+    min-width: 0;
+    border-radius: var(--radius-sm);
+    transition: background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-history-item-main:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-copilot-history-item-main:active {
+    transform: scale(0.99);
+}
+
+.pr-copilot-history-item-title {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-xs);
+    letter-spacing: var(--tracking-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-copilot-history-item-preview {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-2xs);
+    letter-spacing: var(--tracking-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 2px;
+}
+
+.pr-copilot-history-item-time {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-2xs);
+    letter-spacing: var(--tracking-tightest);
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+}
+
+.pr-copilot-history-item-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    align-self: center;
+    margin-right: var(--space-xs);
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-tertiary));
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-history-item:hover .pr-copilot-history-item-delete {
+    opacity: 1;
+}
+
+.pr-copilot-history-item-delete:hover {
+    color: rgb(var(--c-accent-error));
+    background: var(--accent-error-10);
+}
+
+.pr-copilot-history-item-delete:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-history-item-delete.is-confirming {
+    opacity: 1;
+    color: rgb(var(--c-accent-error));
+    background: var(--accent-error-20);
+    animation: pr-shake 0.4s var(--ease-in-out);
+}
+
+@keyframes pr-shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-2px);
+    }
+
+    75% {
+        transform: translateX(2px);
+    }
+}
+
+.pr-copilot-history-item-delete:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* 骨架屏 */
+.pr-copilot-history-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    background: var(--surface-tertiary-alpha);
+}
+
+.pr-copilot-history-skeleton-title,
+.pr-copilot-history-skeleton-preview,
+.pr-copilot-history-skeleton-time {
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg,
+            var(--border-primary-alpha) 0%,
+            var(--border-primary-hover-alpha) 50%,
+            var(--border-primary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-skeleton-shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+.pr-copilot-history-skeleton-title {
+    width: 60%;
+}
+
+.pr-copilot-history-skeleton-preview {
+    width: 90%;
+    height: 8px;
+}
+
+.pr-copilot-history-skeleton-time {
+    width: 30%;
+    height: 8px;
+}
+
+@keyframes pr-skeleton-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* 空状态 */
+.pr-copilot-history-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-md);
+    text-align: center;
+    gap: var(--space-sm);
+}
+
+.pr-copilot-history-empty--collapsed {
+    padding: var(--space-sm);
+}
+
+.pr-copilot-history-empty-icon {
+    color: rgb(var(--c-text-tertiary));
+    opacity: 0.6;
+}
+
+.pr-copilot-history-empty-title {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-copilot-history-empty-desc {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-sm);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-copilot-history-empty-reset {
+    display: inline;
+    padding: 0 var(--space-xs);
+    border: none;
+    background: transparent;
+    color: rgb(var(--c-accent-primary));
+    font-size: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--accent-primary-40);
+    transition: text-decoration-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-history-empty-reset:hover {
+    text-decoration-color: rgb(var(--c-accent-primary));
+}
+
+.pr-copilot-history-empty-reset:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-history-empty-reset:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+    border-radius: var(--radius-xs);
+}
+
+/* ============================================================
+ * 对话区（中栏）—— 卡片式消息流 + 输入区
+ * ============================================================ */
+
+.pr-copilot-chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* 消息流 */
+.pr-copilot-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-primary-alpha) transparent;
+}
+
+.pr-copilot-chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pr-copilot-chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pr-copilot-chat-messages::-webkit-scrollbar-thumb {
+    background: var(--border-primary-alpha);
+    border-radius: var(--radius-full);
+}
+
+.pr-copilot-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: var(--border-primary-hover-alpha);
+}
+
+.pr-copilot-chat-bottom-anchor {
+    height: 1px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+/* 空状态 */
+.pr-copilot-chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+    padding: var(--space-2xl) var(--space-xl);
+    gap: var(--space-lg);
+}
+
+.pr-copilot-chat-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* v7：图标从 72px 升至 96px，视觉重心更突出 */
+    width: 96px;
+    height: 96px;
+    border-radius: var(--radius-full);
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    animation: pr-chat-empty-pulse 3s var(--ease-in-out) infinite;
+    position: relative;
+}
+
+/* v7：图标外圈光韵 —— 圆形脉动光环（参考优质前端部件组光韵设计） */
+.pr-copilot-chat-empty-icon::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--accent-primary-40);
+    opacity: 0;
+    animation: pr-chat-empty-ring 2.4s var(--ease-out) infinite;
+}
+
+@keyframes pr-chat-empty-ring {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: scale(1.25);
+        opacity: 0;
+    }
+}
+
+@keyframes pr-chat-empty-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.85;
+        transform: scale(1.04);
+    }
+}
+
+.pr-copilot-chat-empty-title {
+    margin: 0;
+    /* v7：标题从 text-xl 升至 text-3xl，更大气 */
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-normal);
+}
+
+.pr-copilot-chat-empty-desc {
+    margin: 0;
+    font-size: var(--text-base);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-lg);
+    letter-spacing: var(--tracking-tight);
+    /* v7：最大宽度从 460px 扩至 560px */
+    max-width: 560px;
+}
+
+/* v7：快捷指令卡片网格 —— 替换原 hints 列表 */
+.pr-copilot-chat-empty-hints {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    max-width: 640px;
+    width: 100%;
+}
+
+.pr-copilot-chat-empty-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    background: var(--surface-secondary-alpha);
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-sm);
+    line-height: var(--leading-sm);
+    letter-spacing: var(--tracking-tight);
+    text-align: left;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    animation: pr-chat-hint-in var(--dur-medium) var(--spring-soft) backwards;
+    position: relative;
+    overflow: hidden;
+}
+
+.pr-copilot-chat-empty-hint::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+            var(--accent-primary-10) 0%,
+            transparent 60%);
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease-out);
+    pointer-events: none;
+}
+
+.pr-copilot-chat-empty-hint:hover {
+    background: var(--surface-tertiary-alpha);
+    border-color: var(--accent-primary-40);
+    transform: translateY(-2px);
+    box-shadow:
+        0 4px 16px rgb(var(--c-text-primary) / 0.06),
+        0 8px 24px rgb(var(--c-accent-primary) / 0.08);
+}
+
+.pr-copilot-chat-empty-hint:hover::before {
+    opacity: 1;
+}
+
+.pr-copilot-chat-empty-hint:active {
+    transform: translateY(0) scale(0.99);
+}
+
+.pr-copilot-chat-empty-hint:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-copilot-chat-empty-hint:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.pr-copilot-chat-empty-hint:nth-child(2) {
+    animation-delay: 60ms;
+}
+
+.pr-copilot-chat-empty-hint:nth-child(3) {
+    animation-delay: 120ms;
+}
+
+.pr-copilot-chat-empty-hint:nth-child(4) {
+    animation-delay: 180ms;
+}
+
+.pr-copilot-chat-empty-hint-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    flex-shrink: 0;
+}
+
+.pr-copilot-chat-empty-hint-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-copilot-chat-empty-hint-desc {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-sm);
+    letter-spacing: var(--tracking-tight);
+}
+
+@keyframes pr-chat-hint-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 单条消息气泡 */
+.pr-copilot-chat-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    animation: pr-chat-msg-in var(--dur-medium) var(--spring-soft);
+    content-visibility: auto;
+    contain-intrinsic-size: 120px;
+}
+
+@keyframes pr-chat-msg-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-copilot-chat-msg--user {
+    flex-direction: row-reverse;
+}
+
+.pr-copilot-chat-msg--system {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tightest);
+    gap: var(--space-xs);
+    margin: 0 auto var(--space-md);
+    max-width: 480px;
+}
+
+.pr-copilot-chat-msg-system-icon {
+    display: inline-flex;
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-copilot-chat-msg-system-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 头像 */
+.pr-copilot-chat-msg-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+    transition: background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-chat-msg--user .pr-copilot-chat-msg-avatar {
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-copilot-chat-msg--assistant .pr-copilot-chat-msg-avatar {
+    background: var(--surface-elevated);
+    color: rgb(var(--c-accent-info));
+    box-shadow: 0 2px 8px rgb(var(--c-text-primary) / 0.06);
+}
+
+/* 气泡 */
+.pr-copilot-chat-msg-bubble {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    /* v7：扩大气泡宽度，让对话内容更舒展 */
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    max-width: min(960px, 92%);
+    min-width: 0;
+    position: relative;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.pr-copilot-chat-msg--user .pr-copilot-chat-msg-bubble {
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-text-primary));
+    border-bottom-right-radius: var(--space-xs);
+}
+
+.pr-copilot-chat-msg--assistant .pr-copilot-chat-msg-bubble {
+    background: var(--surface-elevated);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: rgb(var(--c-text-primary));
+    border-bottom-left-radius: var(--space-xs);
+    box-shadow: 0 2px 8px rgb(var(--c-text-primary) / 0.04);
+}
+
+.pr-copilot-chat-msg-text {
+    margin: 0;
+    font-size: var(--text-sm);
+    line-height: var(--leading-base);
+    letter-spacing: var(--tracking-tight);
+    color: rgb(var(--c-text-primary));
+    white-space: pre-wrap;
+}
+
+/* 折叠按钮 */
+.pr-copilot-chat-msg-collapse-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    background: transparent;
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    align-self: flex-start;
+    border-radius: var(--radius-sm);
+    transition: background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-chat-msg-collapse-btn:hover {
+    background: var(--accent-primary-10);
+}
+
+.pr-copilot-chat-msg-collapse-btn:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-chat-msg-collapse-btn:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* v7：流式"思考中"脉动点指示器 —— 替代"（等待模型响应…）"文本 */
+.pr-copilot-chat-thinking {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) 0 var(--space-sm);
+}
+
+.pr-copilot-chat-thinking-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-accent-primary));
+    opacity: 0.4;
+    animation: pr-thinking-pulse 1.4s var(--ease-in-out) infinite;
+    will-change: transform, opacity;
+}
+
+.pr-copilot-chat-thinking-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.pr-copilot-chat-thinking-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes pr-thinking-pulse {
+
+    0%,
+    80%,
+    100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+
+    40% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* 时间戳 */
+.pr-copilot-chat-msg-time {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--tracking-tightest);
+    align-self: flex-end;
+    margin-top: 2px;
+}
+
+.pr-copilot-chat-msg--system .pr-copilot-chat-msg-time {
+    align-self: center;
+    margin-top: 0;
+}
+
+/* 输入区 */
+.pr-copilot-chat-input-area {
+    flex-shrink: 0;
+    /* v7：扩大输入区 padding，让输入框更大气 */
+    padding: var(--space-md) var(--space-xl) var(--space-lg);
+    border-top: 1px solid var(--border-row-alpha);
+    background: var(--surface-elevated-soft);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.pr-copilot-chat-input-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-sm);
+    /* v7：增加 padding，提升输入框视觉重量 */
+    padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    background: rgb(var(--c-surface-primary));
+    box-shadow: 0 0 0 1px var(--border-primary-alpha);
+    transition: box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-chat-input-wrapper:focus-within {
+    box-shadow:
+        0 0 0 1px rgb(var(--c-accent-primary)),
+        var(--shadow-focus-accent);
+}
+
+/* v7：物料插入闪烁动画 —— 视觉反馈"数据已打通" */
+.pr-copilot-chat-input-wrapper.is-inserted {
+    animation: pr-material-insert-flash 0.6s var(--ease-out);
+}
+
+@keyframes pr-material-insert-flash {
+    0% {
+        box-shadow: 0 0 0 1px var(--border-primary-alpha);
+    }
+
+    30% {
+        box-shadow:
+            0 0 0 2px rgb(var(--c-accent-primary)),
+            0 0 0 6px var(--accent-primary-40);
+    }
+
+    100% {
+        box-shadow: 0 0 0 1px var(--border-primary-alpha);
+    }
+}
+
+.pr-copilot-chat-input {
+    flex: 1;
+    padding: var(--space-sm) var(--space-xs);
+    border: none;
+    background: transparent;
+    color: rgb(var(--c-text-primary));
+    /* v7：字号从 text-sm 升至 text-base，提升可读性 */
+    font-size: var(--text-base);
+    font-family: inherit;
+    line-height: var(--leading-base);
+    letter-spacing: var(--tracking-tight);
+    resize: none;
+    /* v7：最小高度从 24px 升至 56px，与发送按钮高度匹配 */
+    min-height: 32px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.pr-copilot-chat-input::placeholder {
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-copilot-chat-input:focus {
+    outline: none;
+}
+
+.pr-copilot-chat-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 发送/停止按钮 */
+.pr-copilot-chat-send,
+.pr-copilot-chat-stop {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* v7：按钮从 36px 升至 44px，圆形设计更大气 */
+    width: var(--control-height-default);
+    height: var(--control-height-default);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    flex-shrink: 0;
+}
+
+.pr-copilot-chat-send {
+    background: var(--gradient-brand);
+    color: rgb(var(--c-text-inverse));
+    box-shadow: 0 2px 8px rgb(var(--c-accent-primary) / 0.15);
+}
+
+.pr-copilot-chat-send:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgb(var(--c-accent-primary) / 0.25);
+}
+
+.pr-copilot-chat-send:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.pr-copilot-chat-send:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.pr-copilot-chat-send:focus-visible {
+    box-shadow:
+        0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px var(--accent-primary-40);
+    outline: none;
+}
+
+.pr-copilot-chat-stop {
+    background: var(--accent-error-10);
+    color: rgb(var(--c-accent-error));
+    gap: var(--space-xs);
+    /* v7：椭圆按钮（带文字），高度与圆形发送按钮一致 */
+    width: auto;
+    height: var(--control-height-default);
+    padding: 0 var(--space-md);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+}
+
+.pr-copilot-chat-stop:hover {
+    background: var(--accent-error-20);
+}
+
+.pr-copilot-chat-stop:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-chat-stop:focus-visible {
+    box-shadow: var(--shadow-focus-error);
+    outline: none;
+}
+
+/* 输入提示 */
+.pr-copilot-chat-input-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
+    padding: 0 var(--space-xs);
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tightest);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+ * 上下文物料库（右栏）—— 4 Tab + 可拖拽
+ * ============================================================ */
+
+.pr-copilot-materials {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.pr-copilot-materials-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-row-alpha);
+    flex-shrink: 0;
+}
+
+.pr-copilot-materials-header-title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-copilot-materials-header-title h3 {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-copilot-materials-header-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 2px var(--space-xs);
+    border-radius: var(--radius-full);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tightest);
+}
+
+/* Tab 切换 */
+.pr-copilot-materials-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    padding: var(--space-xs);
+    border-bottom: 1px solid var(--border-row-alpha);
+    background: var(--surface-tertiary-alpha);
+    flex-shrink: 0;
+}
+
+.pr-copilot-materials-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-materials-tab:hover {
+    color: rgb(var(--c-text-primary));
+    background: var(--surface-elevated-soft);
+}
+
+.pr-copilot-materials-tab:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-materials-tab.is-active {
+    background: var(--surface-elevated);
+    color: rgb(var(--c-accent-primary));
+    box-shadow: 0 1px 3px rgb(var(--c-text-primary) / 0.06);
+}
+
+.pr-copilot-materials-tab:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* 物料来源提示：演示数据、内置参考、局部接口降级必须在当前操作位持续可见。 */
+.pr-copilot-materials-source {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: 1px solid var(--border-row-alpha);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    flex-shrink: 0;
+}
+
+.pr-copilot-materials-source.is-demo-mode,
+.pr-copilot-materials-source.is-preset {
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-copilot-materials-source.is-stale-live {
+    background: var(--accent-info-10);
+    color: rgb(var(--c-accent-info));
+}
+
+.pr-copilot-materials-source.is-unavailable {
+    background: var(--accent-warning-10);
+    color: rgb(var(--c-accent-warning));
+}
+
+.pr-copilot-materials-source > svg {
+    flex: 0 0 auto;
+    margin-top: 2px;
+}
+
+.pr-copilot-materials-source-copy {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.pr-copilot-materials-source-copy strong {
+    color: inherit;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-2xs);
+    letter-spacing: var(--tracking-tightest);
+}
+
+.pr-copilot-materials-source-copy span {
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+    line-height: var(--leading-2xs);
+    letter-spacing: var(--tracking-tightest);
+}
+
+.pr-copilot-materials-source.is-unavailable .pr-copilot-materials-source-copy span,
+.pr-copilot-materials-source.is-stale-live .pr-copilot-materials-source-copy span {
+    color: currentColor;
+    opacity: 0.84;
+}
+
+.pr-copilot-materials-source button {
+    flex: 0 0 auto;
+    min-height: 28px;
+    padding: 3px var(--space-xs);
+    border: 1px solid currentColor;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out), opacity var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-materials-source button:hover:not(:disabled) {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.pr-copilot-materials-source button:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-copilot-materials-source button:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+/* 搜索框 */
+.pr-copilot-materials-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: 1px solid var(--border-row-alpha);
+    flex-shrink: 0;
+}
+
+.pr-copilot-materials-search-icon {
+    position: absolute;
+    left: calc(var(--space-sm) + var(--space-xs));
+    color: rgb(var(--c-text-tertiary));
+    pointer-events: none;
+}
+
+.pr-copilot-materials-search-input {
+    width: 100%;
+    padding: var(--space-xs) var(--space-sm) var(--space-xs) calc(var(--space-sm) * 2 + 12px);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-xs);
+    font-family: inherit;
+    transition: box-shadow var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-materials-search-input::placeholder {
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-copilot-materials-search-input:hover {
+    background: var(--surface-tertiary-light);
+}
+
+.pr-copilot-materials-search-input:focus {
+    background: rgb(var(--c-surface-primary));
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-copilot-materials-search-clear {
+    position: absolute;
+    right: calc(var(--space-sm) + var(--space-xs));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-full);
+    color: rgb(var(--c-text-tertiary));
+    cursor: pointer;
+    transition: color var(--dur-micro) var(--ease-out), background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-materials-search-clear:hover {
+    color: rgb(var(--c-text-primary));
+    background: var(--surface-tertiary-alpha);
+}
+
+.pr-copilot-materials-search-clear:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-materials-search-clear:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* 物料列表 */
+.pr-copilot-materials-list-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-xs) var(--space-sm);
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-primary-alpha) transparent;
+}
+
+.pr-copilot-materials-list-wrapper::-webkit-scrollbar {
+    width: 4px;
+}
+
+.pr-copilot-materials-list-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pr-copilot-materials-list-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-primary-alpha);
+    border-radius: var(--radius-full);
+}
+
+.pr-copilot-materials-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+/* 骨架屏 */
+.pr-copilot-materials-skeleton {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    border-radius: var(--radius-sm);
+    background: var(--surface-tertiary-alpha);
+}
+
+.pr-copilot-materials-skeleton-icon {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg,
+            var(--border-primary-alpha) 0%,
+            var(--border-primary-hover-alpha) 50%,
+            var(--border-primary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-skeleton-shimmer 1.5s var(--ease-in-out) infinite;
+    flex-shrink: 0;
+}
+
+.pr-copilot-materials-skeleton-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-copilot-materials-skeleton-title,
+.pr-copilot-materials-skeleton-subtitle {
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg,
+            var(--border-primary-alpha) 0%,
+            var(--border-primary-hover-alpha) 50%,
+            var(--border-primary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-skeleton-shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+.pr-copilot-materials-skeleton-title {
+    width: 50%;
+}
+
+.pr-copilot-materials-skeleton-subtitle {
+    width: 80%;
+    height: 6px;
+}
+
+/* 空状态 */
+.pr-copilot-materials-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-md);
+    text-align: center;
+    gap: var(--space-sm);
+}
+
+.pr-copilot-materials-empty-icon {
+    color: rgb(var(--c-text-tertiary));
+    opacity: 0.6;
+}
+
+.pr-copilot-materials-empty-title {
+    margin: 0;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-copilot-materials-empty-desc {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-sm);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-copilot-materials-empty-reset {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-md);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-materials-empty-reset:hover {
+    background: var(--accent-primary-20);
+}
+
+.pr-copilot-materials-empty-reset:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-materials-empty-reset:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+/* 单个物料项 —— 可拖拽 */
+.pr-copilot-material-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: rgb(var(--c-text-primary));
+    text-align: left;
+    cursor: grab;
+    transition: background var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+    animation: pr-material-row-in var(--dur-small) var(--spring-soft) backwards;
+    content-visibility: auto;
+    contain-intrinsic-size: 44px;
+}
+
+@keyframes pr-material-row-in {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pr-copilot-material-row:hover {
+    background: var(--surface-tertiary-alpha);
+    box-shadow: 0 0 0 1px var(--border-primary-hover-alpha);
+}
+
+.pr-copilot-material-row.is-dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+.pr-copilot-material-row:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-copilot-material-row:active {
+    cursor: grabbing;
+}
+
+.pr-copilot-material-row-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    flex-shrink: 0;
+}
+
+.pr-copilot-material-row-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.pr-copilot-material-row-title {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-xs);
+    letter-spacing: var(--tracking-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-copilot-material-row-subtitle {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-2xs);
+    letter-spacing: var(--tracking-tightest);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-copilot-material-row-grip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(var(--c-text-tertiary));
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease-out);
+    flex-shrink: 0;
+}
+
+.pr-copilot-material-row:hover .pr-copilot-material-row-grip,
+.pr-copilot-material-row:focus-visible .pr-copilot-material-row-grip {
+    opacity: 0.7;
+}
+
+/* 底部提示 */
+.pr-copilot-materials-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    border-top: 1px solid var(--border-row-alpha);
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tightest);
+    flex-shrink: 0;
+    background: var(--surface-tertiary-alpha);
+}
+
+/* ============================================================
+ * 底部浮动操作栏（InterventionBar）
+ * ============================================================ */
+
+.pr-copilot-intervene.pr-copilot-intervene-v6 {
+    /* v10：移除 sticky bottom 避免遮挡后续内容，改为文档流跟随 */
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.pr-copilot-intervene-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow:
+        0 4px 12px rgb(var(--c-text-primary) / 0.06),
+        0 8px 24px rgb(var(--c-text-primary) / 0.04);
+    flex-wrap: wrap;
+}
+
+/* 左侧：模型参数组 */
+.pr-copilot-intervene-params {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.pr-copilot-intervene-param {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-width: 0;
+}
+
+.pr-copilot-intervene-param-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tightest);
+    text-transform: uppercase;
+}
+
+.pr-copilot-intervene-param-label span:not(.pr-copilot-intervene-temperature-value) {
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-copilot-intervene-temperature-value {
+    color: rgb(var(--c-accent-primary));
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--weight-semibold);
+    margin-left: 2px;
+}
+
+.pr-copilot-intervene-combobox {
+    min-width: 160px;
+}
+
+.pr-copilot-intervene-param--temperature {
+    gap: var(--space-sm);
+}
+
+/* 温度滑块 */
+.pr-copilot-intervene-temperature-slider {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 120px;
+    min-height: 24px;
+    height: 24px;
+    border-radius: var(--radius-full);
+    background: transparent;
+    cursor: pointer;
+}
+
+.pr-copilot-mode-switch {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px;
+    border-radius: var(--radius-md);
+    background: var(--surface-tertiary-alpha);
+    flex-shrink: 0;
+}
+
+.pr-copilot-mode-switch button {
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: 0 var(--space-sm);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-mode-switch button:hover,
+.pr-copilot-mode-switch button.is-active {
+    color: rgb(var(--c-accent-primary));
+    background: var(--surface-elevated);
+}
+
+.pr-copilot-mode-switch button.is-active {
+    box-shadow: 0 1px 4px rgb(var(--c-text-primary) / 0.08);
+}
+
+.pr-copilot-mode-switch button:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-copilot-routing-note {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    line-height: var(--leading-base);
+}
+
+.pr-copilot-routing-note strong {
+    color: rgb(var(--c-accent-primary));
+    font-weight: var(--weight-semibold);
+}
+
+.pr-copilot-intervene-temperature-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: var(--surface-tertiary-alpha);
+    transition: background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-intervene-temperature-slider::-moz-range-track {
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: var(--surface-tertiary-alpha);
+    transition: background var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-intervene-temperature-slider:hover::-webkit-slider-runnable-track,
+.pr-copilot-intervene-temperature-slider:hover::-moz-range-track {
+    background: var(--surface-tertiary-light);
+}
+
+.pr-copilot-intervene-temperature-slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-brand);
+    box-shadow: 0 1px 3px rgb(var(--c-accent-primary) / 0.30);
+    cursor: pointer;
+    margin-top: -6px;
+    transition: transform var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-intervene-temperature-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 2px 6px rgb(var(--c-accent-primary) / 0.40);
+}
+
+.pr-copilot-intervene-temperature-slider::-webkit-slider-thumb:active {
+    transform: scale(0.95);
+}
+
+.pr-copilot-intervene-temperature-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-accent-primary));
+    box-shadow: 0 1px 3px rgb(var(--c-accent-primary) / 0.30);
+    cursor: pointer;
+}
+
+.pr-copilot-intervene-temperature-slider:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+    border-radius: var(--radius-full);
+}
+
+/* 右侧：操作按钮组 */
+.pr-copilot-intervene-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-shrink: 0;
+}
+
+.pr-copilot-intervene-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-intervene-btn:hover {
+    background: var(--surface-tertiary-light);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-copilot-intervene-btn:active {
+    transform: scale(0.97);
+}
+
+.pr-copilot-intervene-btn:focus-visible {
+    box-shadow: var(--shadow-focus-accent);
+    outline: none;
+}
+
+.pr-copilot-intervene-btn.is-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.pr-copilot-intervene-btn--export:hover {
+    background: var(--accent-info-10);
+    color: rgb(var(--c-accent-info));
+}
+
+.pr-copilot-intervene-btn--danger-confirm {
+    background: var(--accent-error-20);
+    color: rgb(var(--c-accent-error));
+    animation: pr-shake 0.4s var(--ease-in-out);
+}
+
+.pr-copilot-intervene-btn--danger-confirm:hover {
+    background: var(--accent-error-40);
+    color: rgb(var(--c-text-inverse));
+}
+
+/* 响应式：小屏堆叠 */
+@media (max-width: 900px) {
+    .pr-copilot-intervene-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
+    }
+
+    .pr-copilot-intervene-params {
+        justify-content: space-between;
+    }
+
+    .pr-copilot-mode-switch {
+        width: 100%;
+    }
+
+    .pr-copilot-mode-switch button {
+        flex: 1;
+    }
+
+    .pr-copilot-intervene-combobox {
+        min-width: 120px;
+        flex: 1;
+    }
+
+    .pr-copilot-intervene-temperature-slider {
+        width: 80px;
+    }
+}
+
+/* ============================================================
+ * prefers-reduced-motion —— 降级动效（规范 6.6 / 14.3）
+ * 全局 tokens.css 已将所有 animation/transition 降至 0.01ms，
+ * 此处补充组件级降级：循环型动效完全关闭、状态切换改为色彩/透明度变化
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    /* 入场动画 —— 关闭，元素直接呈现 */
+    .pr-copilot-chat-msg,
+    .pr-copilot-material-row,
+    .pr-copilot-chat-empty-hint,
+    .pr-proactive-bar,
+    .pr-copilot-history-item-delete.is-confirming,
+    .pr-copilot-intervene-btn--danger-confirm,
+    .pr-copilot-chat-input-wrapper.is-inserted {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    /* 循环型氛围动效 —— 完全移除，避免持续视觉刺激 */
+    .pr-copilot-chat-empty-icon,
+    .pr-copilot-chat-empty-icon::before,
+    .pr-copilot-chat-thinking-dot,
+    .pr-copilot-history-skeleton-title,
+    .pr-copilot-history-skeleton-preview,
+    .pr-copilot-history-skeleton-time,
+    .pr-copilot-materials-skeleton-icon,
+    .pr-copilot-materials-skeleton-title,
+    .pr-copilot-materials-skeleton-subtitle {
+        animation: none !important;
+    }
+
+    .pr-copilot-chat-thinking-dot {
+        will-change: auto;
+    }
+
+    /* hover/active 微交互改为色彩变化，禁用 transform */
+    .pr-copilot-chat-send:hover:not(:disabled),
+    .pr-copilot-chat-stop:hover,
+    .pr-copilot-chat-empty-hint:hover,
+    .pr-copilot-history-new-btn:active,
+    .pr-copilot-history-item-collapsed-btn:active,
+    .pr-copilot-history-item-main:active,
+    .pr-copilot-history-item-delete:active,
+    .pr-copilot-history-collapse-btn:active,
+    .pr-copilot-materials-tab:active,
+    .pr-copilot-material-row:active,
+    .pr-copilot-intervene-btn:active,
+    .pr-copilot-intervene-temperature-slider::-webkit-slider-thumb,
+    .pr-proactive-bar-detail:active,
+    .pr-proactive-bar-close:active,
+    .pr-copilot-history-search-clear:active,
+    .pr-copilot-materials-search-clear:active,
+    .pr-copilot-materials-empty-reset:active,
+    .pr-copilot-history-empty-reset:active,
+    .pr-copilot-chat-msg-collapse-btn:active {
+        transform: none !important;
+    }
+}
+
+/* ============================================================
+ * 多智能体计划审批 —— 先预览、再批准、全程可介入
+ * ============================================================ */
+
+.pr-copilot-plan {
+    width: min(100%, 760px);
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin: var(--space-sm) 0 var(--space-md);
+    padding: clamp(var(--space-md), 2vw, var(--space-lg));
+    border-radius: var(--radius-lg);
+    background: linear-gradient(145deg, rgb(var(--c-accent-primary) / 0.08), var(--surface-elevated));
+    box-shadow: var(--shadow-card);
+}
+
+.pr-copilot-plan-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.pr-copilot-plan-kicker,
+.pr-copilot-plan-meta,
+.pr-copilot-plan-task-actions,
+.pr-copilot-plan-footer,
+.pr-copilot-plan-outcome,
+.pr-copilot-plan-attachment-note {
+    display: flex;
+    align-items: center;
+}
+
+.pr-copilot-plan-kicker {
+    gap: var(--space-xs);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-copilot-plan-header h3 {
+    margin: var(--space-xs) 0 2px;
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-lg);
+}
+
+.pr-copilot-plan-header p,
+.pr-copilot-plan-task-copy span,
+.pr-copilot-plan-task-copy small {
+    margin: 0;
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
+}
+
+.pr-copilot-plan-meta {
+    max-width: 240px;
+    justify-content: flex-end;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+.pr-copilot-plan-meta span,
+.pr-copilot-plan-task-badge {
+    padding: 3px 7px;
+    border-radius: var(--radius-full);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-2xs);
+    white-space: nowrap;
+}
+
+.pr-copilot-plan-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pr-copilot-plan-task {
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+    background: rgb(var(--c-surface-primary) / 0.56);
+}
+
+.pr-copilot-plan-task-main {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--space-sm);
+}
+
+.pr-copilot-plan-task-status {
+    display: inline-flex;
+    margin-top: 2px;
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-copilot-plan-task.is-running .pr-copilot-plan-task-status,
+.pr-copilot-plan-task.is-paused .pr-copilot-plan-task-status {
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-copilot-plan-task.is-success .pr-copilot-plan-task-status {
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-copilot-plan-task.is-failed .pr-copilot-plan-task-status,
+.pr-copilot-plan-task-copy small.is-error {
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-copilot-plan-task-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-wrap: anywhere;
+}
+
+.pr-copilot-plan-task-copy strong {
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-sm);
+}
+
+.pr-copilot-plan-task-actions,
+.pr-copilot-plan-footer {
+    justify-content: flex-end;
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.pr-copilot-plan-task-actions button,
+.pr-copilot-plan-footer button,
+.pr-copilot-plan-editor button {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: 0 var(--space-sm);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+    font: inherit;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+}
+
+.pr-copilot-plan-task-actions button:hover,
+.pr-copilot-plan-footer button:hover,
+.pr-copilot-plan-editor button:hover {
+    color: rgb(var(--c-accent-primary));
+    background: rgb(var(--c-accent-primary) / 0.12);
+}
+
+.pr-copilot-plan-task-actions button:focus-visible,
+.pr-copilot-plan-footer button:focus-visible,
+.pr-copilot-plan-editor button:focus-visible,
+.pr-copilot-plan-editor textarea:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-copilot-plan-footer button.is-primary,
+.pr-copilot-plan-editor button.is-primary {
+    background: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-copilot-plan-footer button.is-danger {
+    background: rgb(var(--c-accent-error) / 0.12);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-copilot-plan-task-actions button:disabled,
+.pr-copilot-plan-footer button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pr-copilot-plan-editor {
+    display: grid;
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
+}
+
+.pr-copilot-plan-editor label {
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+}
+
+.pr-copilot-plan-editor textarea {
+    width: 100%;
+    resize: vertical;
+    padding: var(--space-sm);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--surface-primary);
+    color: rgb(var(--c-text-primary));
+    font: 12px/1.55 var(--font-mono);
+}
+
+.pr-copilot-plan-editor button {
+    justify-self: end;
+}
+
+.pr-copilot-plan-outcome,
+.pr-copilot-plan-attachment-note {
+    gap: var(--space-xs);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+}
+
+.pr-copilot-plan-outcome.is-success {
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-copilot-plan-outcome.is-warning {
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-copilot-evidence {
+    border: 1px solid rgb(var(--c-accent-primary) / 0.16);
+    border-radius: var(--radius-md);
+    background: rgb(var(--c-surface-primary) / 0.5);
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-xs);
+}
+
+.pr-copilot-evidence > summary {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    cursor: pointer;
+    list-style: none;
+}
+
+.pr-copilot-evidence > summary::-webkit-details-marker {
+    display: none;
+}
+
+.pr-copilot-evidence > summary:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-copilot-evidence > summary span,
+.pr-copilot-evidence.is-loading,
+.pr-copilot-evidence.is-unavailable,
+.pr-copilot-evidence-privacy {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.pr-copilot-evidence > summary strong {
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-copilot-evidence > summary small {
+    color: rgb(var(--c-text-tertiary));
+    white-space: nowrap;
+}
+
+.pr-copilot-evidence.is-loading,
+.pr-copilot-evidence.is-unavailable {
+    min-height: 40px;
+    padding: var(--space-sm);
+}
+
+.pr-copilot-evidence.is-unavailable {
+    border-color: rgb(var(--c-accent-error) / 0.18);
+}
+
+.pr-copilot-evidence-body {
+    display: grid;
+    gap: var(--space-sm);
+    padding: 0 var(--space-sm) var(--space-sm);
+}
+
+.pr-copilot-evidence-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xs);
+}
+
+.pr-copilot-evidence-stats span {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-tertiary));
+    overflow-wrap: anywhere;
+}
+
+.pr-copilot-evidence-stats strong {
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-copilot-evidence-versions,
+.pr-copilot-evidence-empty,
+.pr-copilot-evidence-privacy {
+    margin: 0;
+    line-height: var(--leading-relaxed);
+}
+
+.pr-copilot-evidence-versions {
+    overflow-wrap: anywhere;
+}
+
+.pr-copilot-evidence-timeline {
+    display: grid;
+    gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pr-copilot-evidence-timeline li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding-left: var(--space-sm);
+    border-left: 2px solid rgb(var(--c-accent-primary) / 0.32);
+}
+
+.pr-copilot-evidence-timeline li.is-error,
+.pr-copilot-evidence-timeline li.is-aborted {
+    border-left-color: rgb(var(--c-accent-error));
+}
+
+.pr-copilot-evidence-timeline li.is-fallback,
+.pr-copilot-evidence-timeline li.is-retry {
+    border-left-color: rgb(var(--c-accent-warning));
+}
+
+.pr-copilot-evidence-timeline small {
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.pr-copilot-evidence-privacy {
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--border-row-alpha);
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-copilot-plan-attachment-note {
+    margin-bottom: var(--space-xs);
+    color: rgb(var(--c-accent-primary));
+}
+
+@media (max-width: 700px) {
+    .pr-copilot-plan-header {
+        flex-direction: column;
+    }
+
+    .pr-copilot-plan-meta {
+        max-width: none;
+        justify-content: flex-start;
+    }
+
+    .pr-copilot-plan-task-main {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .pr-copilot-plan-task-badge {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .pr-copilot-evidence-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pr-copilot-evidence-timeline li {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 1px;
+    }
+}
+/* ============================================================
+ * 多模态附件（图片 / 语音 / 文本文件）
+ *
+ * 能收哪些文件由模型能力决定：图片走 mimo-v2.5（唯一多模态模型），
+ * 音频先经 mimo-v2.5-asr 转写，纯文本文件直接读入。
+ * 视频与 Office 文档没有可用模型，在选择器与提示里明确排除。
+ * ============================================================ */
+
+/* ── 拖放高亮 ── */
+
+.pr-copilot-chat {
+    position: relative;
+}
+
+.pr-copilot-drop-hint {
+    position: absolute;
+    inset: var(--space-sm);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    pointer-events: none;
+    border-radius: var(--radius-lg);
+    background: rgb(var(--c-accent-primary) / 0.08);
+    /* 无硬边框原则下唯一合理的"投放区"提示：虚线仅在拖拽瞬态出现 */
+    outline: 2px dashed rgb(var(--c-accent-primary) / 0.45);
+    outline-offset: -4px;
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    backdrop-filter: blur(2px);
+}
+
+.pr-copilot-drop-hint small {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-regular);
+    color: rgb(var(--c-text-secondary));
+}
+
+/* ── 附件托盘 ── */
+
+.pr-copilot-attach-tray {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin: 0 0 var(--space-xs);
+    padding: 0;
+    list-style: none;
+}
+
+.pr-copilot-attach {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    /* 失败说明可能比文件名长；移动端必须优先让内容换行，不能撑出输入区。 */
+    max-width: min(320px, 100%);
+    min-width: 0;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-text-primary) / 0.05);
+}
+
+.pr-copilot-attach--failed {
+    background: rgb(var(--c-accent-error) / 0.08);
+}
+
+.pr-copilot-attach-thumb {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: var(--radius-xs);
+}
+
+.pr-copilot-attach-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: var(--radius-xs);
+    background: rgb(var(--c-accent-primary) / 0.12);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-copilot-attach-icon--error {
+    color: rgb(var(--c-accent-error));
+    background: rgb(var(--c-accent-error) / 0.14);
+}
+
+.pr-copilot-attach-body {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.pr-copilot-attach-name {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-primary));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-copilot-attach-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-copilot-attach-error {
+    color: rgb(var(--c-accent-error));
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+/* 语音转写 / 文本内容的可核对摘要 —— 不做黑箱 */
+.pr-copilot-attach-preview {
+    font-size: 10px;
+    line-height: 1.45;
+    color: rgb(var(--c-text-secondary));
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pr-copilot-attach-remove {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 2px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: rgb(var(--c-text-tertiary));
+    cursor: pointer;
+    transition: color var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-attach-remove:hover {
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-copilot-attach-remove:focus-visible {
+    outline: 2px solid rgb(var(--c-accent-primary) / 0.6);
+    outline-offset: 1px;
+}
+
+/* ── 附件按钮 ── */
+
+.pr-copilot-chat-attach {
+    flex-shrink: 0;
+    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    cursor: pointer;
+    transition:
+        color var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-chat-attach:hover:not(:disabled) {
+    color: rgb(var(--c-accent-primary));
+    background: rgb(var(--c-accent-primary) / 0.10);
+}
+
+.pr-copilot-chat-attach:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pr-copilot-chat-attach:focus-visible {
+    outline: 2px solid rgb(var(--c-accent-primary) / 0.6);
+    outline-offset: 1px;
+}
+
+/* ── 模型自动改选提示 ── */
+
+.pr-copilot-autoroute {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: var(--space-xs);
+    padding: 6px var(--space-sm);
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-accent-primary) / 0.10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    line-height: var(--leading-base);
+}
+
+.pr-copilot-autoroute span {
+    flex: 1;
+    min-width: 0;
+}
+
+.pr-copilot-autoroute-close {
+    flex-shrink: 0;
+    display: inline-flex;
+    padding: 2px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.65;
+}
+
+.pr-copilot-autoroute-close:hover {
+    opacity: 1;
+}
+
+/* ── 消息操作条（展开 / 朗读） ── */
+
+.pr-copilot-chat-msg-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.pr-copilot-chat-speak {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    min-height: 24px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-text-primary) / 0.05);
+    color: rgb(var(--c-text-secondary));
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition:
+        color var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-copilot-chat-speak:hover:not(:disabled) {
+    color: rgb(var(--c-accent-primary));
+    background: rgb(var(--c-accent-primary) / 0.12);
+}
+
+.pr-copilot-chat-speak:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.pr-copilot-chat-speak:focus-visible {
+    outline: 2px solid rgb(var(--c-accent-primary) / 0.6);
+    outline-offset: 1px;
+}
+
+/* ── 动效降级（规范 6.5） ── */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-copilot-attach-remove,
+    .pr-copilot-chat-attach,
+    .pr-copilot-chat-speak {
+        transition: none;
+    }
+}

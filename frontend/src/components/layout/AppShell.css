@@ -1,0 +1,2244 @@
+/**
+ * AppShell 二模式样式（v5.0：classic / immersive）
+ *
+ * 设计依据：
+ * - 规范 3.1 反模板化：v5.0 简化为二模式，全应用统一左侧栏导航
+ * - 规范 4.2 玻璃质感：ImmersiveShell 用 backdrop-blur 24px + 78% 不透明度
+ * - 规范 6.1 极致丝滑：仅 transform / opacity 动画，60fps
+ * - 规范 6.2 Spring 物理：抽屉用 ease-out（cubic-bezier(0.16,1,0.3,1)）
+ * - 规范 6.5 无障碍动效：reduce-motion 下所有过渡降级为瞬时
+ * - 规范 7.1 无边框设计：边界通过留白 + 色彩差异 + 阴影定义
+ *
+ * v5.0 变更（Task 2.1-2.4）：
+ * - 删除 floating 模式（FloatingNav 悬浮胶囊）—— 避免导航方式混用
+ * - immersive 抽屉改为左滑（Task 2.3）—— 与 classic 侧边栏语义对齐
+ * - classic 模式样式保留在 ui.css，本文件定义 immersive + classic 共享组件
+ */
+
+/* ============================================================
+ * 一、immersive 模式 —— 全屏沉浸 + 玻璃返回胶囊 + 左滑抽屉（v5.0 Task 2.3）
+ * ============================================================ */
+
+.pr-immersive {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.pr-immersive-content {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* 左上角玻璃返回胶囊
+ * v5.0 Task 9：移除 fixed 定位（避免遮挡内容），改为 absolute 依赖父容器 relative
+ * 父容器 .pr-immersive 为 position: relative */
+.pr-immersive-back {
+    position: absolute;
+    top: var(--space-md);
+    left: var(--space-md);
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--control-height-default);
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--surface-glass-heavy);
+    backdrop-filter: var(--blur-glass-heavy);
+    -webkit-backdrop-filter: var(--blur-glass-heavy);
+    box-shadow: var(--shadow-glass-layered);
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: transform var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        background var(--dur-micro) var(--ease-out);
+    max-width: min(280px, 40vw);
+}
+
+.pr-immersive-back:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgb(var(--c-text-primary) / 0.18);
+}
+
+.pr-immersive-back:active {
+    transform: translateY(0);
+}
+
+.pr-immersive-back-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pr-immersive-back:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px rgb(var(--c-accent-primary) / 0.5);
+}
+
+/* 右上角操作区 + 菜单按钮
+ * v5.0 Task 9：移除 fixed 定位（避免遮挡内容），改为 absolute 依赖父容器 relative */
+.pr-immersive-topright {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.pr-immersive-extra {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.pr-immersive-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--surface-glass-heavy);
+    backdrop-filter: var(--blur-glass-heavy);
+    -webkit-backdrop-filter: var(--blur-glass-heavy);
+    box-shadow: var(--shadow-glass-layered);
+    color: rgb(var(--c-text-primary));
+    cursor: pointer;
+    transition: transform var(--dur-micro) var(--ease-out),
+        background var(--dur-micro) var(--ease-out);
+}
+
+.pr-immersive-menu-btn:hover {
+    transform: translateY(-1px);
+    background: var(--surface-elevated);
+}
+
+.pr-immersive-menu-btn:active {
+    transform: translateY(0);
+}
+
+.pr-immersive-menu-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px rgb(var(--c-accent-primary) / 0.5);
+}
+
+/* 右滑抽屉遮罩 */
+.pr-immersive-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: var(--overlay-modal);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: pr-drawer-overlay-in var(--dur-micro) var(--ease-out);
+}
+
+@keyframes pr-drawer-overlay-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* 左滑抽屉（v5.0 Task 2.3：从左侧滑入，与 classic 侧边栏语义对齐）
+ * 设计意图：immersive 模式虽全屏，但导航抽屉仍从左侧出现，
+ * 保持与 classic 模式侧边栏一致的"左侧导航"心智模型 */
+.pr-immersive-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: min(320px, 80vw);
+    z-index: 60;
+    background: var(--surface-glass-heavy);
+    backdrop-filter: var(--blur-glass-heavy);
+    -webkit-backdrop-filter: var(--blur-glass-heavy);
+    box-shadow: var(--shadow-glass-layered);
+    transform: translateX(-100%);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 离屏不等于不可达：关闭态必须同时退出焦点序列与可访问树。
+ * aria-hidden 负责辅助技术树；visibility 为键盘和旧浏览器提供焦点兜底。 */
+.pr-immersive-drawer:not(.is-open) {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.pr-immersive-drawer.is-open {
+    transform: translateX(0);
+}
+
+.pr-immersive-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+    flex-shrink: 0;
+}
+
+.pr-immersive-drawer-brand {
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-normal);
+}
+
+.pr-immersive-drawer-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-height-default);
+    height: var(--control-height-default);
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-immersive-drawer-close:hover {
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-immersive-drawer-close:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px rgb(var(--c-accent-primary) / 0.5);
+}
+
+.pr-immersive-drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-sm) var(--space-md) var(--space-lg);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.pr-immersive-drawer-nav-item {
+    display: flex;
+    align-items: center;
+    min-height: var(--control-height-default);
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+    position: relative;
+}
+
+.pr-immersive-drawer-nav-item:hover {
+    background: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-immersive-drawer-nav-item.is-active {
+    background: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-immersive-drawer-nav-item.is-active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: rgb(var(--c-accent-primary));
+    border-radius: var(--radius-full);
+}
+
+.pr-immersive-drawer-nav-item:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px rgb(var(--c-accent-primary) / 0.5);
+}
+
+/* ============================================================
+ * 三、响应式 —— 移动端（<768px）
+ * ============================================================ */
+
+@media (max-width: 767px) {
+
+    /* ImmersiveShell 返回胶囊缩小 */
+    .pr-immersive-back {
+        top: var(--space-sm);
+        left: var(--space-sm);
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--text-xs);
+    }
+
+    .pr-immersive-topright {
+        top: var(--space-sm);
+        right: var(--space-sm);
+    }
+
+    .pr-immersive-menu-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* ============================================================
+ * 四、reduce-motion 降级（规范 6.5）
+ * ============================================================ */
+
+[data-reduce-motion='1'] .pr-immersive-back,
+[data-reduce-motion='1'] .pr-immersive-menu-btn,
+[data-reduce-motion='1'] .pr-immersive-drawer,
+[data-reduce-motion='1'] .pr-immersive-drawer-overlay,
+[data-reduce-motion='1'] .pr-immersive-drawer-nav-item,
+[data-reduce-motion='1'] .pr-immersive-drawer-close {
+    transition: none !important;
+    animation: none !important;
+}
+
+[data-reduce-motion='1'] .pr-immersive-back:hover,
+[data-reduce-motion='1'] .pr-immersive-menu-btn:hover {
+    transform: none !important;
+}
+
+/* ============================================================
+ * 五、classic 模式 —— 左侧 sidebar + 右侧主内容（从 ui.css 迁移，B3.4）
+ * 规范 8、5.4
+ * ============================================================ */
+
+.pr-shell {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    /* v7 布局计算修复：max-width 提升至 shell 层级
+     * 计算依据：app-max-width=1440px 是"整个应用（含 sidebar）"的最大宽度
+     * 原设计将 max-width 放在 .pr-content 上，导致 sidebar(280px) + content(1440px)
+     * 在 1920px 屏幕上 content 在 pr-main(1640px) 内二次居中，左偏 280px
+     * 修复后：pr-shell 整体居中在视口，sidebar+content 作为整体平衡
+     * 1920px: shell=1440 居中(左右留白240) → sidebar280 + main1160 → 内容对称
+     * 1366px: shell=1366(未达上限) → sidebar280 + main1086 → 内容填满
+     * 2560px: shell=1440 居中(左右留白560) → 防止内容过宽 */
+    max-width: var(--app-max-width);
+    margin: 0 auto;
+}
+
+.pr-sidebar {
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+    /* v7 参赛修复：移除 backdrop-filter + 半透明背景，改用不透明背景 + 噪点纹理
+     * 原设计 surface-secondary-alpha + backdrop-blur(12px) 导致侧边栏内容模糊看不清
+     * 用户反馈"侧边栏好像有模糊，就导致有的内容看不太清"
+     * 改用 surface-secondary 实色背景 + 噪点纹理，确保文字清晰可读
+     * 设计规范 2.5：表面非纯色——叠加 noise-texture 满足"表面非纯色"要求 */
+    background-color: var(--surface-secondary);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    /* SidebarResizer 集成：宽度过渡 200ms spring-soft（规范 6.2）
+     * 作用于：双击预设切换、折叠/展开、SidebarResizer 拖拽结束后的回弹
+     * 拖拽过程中通过 body.sidebar-resizing 类禁用本 transition，避免"粘滞"感
+     *
+     * 关于规范 7.1「动效仅操作 transform/opacity」的例外说明：
+     * 侧边栏宽度变化是**真实的布局变化**——主内容区必须同步让位重排。
+     * 用 scaleX 只会把侧栏内的图标与文字一起横向压扁，视觉上是错的。
+     * 因此这里必须动画 width，属于规范意义上的合理例外（非装饰性动效），
+     * 并已通过「拖拽期间禁用过渡」把重排成本限制在 200ms 的一次性收敛内。 */
+    transition: width var(--dur-small) var(--spring-soft);
+    z-index: var(--z-sticky);
+}
+
+/* SidebarResizer 拖拽中：禁用 .pr-sidebar 的 width transition
+ * 让宽度跟随鼠标实时变化，不被 200ms 过渡滞后
+ * body.sidebar-resizing 由 SidebarResizer 组件在 mousedown/touchstart 时添加 */
+body.sidebar-resizing .pr-sidebar {
+    transition: none !important;
+}
+
+.pr-sidebar--collapsed {
+    width: var(--sidebar-collapsed);
+}
+
+.pr-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    height: 56px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.pr-sidebar-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-sidebar-brand-text {
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-normal);
+    color: rgb(var(--c-text-primary));
+    white-space: nowrap;
+    transition: opacity var(--dur-micro) var(--ease-out);
+}
+
+.pr-sidebar--collapsed .pr-sidebar-brand-text,
+.pr-sidebar--collapsed .pr-sidebar-nav-label {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.pr-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-sm);
+    flex: 1;
+    overflow-y: auto;
+}
+
+.pr-sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    min-height: var(--control-height-default);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    transition: background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-sidebar-nav-item:hover {
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-sidebar-nav-item.is-active {
+    background-color: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+}
+
+/* 选中态左侧 3px accent 竖线（无 hard border） */
+.pr-sidebar-nav-item.is-active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: rgb(var(--c-accent-primary));
+    border-radius: var(--radius-full);
+}
+
+/* focus-visible 双环光晕 —— 内环 surface-primary + 外环 accent 40%（规范 14.1） */
+.pr-sidebar-nav-item:focus-visible {
+    box-shadow: 0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px var(--accent-primary-40);
+    outline: none;
+}
+
+.pr-sidebar--collapsed .pr-sidebar-nav-item {
+    justify-content: center;
+    padding: var(--space-sm);
+}
+
+.pr-sidebar-nav-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: opacity var(--dur-micro) var(--ease-out);
+}
+
+.pr-sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: var(--space-sm);
+    width: var(--control-icon-size);
+    min-width: var(--control-icon-size);
+    height: var(--control-icon-size);
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-tertiary));
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-sidebar-toggle:hover {
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+}
+
+/* ============================================================
+ * v8 角色分离：导航分组标题 + 角色切换器
+ * ============================================================ */
+
+/* 分组容器 —— 每组之间留出"稳带"间距（松紧得当原则） */
+.pr-sidebar-nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: var(--space-md);
+}
+
+.pr-sidebar-nav-group:last-child {
+    margin-bottom: 0;
+}
+
+/* 分组标题 —— 极小字号、半透明、大写间距，暗示分类而非可交互 */
+.pr-sidebar-group-label {
+    padding: var(--space-xs) var(--space-md) var(--space-xs);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.08em;
+    color: rgb(var(--c-text-tertiary));
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: opacity var(--dur-micro) var(--ease-out);
+    user-select: none;
+}
+
+/* 折叠态隐藏分组标题（与 label 同步隐藏） */
+.pr-sidebar--collapsed .pr-sidebar-group-label {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 折叠态分组间用极细分隔线暗示分组
+ * 规范 8.2：alpha ≤ 12% —— 原值 0.5 严重违规，修正为 0.10（10%）符合"极淡 Alpha 线条"要求 */
+.pr-sidebar--collapsed .pr-sidebar-nav-group+.pr-sidebar-nav-group {
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid rgb(var(--c-border-primary) / 0.10);
+}
+
+/* ============================================================
+ * 以下为原有样式（.pr-main 及之后）
+ * ============================================================ */
+
+.pr-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.pr-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 0 var(--space-lg);
+    background: transparent;
+    border: none;
+    transition: background-color var(--dur-small) var(--ease-out),
+        backdrop-filter var(--dur-small) var(--ease-out);
+}
+
+.pr-header.is-scrolled {
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.pr-header-title {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-normal);
+    color: rgb(var(--c-text-primary));
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 品牌分层：小屏优先显示完整中文主品牌，桌面保留产品英文扩展名。
+ * 不依赖 ellipsis 隐藏半截品牌；完整可访问名称由 AppBrandTitle 的 sr-only
+ * 文本统一提供，视觉副标题不会造成读屏重复。 */
+.pr-header-brand-title,
+.pr-header-brand-title__visible {
+    display: inline-flex;
+    align-items: baseline;
+    min-width: 0;
+}
+
+.pr-header-brand-title__visible {
+    gap: var(--space-xs);
+    white-space: nowrap;
+}
+
+.pr-header-brand-title__primary,
+.pr-header-brand-title__secondary {
+    flex: 0 0 auto;
+}
+
+.pr-header-brand-title__secondary {
+    color: rgb(var(--c-text-secondary));
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-mobile-nav-trigger,
+.pr-sidebar-overlay {
+    display: none;
+}
+
+.pr-header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* 延迟加载顶栏工具时锁定最终占位，避免通知/设置组件到达后产生 CLS。 */
+.pr-header-tools-placeholder {
+    display: inline-block;
+    flex: 0 0 auto;
+    height: 36px;
+}
+
+.pr-header-tools-placeholder--teacher {
+    width: 248px;
+}
+
+.pr-header-tools-placeholder--student {
+    width: 80px;
+}
+
+/* 教师身份切换器（AppShell headerExtra 内嵌） */
+.pr-teacher-switcher {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.pr-teacher-switcher-panel {
+    position: absolute;
+    top: calc(100% + var(--space-sm));
+    right: 0;
+    min-width: 260px;
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    background: var(--surface-elevated);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-popover);
+    z-index: var(--z-popover);
+    animation: pr-dropdown-in var(--dur-small) var(--ease-out) both;
+}
+
+.pr-teacher-switcher-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding: var(--space-xs) 0;
+}
+
+.pr-teacher-switcher-label {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+}
+
+.pr-teacher-switcher-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-teacher-switcher-input {
+    width: 100%;
+    /* 规范 13.1：使用 --control-height-compact token 替代硬编码 36px */
+    height: var(--control-height-compact);
+    padding: 0 var(--space-sm);
+    background: var(--surface-primary);
+    border: 1px solid var(--border-primary-alpha);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    transition: border-color var(--dur-small) var(--ease-out),
+        box-shadow var(--dur-small) var(--ease-out);
+}
+
+.pr-teacher-switcher-input::placeholder {
+    color: rgb(var(--c-text-tertiary));
+    font-style: normal;
+}
+
+.pr-teacher-switcher-input:hover {
+    border-color: rgb(var(--c-border-primary) / 0.32);
+}
+
+.pr-teacher-switcher-input:focus-visible {
+    outline: none;
+    border-color: rgb(var(--c-accent-primary));
+    box-shadow: var(--shadow-focus-accent);
+}
+
+@keyframes pr-dropdown-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ────────────────────────────────────────────────────────────
+ * 通用图标按钮（通知/设置共用，规范 14.1 次要按钮变体）
+ * ──────────────────────────────────────────────────────────── */
+.pr-icon-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-icon-size);
+    height: var(--control-icon-size);
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-text-secondary));
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-icon-button:hover {
+    background: var(--border-row-hover);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-icon-button:active {
+    /* P0-D8：active 缩放修正为规范值 0.97（原 0.95 偏离规范 7.2/14.1） */
+    transform: scale(0.97);
+}
+
+.pr-icon-button:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+/* ────────────────────────────────────────────────────────────
+ * 通知中心
+ * ──────────────────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════
+ * 通知中心 —— Liquid Glass + Spring 动效 + 渐进式入场
+ * 规范：4.2 玻璃质感 / 6.2 Spring 物理动画 / 6.4 渐进式动效
+ *       7.1 无边框 / 7.2 透明背景 / 8.1 信息分层 / 9.2 情感化
+ * ════════════════════════════════════════════════════════════ */
+.pr-notification-center {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* ── 未读脉冲环（铃铛呼吸提示，吸引注意力） ── */
+.pr-notification-pulse {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid rgb(var(--c-accent-error) / 0.35);
+    pointer-events: none;
+    animation: pr-notification-pulse 2.4s var(--ease-out) infinite;
+}
+
+@keyframes pr-notification-pulse {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.12);
+    }
+}
+
+/* ── Badge（未读计数，spring-pop 入场） ── */
+.pr-notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(var(--c-accent-error));
+    color: rgb(var(--c-text-inverse));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+    border-radius: var(--radius-full);
+    box-shadow: 0 2px 8px rgb(var(--c-accent-error) / 0.35);
+    animation: pr-badge-pop var(--dur-small) var(--spring-snappy) both;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
+    z-index: 1;
+}
+
+@keyframes pr-badge-pop {
+    0% {
+        transform: scale(0);
+    }
+
+    60% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ── 面板（Liquid Glass：blur + saturate + 内发光边缘） ── */
+.pr-notification-panel {
+    position: absolute;
+    top: calc(100% + var(--space-sm));
+    right: 0;
+    width: 400px;
+    max-width: calc(100vw - var(--space-md) * 2);
+    max-height: 520px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-elevated);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+    border-radius: var(--radius-lg);
+    box-shadow:
+        var(--shadow-popover),
+        inset 0 1px 0 rgb(var(--c-surface-elevated) / 0.6);
+    z-index: var(--z-popover);
+    overflow: hidden;
+    transform-origin: top right;
+    animation: pr-panel-in var(--dur-medium) var(--spring-soft) both;
+}
+
+@keyframes pr-panel-in {
+    0% {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── Header（微渐变背景，透明度差分隔） ── */
+.pr-notification-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-md) var(--space-sm);
+    background: linear-gradient(to bottom,
+            rgb(var(--c-accent-primary) / 0.04),
+            transparent);
+}
+
+.pr-notification-header-info {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+}
+
+.pr-notification-title {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    font-family: var(--font-display);
+}
+
+.pr-notification-count {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-accent-primary));
+    font-weight: var(--weight-medium);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Action 按钮（完整微交互链路） ── */
+.pr-notification-action {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition:
+        background var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy);
+}
+
+.pr-notification-action:hover {
+    background: rgb(var(--c-accent-primary) / 0.08);
+}
+
+.pr-notification-action:active {
+    background: rgb(var(--c-accent-primary) / 0.14);
+    transform: scale(0.97);
+}
+
+.pr-notification-action:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--c-accent-primary) / 0.35);
+}
+
+.pr-notification-action--danger {
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-notification-action--danger:hover {
+    background: rgb(var(--c-accent-error) / 0.08);
+}
+
+.pr-notification-action--danger:active {
+    background: rgb(var(--c-accent-error) / 0.14);
+}
+
+/* ── 通知列表（美化滚动条） ── */
+.pr-notification-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-xs);
+    scroll-behavior: smooth;
+}
+
+.pr-notification-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.pr-notification-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pr-notification-list::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-text-tertiary) / 0.2);
+    border-radius: 3px;
+}
+
+.pr-notification-list::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--c-text-tertiary) / 0.35);
+}
+
+/* ── 时间分组（渐进式浏览信息分层） ── */
+.pr-notification-group {
+    margin-bottom: var(--space-xs);
+}
+
+.pr-notification-group-label {
+    padding: var(--space-xs) var(--space-sm) 2px;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-tertiary));
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ── 空状态（情感化设计） ── */
+.pr-notification-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-3xl) var(--space-md);
+    text-align: center;
+}
+
+.pr-notification-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgb(var(--c-accent-primary) / 0.06);
+    color: rgb(var(--c-text-tertiary));
+    margin-bottom: var(--space-xs);
+}
+
+.pr-notification-empty-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-notification-empty-desc {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: 1.5;
+    max-width: 240px;
+}
+
+/* ── 通知项（Spring 交互 + Staggered 入场） ── */
+.pr-notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    transition:
+        background var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy);
+    animation: pr-item-in var(--dur-medium) var(--spring-soft) both;
+    animation-delay: calc(var(--item-index, 0) * 40ms);
+}
+
+@keyframes pr-item-in {
+    0% {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.pr-notification-item:hover {
+    background: var(--border-row-hover);
+    transform: translateX(2px);
+}
+
+.pr-notification-item:active {
+    background: rgb(var(--c-accent-primary) / 0.08);
+    transform: translateX(0) scale(0.99);
+}
+
+.pr-notification-item:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--c-accent-primary) / 0.35);
+}
+
+/* 未读项高亮背景 */
+.pr-notification-item.is-unread {
+    background: rgb(var(--c-accent-primary) / 0.04);
+}
+
+.pr-notification-item.is-unread:hover {
+    background: rgb(var(--c-accent-primary) / 0.08);
+}
+
+/* 类型语义色条（左侧 3px，颜色随类型变化） */
+.pr-notification-item.is-unread::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    /* B3.3: height→scaleY — 固定终态高度 72%，初态 scaleY(60/72≈0.8333)，transform-origin 默认 center 等价于原 height 中心扩展 */
+    transform: translateY(-50%) scaleY(0.8333);
+    width: 3px;
+    height: 72%;
+    background: var(--type-color, rgb(var(--c-accent-primary)));
+    border-radius: 2px;
+    transition: transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-notification-item.is-unread:hover::before {
+    transform: translateY(-50%) scaleY(1);
+}
+
+/* ── 通知项图标（类型色圆背景，hover 放大） ── */
+.pr-notification-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--type-color, rgb(var(--c-accent-primary))) 12%, transparent);
+    color: var(--type-color, rgb(var(--c-accent-primary)));
+    transition: transform var(--dur-micro) var(--spring-snappy);
+}
+
+.pr-notification-item:hover .pr-notification-item-icon {
+    transform: scale(1.08);
+}
+
+/* ── 通知项正文 ── */
+.pr-notification-item-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.pr-notification-item-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary));
+    line-height: 1.4;
+}
+
+.pr-notification-item.is-unread .pr-notification-item-title {
+    font-weight: var(--weight-semibold);
+}
+
+.pr-notification-item-desc {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.pr-notification-item-time {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── 跳转箭头（有 linkTo 时 hover 显示方向指示） ── */
+.pr-notification-item-arrow {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: 8px;
+    color: rgb(var(--c-text-tertiary));
+    opacity: 0;
+    transform: translateX(-4px);
+    transition:
+        opacity var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy);
+}
+
+.pr-notification-item:hover .pr-notification-item-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ── Footer（微渐变背景 + danger 变体） ── */
+.pr-notification-footer {
+    padding: var(--space-xs) var(--space-md);
+    background: linear-gradient(to top,
+            rgb(var(--c-accent-primary) / 0.03),
+            transparent);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-xs);
+}
+
+/* ── Reduced Motion 降级（规范 6.5） ── */
+@media (prefers-reduced-motion: reduce) {
+    .pr-notification-pulse {
+        display: none;
+    }
+
+    .pr-notification-badge,
+    .pr-notification-panel,
+    .pr-notification-item,
+    .pr-notification-item-icon {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .pr-notification-item:hover {
+        transform: none;
+    }
+}
+
+/* ── 响应式（窄屏适配） ── */
+@media (max-width: 480px) {
+    .pr-notification-panel {
+        /* 通知触发器位于右侧工具组内；若继续相对它绝对定位，工具组宽度会把
+         * 宽面板推到视口左边。窄屏改由视口锚定，保证两侧安全边距恒成立。 */
+        position: fixed;
+        top: calc(60px - var(--space-xs));
+        width: calc(100vw - var(--space-md) * 2);
+        max-width: none;
+        max-height: min(520px, calc(100dvh - 60px - var(--space-md)));
+        right: var(--space-md);
+    }
+}
+
+/* ────────────────────────────────────────────────────────────
+ * 设置面板
+ * ──────────────────────────────────────────────────────────── */
+.pr-settings-panel {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.pr-settings-panel-dropdown {
+    position: absolute;
+    top: calc(100% + var(--space-sm));
+    right: 0;
+    /* 加入「模型接入」分区后内容变多：放宽下限、限制上限并允许内部滚动，
+       避免面板在小屏上顶出视口。max-height 留 120px 给顶栏与上下呼吸。 */
+    min-width: 340px;
+    max-width: min(420px, calc(100vw - var(--space-xl)));
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    background: var(--surface-elevated);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-popover);
+    z-index: var(--z-popover);
+    animation: pr-dropdown-in var(--dur-small) var(--ease-out) both;
+}
+
+.pr-settings-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    padding-bottom: var(--space-xs);
+    /* v5.0 Task A.2.5：移除 border-bottom，改用 box-shadow inset 模拟分割线 */
+    box-shadow: inset 0 -1px 0 var(--border-row-alpha);
+}
+
+.pr-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-settings-row-column {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.pr-settings-row-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-settings-hint {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    text-align: center;
+    padding-top: var(--space-xs);
+    /* v5.0 Task A.2.5：移除 border-top，改用 box-shadow inset 模拟分割线 */
+    box-shadow: inset 0 1px 0 var(--border-row-alpha);
+}
+
+/* 退出登录按钮：透明度分隔 + 暖调危险色 + 完整三态
+ * 规范 13.1：零硬编码 —— border-radius / transition 时长与缓动均引用 tokens */
+.pr-settings-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    width: 100%;
+    margin-top: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-accent-error) / 0.08);
+    color: rgb(var(--c-accent-error));
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy);
+}
+
+.pr-settings-logout:hover {
+    background: rgb(var(--c-accent-error) / 0.14);
+}
+
+.pr-settings-logout:active {
+    transform: scale(0.97);
+    background: var(--accent-error-20);
+}
+
+.pr-settings-logout:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent-error-20);
+}
+
+/* ============================================================
+ * 六、主内容区 + 路由过渡 + 页脚（从 ui.css 迁移，B3.4）
+ * ============================================================ */
+
+.pr-content {
+    flex: 1;
+    width: 100%;
+    /* v7 布局计算修复：移除 max-width + margin: 0 auto
+     * 原因：max-width 已上移至 .pr-shell，此处再设会导致二次居中
+     * 1920px 修复前：pr-main(1640px) 内 content(1440px) 居中 → 左偏 280px
+     * 1920px 修复后：pr-shell(1440px) 居中 → pr-main(1160px) → content 填满 1160px
+     * padding 提供内容留白，clamp 确保小屏 24px → 大屏 48px 流体插值 */
+    /* 流体 padding：小屏 24px → 大屏 48px，确保所有屏幕尺寸下都有居中留白
+     * 数学依据：1366px 屏幕主区域=1086px，padding=48px 时内容=990px，左右留白48px 实现居中感
+     * 1920px 屏幕 shell=1440px 居中，pr-main=1160px，padding=48px 时内容=1064px */
+    padding: clamp(28px, 3vw, 44px) clamp(var(--space-lg), 4vw, var(--space-2xl));
+    /* 不建立布局包含块：页面内 fixed/portal 兜底必须始终以视口为几何边界。 */
+}
+
+/* ============================================================
+ * 整屏路由（viewport-locked route）
+ * ============================================================
+ *
+ * 问题：外层链条 .pr-shell → .pr-main → .pr-content → .pr-route
+ * 全部是「按内容撑高」的。页面里写 `height: 100%` 得到的是
+ * **内容自身撑出来的高度**，而不是视口高度——高度约束等于没有。
+ * AI 副驾就栽在这上面：实测 shell 高 1074px、视口 897px，
+ * 整页可滚 177px，于是消息一多，底部输入框就被推到屏幕外，
+ * 用户必须先往下翻才能打字。
+ *
+ * 方案：由页面自己声明 `.pr-page--viewport`，本规则把它上方的
+ * 整条链锁到视口高度，滚动交还给页面内部的消息区。
+ * 把判断权放在页面而不是 AppShell，是因为"这一页要不要整屏"
+ * 属于页面自身的布局知识，写进 shell 会变成一张需要同步维护的路由清单。
+ *
+ * `:has()` 不被支持时本规则整条失效，页面退回当前的整页滚动行为——
+ * 是可接受的降级，不会出现布局塌陷。
+ */
+.pr-shell:has(.pr-page--viewport) {
+    height: 100dvh;
+    min-height: 0;
+    /* 外层不再滚动，滚动条归页面内部所有 */
+    overflow: hidden;
+}
+
+.pr-shell:has(.pr-page--viewport) .pr-main,
+.pr-shell:has(.pr-page--viewport) .pr-content {
+    /* flex 子项默认 min-height:auto，会拒绝收缩到内容以下；
+       必须显式归零，否则上面的 height 约束传不下去 */
+    min-height: 0;
+}
+
+.pr-shell:has(.pr-page--viewport) .pr-content {
+    overflow: hidden;
+}
+
+.pr-shell:has(.pr-page--viewport) .pr-route {
+    height: 100%;
+    min-height: 0;
+}
+
+/* 多栏工作台在窄屏会纵向堆叠。若仍锁死为一屏，后续列与常驻输入框
+ * 会被裁掉且页面无法滚动；窄屏改回文档流，由各模块自然滚动。 */
+@media (max-width: 900px) {
+    .pr-shell:has(.pr-page--viewport) {
+        height: auto;
+        min-height: 100dvh;
+        overflow-y: visible;
+        /* fixed 抽屉平移到视口外时不能参与 document scrollWidth */
+        overflow-x: clip;
+    }
+
+    .pr-shell:has(.pr-page--viewport) .pr-main,
+    .pr-shell:has(.pr-page--viewport) .pr-content {
+        overflow: visible;
+    }
+
+    .pr-shell:has(.pr-page--viewport) .pr-route {
+        height: auto;
+    }
+}
+
+/* 页脚（Task 28.4：隐私政策入口） */
+.pr-footer {
+    flex-shrink: 0;
+    width: 100%;
+    /* v5.0 Task A.2.5：移除 border-top，改用 box-shadow inset + 透明度差分隔 */
+    box-shadow: inset 0 1px 0 var(--border-row-alpha);
+    background: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* v5.2 性能修正：隔离 Footer 自身布局，减少被测量为布局偏移源的概率 */
+    contain: layout;
+}
+
+.pr-footer-inner {
+    /* v7 布局计算修复：移除 max-width + margin: 0 auto（已上移至 .pr-shell） */
+    padding: var(--space-md) var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.pr-footer-copyright {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-xs);
+}
+
+.pr-footer-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.pr-footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    text-decoration: none;
+    padding: var(--space-xs) var(--space-sm);
+    min-height: var(--control-height-compact);
+    border-radius: 6px;
+    transition: color var(--dur-small) var(--ease-out),
+        background-color var(--dur-small) var(--ease-out);
+}
+
+.pr-footer-link:hover {
+    color: rgb(var(--c-accent-primary));
+    background-color: rgb(var(--c-accent-primary) / 0.06);
+}
+
+.pr-footer-link:focus-visible {
+    outline: none;
+    /* 规范 13.1：使用 --shadow-focus-accent token（已含 3px accent 12% 光晕） */
+    box-shadow: var(--shadow-focus-accent);
+}
+
+/* 移动端使用完整抽屉，不以 64px 图标轨长期侵占课堂内容宽度 */
+@media (max-width: 767px) {
+    .pr-shell {
+        /* 隐藏的 fixed 抽屉在 Chromium 的 scrollWidth 计算中仍可产生负向视觉溢出。
+         * clip 只裁剪水平轴，不创建滚动容器，不影响 sticky header 或抽屉打开。 */
+        overflow-x: clip;
+    }
+
+    .pr-sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(300px, 86vw);
+        height: 100dvh;
+        z-index: calc(var(--z-modal) + 1);
+        transform: translateX(-102%);
+        box-shadow: var(--shadow-glass-layered);
+        transition: transform var(--dur-medium) var(--ease-out);
+    }
+
+    .pr-sidebar.is-mobile-open {
+        transform: translateX(0);
+    }
+
+    .pr-sidebar-nav-item {
+        justify-content: flex-start;
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .pr-sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: var(--z-modal);
+        border: 0;
+        background: var(--overlay-modal);
+        backdrop-filter: blur(3px);
+    }
+
+    .pr-mobile-nav-trigger {
+        display: inline-flex;
+        flex: 0 0 var(--control-height-compact);
+        align-items: center;
+        justify-content: center;
+        width: var(--control-height-compact);
+        height: var(--control-height-compact);
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: rgb(var(--c-text-primary));
+    }
+
+    .pr-header {
+        height: 60px;
+        gap: var(--space-sm);
+        padding: 0 var(--space-md);
+    }
+
+    .pr-header-title {
+        max-width: min(40vw, 156px);
+        font-size: var(--text-sm);
+    }
+
+    .pr-header-brand-title__secondary {
+        display: none;
+    }
+
+    .pr-header-actions {
+        gap: var(--space-xs);
+    }
+
+    .pr-header-tools-placeholder--teacher {
+        width: 128px;
+    }
+
+    .pr-content {
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    .pr-footer-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-sm) var(--space-md);
+    }
+}
+
+/* ============================================================
+ * v5.1 —— AppShell 升级（2026-07-04）
+ * ------------------------------------------------------------
+ * 融合高质量前端界面精髓：
+ * - Lusion 文字克隆上移 hover：侧边栏导航 hover 时字色微变 + 背景胶囊
+ * - Lusion 十字标记：侧边栏底部添加坐标锚点
+ * - MiMo Studio 玻璃态底栏 + 顶部光晕胶囊：header is-scrolled 升级
+ * - Unseen 编号导航：用 CSS counter 给 nav-item 添加"卷一/卷二/..."编号
+ * - Grok 行尾渐隐遮罩：长 label 在右侧渐隐
+ * - MiMo opacity 三态：nav-item hover 用 opacity 微调而非色彩跳跃
+ * ============================================================ */
+
+/* —— 1. 侧边栏导航项 v5.1 升级 ——
+ * 应用 MiMo opacity 三态：hover 时 opacity 0.85 + 背景胶囊
+ * 配合 Lusion 文字克隆效果：用 ::after 伪元素叠加克隆字（serif italic）
+ * v5.0 Task 9：移除无效的 sticky（无 top 值），保持原有 relative */
+.pr-sidebar-nav-item {
+    /* 增强过渡：背景 + 字色 + 位移 */
+    transition: background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy),
+        opacity var(--dur-micro) var(--ease-out);
+}
+
+/* —— 2. nav-item hover 升级 ——
+ * 以强调色胶囊和 2px 位移提供明确反馈，不复制文字节点，避免视觉与
+ * 屏幕阅读器命名出现双份内容。 */
+.pr-sidebar-nav-item:hover {
+    /* MiMo opacity 三态：保持色彩不变，仅微调 opacity */
+    background-color: rgb(var(--c-accent-primary) / 0.06);
+    /* 6% 强调色底，比原 surface-tertiary-alpha 更品牌化 */
+    transform: translateX(2px);
+    /* 微妙右移，暗示"可点击进入" */
+}
+
+.pr-sidebar-nav-item:active {
+    transform: translateX(0) scale(0.98);
+    /* 按下回弹 */
+    opacity: 0.85;
+}
+
+/* —— 3. 选中态升级 ——
+ * 应用智谱 selected-gradient 渐变叠层（底部 alpha + 顶部玻璃白） */
+.pr-sidebar-nav-item.is-active {
+    background: var(--selected-gradient);
+    /* 替代原 accent-primary-20 纯色，更有层次 */
+}
+
+/* —— 5. 顶部 header is-scrolled 玻璃态升级 ——
+ * 应用 MiMo Studio 玻璃态底栏：向上白色阴影 + 顶部光晕胶囊
+ * 增强吸顶态的浮起感 */
+.pr-header.is-scrolled {
+    background: var(--glass-bar-bg);
+    backdrop-filter: var(--glass-bar-blur);
+    -webkit-backdrop-filter: var(--glass-bar-blur);
+    box-shadow: var(--shadow-glass-upward);
+    /* 向上白色阴影 —— 反常规浮起感 */
+    /* 保留基础 position:sticky；sticky 本身已建立 ::before 的定位包含块。 */
+    isolation: isolate;
+}
+
+/* 顶部居中发光胶囊 —— 模拟"高光"光晕
+ * 仅在 is-scrolled 时显现，强化吸顶态的玻璃质感 */
+.pr-header.is-scrolled::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: var(--glass-glow-capsule-width);
+    height: var(--glass-glow-capsule-height);
+    transform: translate(-50%, -50%);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, rgb(var(--c-bg-ultra-glow)) 72%, transparent);
+    filter: blur(var(--glass-glow-capsule-blur));
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0;
+    animation: pr-header-glow-in var(--dur-small) var(--ease-out) forwards;
+}
+
+@keyframes pr-header-glow-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* —— 6. 侧边栏底部十字锚点（Lusion signature） ——
+ * 在 sidebar 底部添加一个十字标记，作为"导航坐标原点"的隐喻 */
+.pr-sidebar::after {
+    content: "";
+    position: absolute;
+    bottom: var(--space-md);
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--cross-size);
+    height: var(--cross-size);
+    background-image:
+        linear-gradient(var(--cross-color), var(--cross-color)),
+        linear-gradient(var(--cross-color), var(--cross-color));
+    background-size: 100% var(--cross-thickness), var(--cross-thickness) 100%;
+    background-position: center, center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* 折叠态隐藏十字锚点，避免拥挤 */
+.pr-sidebar--collapsed::after {
+    display: none;
+}
+
+/* —— 7. 品牌 logo 区升级 ——
+ * 应用 opacity 三态 + 微妙位移 */
+.pr-sidebar-brand-mark {
+    transition: transform var(--dur-micro) var(--spring-snappy),
+        opacity var(--dur-micro) var(--ease-out);
+}
+
+.pr-sidebar-brand-mark:hover {
+    transform: rotate(-8deg) scale(1.05);
+    /* 羽毛笔 logo 微旋，呼应"书写"动作 */
+}
+
+.pr-sidebar-brand-mark:active {
+    transform: rotate(-8deg) scale(0.95);
+    opacity: 0.85;
+}
+
+/* —— 8. Reduced Motion 降级 —— */
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-sidebar-nav-item,
+    .pr-sidebar-nav-item:hover,
+    .pr-sidebar-nav-item:active,
+    .pr-sidebar-brand-mark,
+    .pr-sidebar-brand-mark:hover,
+    .pr-sidebar-brand-mark:active,
+    .pr-header.is-scrolled::before {
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .pr-header.is-scrolled::before {
+        opacity: 1 !important;
+    }
+}
+
+/* ============================================================
+ * 模型接入（设置面板内）
+ * ============================================================ */
+
+/* 分区分隔：极淡 alpha 线 + 松带间距（规范 8.2 唯一准边框场景） */
+.pr-settings-section-divider {
+    height: 1px;
+    margin: var(--space-sm) 0 0;
+    background: rgb(var(--c-text-primary) / 0.06);
+}
+
+.pr-settings-section-desc {
+    margin: calc(-1 * var(--space-sm)) 0 0;
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+    color: rgb(var(--c-text-tertiary));
+}
+
+/* ============================================================
+ * 长期记忆治理（默认折叠，避免设置面板首次打开时增加认知负担）
+ * ============================================================ */
+.pr-memory-governance {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding-top: var(--space-xs);
+    box-shadow: inset 0 1px 0 rgb(var(--c-text-primary) / 0.06);
+}
+
+.pr-memory-governance-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-xs) 0;
+    border: 0;
+    background: transparent;
+    color: rgb(var(--c-text-primary));
+    cursor: pointer;
+    text-align: left;
+}
+
+.pr-memory-governance-toggle-meta {
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+}
+
+.pr-memory-governance-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-memory-governance-notice,
+.pr-memory-governance-empty {
+    margin: 0;
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+    line-height: 1.55;
+}
+
+.pr-memory-governance-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    background: rgb(var(--c-surface-secondary) / 0.72);
+    border-radius: var(--radius-sm);
+}
+
+.pr-memory-governance-form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-xs);
+}
+
+.pr-memory-governance-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-2xs);
+}
+
+.pr-memory-governance-form input:not([type="checkbox"]),
+.pr-memory-governance-form select,
+.pr-memory-governance-form textarea,
+.pr-memory-governance-item textarea {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 8px;
+    border: 1px solid rgb(var(--c-text-primary) / 0.12);
+    border-radius: var(--radius-xs);
+    background: rgb(var(--c-surface-primary) / 0.7);
+    color: rgb(var(--c-text-primary));
+    font: inherit;
+    font-size: var(--text-2xs);
+    resize: vertical;
+}
+
+.pr-memory-governance-form input:focus-visible,
+.pr-memory-governance-form select:focus-visible,
+.pr-memory-governance-form textarea:focus-visible,
+.pr-memory-governance-item textarea:focus-visible,
+.pr-memory-governance-toggle:focus-visible,
+.pr-memory-governance-item-actions button:focus-visible,
+.pr-memory-governance-primary:focus-visible,
+.pr-memory-governance-clear:focus-visible,
+.pr-memory-governance-clear-confirmation button:focus-visible {
+    outline: 2px solid rgb(var(--c-accent-primary));
+    outline-offset: 2px;
+}
+
+.pr-memory-governance-check {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start;
+    gap: 6px !important;
+    line-height: 1.45;
+}
+
+.pr-memory-governance-check input {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    width: 24px;
+    height: 24px;
+    accent-color: rgb(var(--c-accent-primary));
+}
+
+.pr-memory-governance-primary,
+.pr-memory-governance-clear,
+.pr-memory-governance-item-actions button {
+    border: 0;
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--text-2xs);
+    min-height: 24px;
+    padding: 4px 8px;
+}
+
+.pr-memory-governance-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 10px;
+    background: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-surface-primary));
+    font-weight: var(--weight-semibold);
+}
+
+.pr-memory-governance-primary:disabled,
+.pr-memory-governance-clear:disabled,
+.pr-memory-governance-clear-confirmation button:disabled,
+.pr-memory-governance-item-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.pr-memory-governance-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-memory-governance-list-header,
+.pr-memory-governance-item-meta,
+.pr-memory-governance-item-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+}
+
+.pr-memory-governance-list-header,
+.pr-memory-governance-item-meta {
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+}
+
+.pr-memory-governance-clear {
+    padding: 4px 6px;
+    background: rgb(var(--c-accent-error) / 0.08);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-memory-governance-clear-confirmation {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    scroll-margin-block: var(--space-md);
+    border: 1px solid rgb(var(--c-accent-error) / 0.28);
+    border-radius: var(--radius-xs);
+    background: rgb(var(--c-accent-error) / 0.06);
+}
+
+.pr-memory-governance-clear-confirmation p {
+    margin: 0;
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-2xs);
+    line-height: 1.55;
+}
+
+.pr-memory-governance-clear-confirmation-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-xs);
+}
+
+.pr-memory-governance-clear-confirmation-cancel,
+.pr-memory-governance-clear-confirmation-submit {
+    min-height: 30px;
+    border: 0;
+    border-radius: var(--radius-xs);
+    padding: 5px 8px;
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--text-2xs);
+}
+
+.pr-memory-governance-clear-confirmation-cancel {
+    background: rgb(var(--c-text-primary) / 0.08);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-memory-governance-clear-confirmation-submit {
+    background: rgb(var(--c-accent-error) / 0.14);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-memory-governance-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: var(--space-sm);
+    background: rgb(var(--c-surface-secondary) / 0.5);
+    border-radius: var(--radius-xs);
+}
+
+.pr-memory-governance-item p {
+    margin: 0;
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.pr-memory-governance-item-actions {
+    justify-content: flex-end;
+}
+
+.pr-memory-governance-item-actions button {
+    padding: 4px 7px;
+    background: rgb(var(--c-text-primary) / 0.07);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-memory-governance-item-actions button:last-child {
+    color: rgb(var(--c-accent-error));
+}
+
+@media (max-width: 520px) {
+    .pr-memory-governance-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pr-cred {
+    display: flex;
+    flex-direction: column;
+    /* 稳带：三个供应商块之间 */
+    gap: var(--space-md);
+}
+
+.pr-cred-loading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+}
+
+/* 单个供应商：纸张质感底板，与面板的玻璃质感形成对比（规范 5.3 质感搭配） */
+.pr-cred-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-surface-tertiary) / 0.42);
+}
+
+.pr-cred-item-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-cred-item-name {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+}
+
+/* 未配置：中性弱化；已配置：主色 + 等宽数字，便于核对尾号 */
+.pr-cred-item-state {
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-cred-item-state.is-set {
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-cred-item-powers {
+    margin: 0;
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-cred-item-form {
+    display: flex;
+    /* 紧带：输入框与其两个动作按钮是同一操作单元 */
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+}
+
+.pr-cred-input {
+    flex: 1;
+    min-width: 0;
+    height: 30px;
+    padding: 0 var(--space-sm);
+    border: 1px solid rgb(180 170 155 / 0.18);
+    border-radius: var(--radius-xs);
+    background: rgb(var(--c-surface-primary));
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-xs);
+    font-family: var(--font-mono);
+    transition: border-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.pr-cred-input:hover {
+    border-color: rgb(180 170 155 / 0.3);
+}
+
+.pr-cred-input:focus-visible {
+    outline: none;
+    border-color: rgb(var(--c-accent-primary));
+    box-shadow: 0 0 0 3px rgb(var(--c-accent-primary) / 0.12);
+}
+
+.pr-cred-btn {
+    flex-shrink: 0;
+    height: 30px;
+    padding: 0 var(--space-sm);
+    border: none;
+    border-radius: var(--radius-xs);
+    background: rgb(var(--c-surface-secondary));
+    color: rgb(var(--c-text-secondary));
+    font-size: var(--text-2xs);
+    cursor: pointer;
+    transition: background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-cred-btn:hover:not(:disabled) {
+    background: rgb(var(--c-surface-tertiary));
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-cred-btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.pr-cred-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+.pr-cred-btn--save {
+    background: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-cred-btn--save:hover:not(:disabled) {
+    background: rgb(var(--c-accent-primary-hover));
+    color: rgb(var(--c-text-inverse));
+}
+
+/* 检测结果：成功/失败用色彩语义区分，10% alpha 底不抢注意力 */
+.pr-cred-result {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-xs);
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+}
+
+.pr-cred-result.is-ok {
+    background: rgb(var(--c-accent-success) / 0.1);
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-cred-result.is-fail {
+    background: rgb(var(--c-accent-error) / 0.1);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-cred-result-msg {
+    flex: 1;
+    min-width: 0;
+}
+
+.pr-cred-result-latency {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+}
+
+/* 原始返回默认折叠：它是排查用的第三层信息，不该占据首屏注意力 */
+.pr-cred-result-detail {
+    flex-basis: 100%;
+}
+
+.pr-cred-result-detail summary {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.pr-cred-result-detail code {
+    display: block;
+    margin-top: var(--space-xs);
+    padding: var(--space-xs);
+    border-radius: var(--radius-xs);
+    background: rgb(var(--c-text-primary) / 0.05);
+    color: rgb(var(--c-text-secondary));
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    word-break: break-all;
+}
+
+.pr-cred-item-console {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    align-self: flex-start;
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-accent-primary));
+    text-decoration: none;
+}
+
+.pr-cred-item-console:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.pr-cred-note {
+    margin: 0;
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+    color: rgb(var(--c-text-tertiary));
+}
+
+/* 正式打印只输出业务内容，应用导航与合成层不能污染报告/题目。 */
+@media print {
+    .pr-shell {
+        display: block !important;
+        min-height: 0 !important;
+        background: #fff !important;
+    }
+
+    .pr-sidebar,
+    .pr-sidebar-overlay,
+    .pr-header,
+    .pr-footer,
+    .pr-route-exit-mask {
+        display: none !important;
+    }
+
+    .pr-main,
+    .pr-content,
+    .pr-route {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        contain: none !important;
+        transform: none !important;
+        animation: none !important;
+    }
+}

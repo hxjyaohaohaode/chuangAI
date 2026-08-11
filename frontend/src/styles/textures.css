@@ -1,0 +1,352 @@
+/**
+ * B4.2 质感多样性扩展 —— 7 种质感工具类（规范第 4 章）
+ * ------------------------------------------------------------
+ * 设计理念：打破"全玻璃"单一质感，根据情境灵活选用、混合搭配
+ * 一个界面中应当同时存在 2-4 种质感，通过质感对比与呼应构建丰富视觉层次
+ *
+ * 质感选用决策矩阵（规范 4.8）：
+ *   玻璃质感   —— 悬浮导航 / 模态弹层（通透、不遮挡内容）
+ *   新拟态     —— 次要操作 / 软交互（柔和、低侵入）
+ *   黏土拟态   —— 情感化 / 创意元素（亲和、温暖）
+ *   亚克力     —— 大面积背景 / 分区（退让、含蓄）
+ *   极简扁平   —— 数据密集 / 信息清晰（安静、高密度）
+ *   纸张质感   —— 长内容 / 阅读场景（可靠、仪式感）
+ *   实体微渐变 —— 主操作按钮 / CTA（稳重、有力量）
+ *
+ * 性能：所有质感仅使用 box-shadow / background / backdrop-filter（GPU 合成）
+ * 无障碍：所有质感在 forced-colors 模式下自动降级为系统色
+ */
+
+/* ============================================================
+ * 1. 黏土拟态（Claymorphism）—— 圆润 + 内外柔阴影
+ * ============================================================ */
+
+.pr-surface-clay {
+    background: var(--clay-bg);
+    border-radius: var(--clay-radius);
+    box-shadow: var(--clay-shadow-outer), var(--clay-shadow-inner);
+    transition: transform var(--transition-surface), box-shadow var(--transition-surface);
+    position: relative;
+    overflow: hidden;
+}
+
+.pr-surface-clay--warm {
+    background: var(--clay-bg-warm);
+}
+
+.pr-surface-clay--lg {
+    border-radius: var(--clay-radius-lg);
+}
+
+.pr-surface-clay:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--clay-shadow-hover), var(--clay-shadow-inner);
+}
+
+.pr-surface-clay:active {
+    transform: translateY(0);
+    box-shadow: var(--clay-shadow-pressed);
+}
+
+/* 黏土按钮 —— 情感化 CTA */
+.pr-clay-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs, 8px);
+    padding: 12px 24px;
+    background: var(--clay-bg-warm);
+    border: none;
+    border-radius: var(--clay-radius);
+    box-shadow: var(--clay-shadow-outer), var(--clay-shadow-inner);
+    color: rgb(var(--c-text-primary));
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform var(--transition-surface), box-shadow var(--transition-surface);
+}
+
+.pr-clay-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--clay-shadow-hover), var(--clay-shadow-inner);
+}
+
+.pr-clay-button:active {
+    transform: translateY(0);
+    box-shadow: var(--clay-shadow-pressed);
+}
+
+.pr-clay-button:focus-visible {
+    outline: 2px solid rgb(var(--c-accent-primary) / 0.55);
+    outline-offset: 2px;
+}
+
+/* ============================================================
+ * 2. 新拟态（Neumorphism）—— 双向柔和阴影 + 与背景同色系
+ * ============================================================ */
+
+.pr-surface-neu {
+    background: var(--neu-bg);
+    border-radius: var(--neu-radius);
+    box-shadow: var(--neu-shadow-raised);
+    transition: box-shadow var(--transition-surface), transform var(--transition-surface);
+}
+
+.pr-surface-neu--sm {
+    border-radius: var(--neu-radius-sm);
+}
+
+/* 新拟态凹陷态 —— 用于已选中/已按下 */
+.pr-surface-neu.is-inset,
+.pr-surface-neu:active {
+    box-shadow: var(--neu-shadow-inset);
+}
+
+.pr-surface-neu:hover {
+    box-shadow: var(--neu-shadow-hover);
+}
+
+/* 新拟态开关 —— 软交互 */
+.pr-neu-switch {
+    width: 48px;
+    height: 28px;
+    background: var(--neu-bg-inset);
+    border: none;
+    border-radius: var(--neu-radius);
+    box-shadow: var(--neu-shadow-inset);
+    position: relative;
+    cursor: pointer;
+    transition: background var(--transition-surface);
+    padding: 0;
+}
+
+.pr-neu-switch-thumb {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 20px;
+    height: 20px;
+    background: var(--neu-bg-raised);
+    border-radius: 50%;
+    box-shadow: 3px 3px 6px rgb(var(--c-border-primary) / 0.40), -3px -3px 6px rgb(var(--c-surface-elevated) / 0.90);
+    transition: transform var(--transition-surface), background var(--transition-surface);
+}
+
+.pr-neu-switch.is-on {
+    background: rgb(var(--c-accent-primary) / 0.18);
+}
+
+.pr-neu-switch.is-on .pr-neu-switch-thumb {
+    transform: translateX(20px);
+    background: rgb(var(--c-accent-primary));
+    box-shadow: 0 2px 6px rgb(var(--c-accent-primary) / 0.35);
+}
+
+.pr-neu-switch:focus-visible {
+    outline: 2px solid rgb(var(--c-accent-primary) / 0.55);
+    outline-offset: 2px;
+}
+
+/* ============================================================
+ * 3. 亚克力（Acrylic）—— 极低不透明度 + 轻微模糊 + 噪点
+ * ============================================================ */
+
+.pr-surface-acrylic {
+    background: var(--acrylic-bg);
+    backdrop-filter: var(--acrylic-blur);
+    -webkit-backdrop-filter: var(--acrylic-blur);
+    box-shadow: var(--acrylic-edge-highlight);
+    position: relative;
+}
+
+.pr-surface-acrylic--warm {
+    background: var(--acrylic-bg-warm);
+    backdrop-filter: var(--acrylic-blur-strong);
+    -webkit-backdrop-filter: var(--acrylic-blur-strong);
+}
+
+.pr-surface-acrylic--cool {
+    background: var(--acrylic-bg-cool);
+}
+
+/* 亚克力噪点纹理叠加 —— 模拟磨砂亚克力板 */
+.pr-surface-acrylic::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--noise-texture);
+    opacity: var(--acrylic-noise-opacity);
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+/* 亚克力边缘高光线 —— 模拟材质边缘 */
+.pr-surface-acrylic::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 1px 1px 0 rgb(var(--c-surface-elevated) / 0.45),
+        inset -1px -1px 0 rgb(var(--c-border-primary) / 0.08);
+    pointer-events: none;
+}
+
+/* ============================================================
+ * 4. 纸张质感（Paper）—— 极细微纹理 + 柔和方向性阴影
+ * ============================================================ */
+
+.pr-surface-paper {
+    background: var(--paper-bg);
+    background-image: var(--paper-texture);
+    border-radius: var(--paper-radius);
+    box-shadow: var(--paper-shadow);
+    position: relative;
+    transition: box-shadow var(--transition-surface), transform var(--transition-surface);
+}
+
+.pr-surface-paper--soft {
+    background: var(--paper-bg-soft);
+}
+
+.pr-surface-paper:hover {
+    box-shadow: var(--paper-shadow-hover);
+    transform: translateY(-1px);
+}
+
+/* 纸张噪点纹理叠加 */
+.pr-surface-paper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--noise-texture);
+    opacity: var(--paper-noise-opacity);
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+/* 纸张折痕装饰 —— 用于报告卡片，增强"阅读仪式感" */
+.pr-surface-paper--folded {
+    background-image: var(--paper-texture),
+        linear-gradient(135deg, transparent 49.5%, rgb(var(--c-border-primary) / 0.08) 49.7%, transparent 50%);
+}
+
+/* ============================================================
+ * 5. 实体微渐变（Solid Micro-Gradient）—— 主操作按钮 / CTA
+ * ============================================================ */
+
+.pr-solid-primary {
+    background: var(--solid-primary-gradient);
+    box-shadow: var(--shadow-button), inset 0 1px 0 rgb(var(--c-surface-elevated) / 0.20);
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-solid-primary:hover {
+    box-shadow: var(--shadow-button-primary-hover), inset 0 1px 0 rgb(var(--c-surface-elevated) / 0.25);
+}
+
+.pr-solid-primary:active {
+    box-shadow: var(--shadow-button-active), inset 0 1px 2px rgb(var(--c-text-primary) / 0.15);
+}
+
+.pr-solid-success {
+    background: var(--solid-success-gradient);
+    box-shadow: var(--shadow-button-success), inset 0 1px 0 rgb(var(--c-surface-elevated) / 0.20);
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-solid-success:hover {
+    box-shadow: var(--shadow-button-success-hover), inset 0 1px 0 rgb(var(--c-surface-elevated) / 0.25);
+}
+
+.pr-solid-danger {
+    background: var(--solid-danger-gradient);
+    box-shadow: var(--shadow-button-danger), inset 0 1px 0 rgb(var(--c-surface-elevated) / 0.20);
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-solid-danger:hover {
+    box-shadow: var(--shadow-button-danger-hover), inset 0 1px 0 rgb(var(--c-surface-elevated) / 0.25);
+}
+
+/* ============================================================
+ * 6. 玻璃质感补强 —— 已有 .pr-surface-glass，此处补充变体
+ * ============================================================ */
+
+.pr-surface-glass-liquid {
+    background: var(--surface-glass);
+    backdrop-filter: var(--blur-glass-heavy);
+    -webkit-backdrop-filter: var(--blur-glass-heavy);
+    box-shadow: var(--shadow-glass-layered),
+        inset 0 1px 0 rgb(var(--c-surface-elevated) / 0.30),
+        inset 0 -1px 0 rgb(var(--c-accent-primary) / 0.06);
+}
+
+/* ============================================================
+ * 7. 极简扁平（Minimal Flat）—— 无阴影、无渐变、仅边框
+ * ============================================================ */
+
+.pr-surface-flat {
+    background: transparent;
+    border: 1px solid var(--border-primary-alpha);
+    border-radius: var(--radius-sm, 4px);
+    box-shadow: none;
+    transition: border-color var(--transition-surface), background var(--transition-surface);
+}
+
+.pr-surface-flat:hover {
+    border-color: var(--border-primary-hover-alpha);
+    background: var(--surface-tertiary-alpha);
+}
+
+/* ============================================================
+ * 无障碍降级 —— forced-colors（Windows 高对比度模式）
+ * ============================================================ */
+
+@media (forced-colors: active) {
+
+    .pr-surface-clay,
+    .pr-surface-neu,
+    .pr-surface-acrylic,
+    .pr-surface-paper,
+    .pr-surface-flat {
+        background: Canvas;
+        box-shadow: none;
+        border: 1px solid ButtonText;
+    }
+
+    .pr-clay-button,
+    .pr-solid-primary,
+    .pr-solid-success,
+    .pr-solid-danger {
+        background: ButtonFace;
+        color: ButtonText;
+        border: 1px solid ButtonText;
+    }
+
+    .pr-neu-switch-thumb {
+        background: ButtonText;
+    }
+}
+
+/* ============================================================
+ * 无障碍降级 —— prefers-reduced-motion
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-surface-clay,
+    .pr-surface-clay:hover,
+    .pr-surface-neu,
+    .pr-surface-paper,
+    .pr-surface-paper:hover,
+    .pr-clay-button,
+    .pr-neu-switch-thumb {
+        transition: none;
+        transform: none;
+    }
+
+    .pr-neu-switch.is-on .pr-neu-switch-thumb {
+        transform: translateX(20px);
+    }
+}

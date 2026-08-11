@@ -1,0 +1,122 @@
+/**
+ * GlassCard 样式（spec enhance-ui-premium-components-v7 Task 3.2）
+ *
+ * 设计规范合规：
+ * - 零硬编码色值（使用 rgb(var(--c-xxx) / alpha) 语法）
+ * - 无 1px 实色边框（透明度分层 + 负空间）
+ * - transform/opacity 动画（不触发 Layout）
+ * - prefers-reduced-motion 降级
+ * - 玻璃态：backdrop-blur + 半透明背景 + 渐变 + 噪点
+ */
+
+.pr-glasscard {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    isolation: isolate;
+    /* 基础过渡：背景 + 阴影 + transform */
+    transition: transform var(--dur-small) var(--spring-soft),
+        box-shadow var(--dur-small) var(--ease-out);
+}
+
+/* ── 玻璃态强度 ── */
+.pr-glasscard--light {
+    background: rgb(var(--c-surface-elevated, 255 252 248) / 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.pr-glasscard--normal {
+    background: rgb(var(--c-surface-elevated, 255 252 248) / 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.pr-glasscard--heavy {
+    background: rgb(var(--c-surface-elevated, 255 252 248) / 0.90);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+}
+
+/* ── 渐变叠加层（极微妙，增强空间深度感） ── */
+.pr-glasscard-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    /* 从左上到右下的极淡渐变 —— 模拟光线方向 */
+    background: linear-gradient(
+        135deg,
+        rgb(var(--c-surface-primary) / 0.15) 0%,
+        transparent 40%,
+        transparent 60%,
+        rgb(var(--c-text-primary) / 0.02) 100%
+    );
+}
+
+/* ── 噪点纹理层（规范 2.5：表面叠加 0.3% 噪点） ── */
+.pr-glasscard-noise {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.03;
+    /* SVG 噪点纹理 —— inline data URI，无外部请求 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' /%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+}
+
+/* ── 内容层 ── */
+.pr-glasscard-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* ── 默认内边距（padding=lg 时使用 CSS 而非 inline style） ── */
+.pr-glasscard:not([style*='padding']) {
+    padding: var(--space-lg);
+}
+
+/* ── 交互态：hover 上浮 + 阴影 + 微边框 ── */
+.pr-glasscard--interactive {
+    cursor: pointer;
+    /* 常态：极淡阴影 */
+    box-shadow: 0 1px 3px rgb(var(--c-text-primary) / 0.04);
+}
+
+.pr-glasscard--interactive:hover {
+    /* hover：上浮 2px + 阴影扩散 + 微边框（规范 14.3） */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgb(var(--c-text-primary) / 0.06),
+        0 0 0 1px rgb(var(--c-text-primary) / 0.08);
+}
+
+.pr-glasscard--interactive:active {
+    /* active：回弹（规范 7.2） */
+    transform: translateY(-1px) scale(0.99);
+    box-shadow: 0 2px 8px rgb(var(--c-text-primary) / 0.04);
+}
+
+.pr-glasscard--interactive:focus-visible {
+    outline: none;
+    /* focus ring：accent 40% alpha 双环（规范 14.1） */
+    box-shadow: 0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px rgb(var(--c-accent-primary) / 0.40),
+        0 4px 16px rgb(var(--c-text-primary) / 0.06);
+}
+
+/* ── prefers-reduced-motion 降级 ── */
+@media (prefers-reduced-motion: reduce) {
+    .pr-glasscard {
+        transition: none !important;
+    }
+
+    .pr-glasscard--interactive:hover {
+        transform: none !important;
+    }
+
+    .pr-glasscard--interactive:active {
+        transform: none !important;
+    }
+}

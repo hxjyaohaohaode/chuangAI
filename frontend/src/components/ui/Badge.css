@@ -1,0 +1,49 @@
+/**
+ * Badge 组件样式（从 ui.css 拆分，B3.4 CSS 代码分割）
+ * 设计依据：规范第 14 章
+ */
+
+.pr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 2px var(--space-sm);
+    border: none;
+    border-radius: var(--radius-full);
+    font-family: var(--font-sans);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    line-height: 1.4;
+    letter-spacing: var(--tracking-tightest);
+    white-space: nowrap;
+}
+
+.pr-badge--default {
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-badge--primary {
+    background-color: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-badge--success {
+    background-color: var(--accent-success-20);
+    color: rgb(var(--c-accent-success));
+}
+
+.pr-badge--warning {
+    background-color: var(--accent-warning-20);
+    color: rgb(var(--c-accent-warning));
+}
+
+.pr-badge--error {
+    background-color: var(--accent-error-20);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-badge--info {
+    background-color: var(--accent-info-20);
+    color: rgb(var(--c-accent-info));
+}

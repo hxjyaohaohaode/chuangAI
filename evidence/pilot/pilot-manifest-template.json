@@ -1,0 +1,20 @@
+{
+  "dataKind": "UNVERIFIED",
+  "pilotId": "",
+  "classId": "",
+  "systemVersion": "",
+  "pilotStartDate": "",
+  "pilotEndDate": "",
+  "expectedStudents": 0,
+  "requiredMetrics": [
+    "knowledge_accuracy",
+    "poem_comprehension",
+    "recitation",
+    "transfer_creation",
+    "task_completion"
+  ],
+  "consentAndAuthorizationConfirmed": false,
+  "piiRemoved": false,
+  "independentReviewer": "",
+  "authorizationEvidenceLocation": ""
+}

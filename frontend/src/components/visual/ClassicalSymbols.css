@@ -1,0 +1,287 @@
+/**
+ * ClassicalSymbols 古典文化符号组件库样式（视觉创新层 2/4）
+ *
+ * 设计依据：规范第 2、4、5、9、14 章
+ * - 全部 SVG 手绘，禁止 emoji（规范 13.1）
+ * - 颜色使用 currentColor 继承父级 + 设计 token alpha 控制
+ * - 朱砂印章使用 --c-accent-error（朱砂红，已通过 WCAG AA）
+ * - 透明度驱动分层，无边框优先（规范 4.1）
+ * - 动画仅 transform/opacity，缓动 --ease-out/--spring-soft（规范 6.x）
+ * - prefers-reduced-motion 降级
+ */
+
+/* ============================================================
+ * Seal —— 朱砂印章
+ * ============================================================ */
+
+.pr-seal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: rgb(var(--c-accent-error));
+    /* 默认尺寸，可外部覆盖 */
+    width: 3.5em;
+    height: 3.5em;
+    flex-shrink: 0;
+}
+
+.pr-seal__svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* 印章本体 —— 朱砂红，带浓淡 alpha 模拟印泥不均 */
+.pr-seal__body {
+    fill: rgb(var(--c-accent-error));
+    fill-opacity: 0.78;
+    /* 印章边缘略带残缺感 */
+}
+
+/* 印章内框 */
+.pr-seal__frame {
+    fill: none;
+    stroke: rgb(var(--c-text-inverse));
+    stroke-opacity: 0.55;
+    stroke-width: 1.4;
+}
+
+/* 印文文字 */
+.pr-seal__text {
+    fill: rgb(var(--c-text-inverse));
+    fill-opacity: 0.92;
+    font-family: var(--font-serif-italic);
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* 印章变体：方形 */
+.pr-seal--square .pr-seal__body {
+    /* 圆角方形（规范圆角 radius-sm） */
+}
+
+/* 印章变体：圆形 */
+.pr-seal--round .pr-seal__body {
+    /* 圆形 */
+}
+
+/* 印章按压入场动画 —— 从大缩小+淡入，模拟盖章 */
+.pr-seal--animated .pr-seal__svg {
+    transform-origin: center;
+    animation: pr-seal-stamp 0.4s var(--ease-out) both;
+}
+
+@keyframes pr-seal-stamp {
+    0% {
+        opacity: 0;
+        transform: scale(1.6) rotate(-4deg);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(0.94) rotate(1deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* ============================================================
+ * ScrollExpand —— 折扇展开容器
+ * ============================================================ */
+
+.pr-scroll-expand {
+    position: relative;
+    display: block;
+    /* overflow hidden 裁剪展开过程 */
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    /* 折扇展开底色 —— 极淡暖色 */
+    background-color: rgb(var(--c-surface-secondary) / 0.45);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+}
+
+.pr-scroll-expand__content {
+    transform-origin: center;
+    /* 初始收拢（scaleX 0），由 GSAP 展开 */
+    transform: scaleX(0);
+    opacity: 0;
+}
+
+/* ============================================================
+ * BambooSlip —— 竹简表序容器
+ * ============================================================ */
+
+.pr-bamboo-slip {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    /* 竹简底色 —— 暖竹色（复用 lessonplan hero 暖竹色） */
+    background-color: rgb(var(--c-page-lessonplan-hero) / 0.06);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    /* 隐藏横向滚动条美化 */
+    scrollbar-width: thin;
+}
+
+.pr-bamboo-slip__slip {
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    /* 竹片宽度流体 */
+    width: clamp(40px, 6vw, 56px);
+    min-height: clamp(160px, 28vw, 240px);
+    padding: var(--space-md) var(--space-xs);
+    /* 竹片色 —— 暖黄绿 alpha */
+    background: linear-gradient(180deg,
+            rgb(var(--c-page-selfstudy-hero) / 0.14) 0%,
+            rgb(var(--c-page-selfstudy-hero) / 0.08) 100%);
+    border-radius: var(--radius-xs);
+    /* 竹片间纵向纹理 */
+    box-shadow: inset 0 0 0 1px rgb(var(--c-text-tertiary) / 0.08);
+    /* 入场：从左到右逐片展开 */
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+/* 竹片上下绳结装饰 —— 两条横向虚线模拟编绳 */
+.pr-bamboo-slip__cord {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-image: linear-gradient(90deg,
+            rgb(var(--c-text-tertiary) / 0.25) 50%,
+            transparent 50%);
+    background-size: 4px 1px;
+}
+
+.pr-bamboo-slip__cord--top {
+    top: 18px;
+}
+
+.pr-bamboo-slip__cord--bottom {
+    bottom: 18px;
+}
+
+/* 竹简文字 —— 竖排 */
+.pr-bamboo-slip__text {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-family: var(--font-serif-italic);
+    font-size: var(--text-lg);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-lg);
+    /* 字间距留白 */
+    margin-block: var(--space-md);
+}
+
+/* ============================================================
+ * FolioPage —— 册页卷帙容器（带装订线）
+ * ============================================================ */
+
+.pr-folio-page {
+    position: relative;
+    display: block;
+    padding: var(--space-lg);
+    padding-left: calc(var(--space-lg) + 20px);
+    /* 册页纸张质感 */
+    background-color: var(--paper-bg);
+    background-image: var(--paper-texture), var(--noise-texture);
+    background-size: cover, 160px 160px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--paper-shadow);
+}
+
+/* 装订线 —— 左侧打孔+穿线效果 */
+.pr-folio-page__binding {
+    position: absolute;
+    top: var(--space-md);
+    bottom: var(--space-md);
+    left: 8px;
+    width: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+/* 装订孔（点） */
+.pr-folio-page__hole {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-text-tertiary) / 0.18);
+}
+
+/* 装订线（垂直虚线） */
+.pr-folio-page__thread {
+    position: absolute;
+    top: var(--space-md);
+    bottom: var(--space-md);
+    left: 9px;
+    width: 1px;
+    background-image: linear-gradient(180deg,
+            rgb(var(--c-accent-primary) / 0.30) 50%,
+            transparent 50%);
+    background-size: 1px 6px;
+}
+
+/* ============================================================
+ * CloudPattern —— 云纹装饰边框
+ * ============================================================ */
+
+.pr-cloud-pattern {
+    position: relative;
+    display: block;
+    padding: var(--space-md);
+}
+
+.pr-cloud-pattern__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    color: rgb(var(--c-text-tertiary));
+    opacity: 0.5;
+}
+
+/* 云纹 stroke —— 描边线条 */
+.pr-cloud-pattern__stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-opacity: 0.32;
+}
+
+/* ============================================================
+ * prefers-reduced-motion 降级（规范 6.6）
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-scroll-expand__content {
+        transform: scaleX(1);
+        opacity: 1;
+    }
+
+    .pr-bamboo-slip__slip {
+        opacity: 1;
+        transform: none;
+    }
+
+    .pr-seal--animated .pr-seal__svg {
+        animation: none;
+    }
+}

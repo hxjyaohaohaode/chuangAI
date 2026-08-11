@@ -1,0 +1,2304 @@
+﻿/**
+ * 文化语境还原 CultureContextPage 样式（Task 20）
+ *
+ * 严格依据《界面设计规范.md》第 2、4、5、6、7、14 章实现
+ *
+ * 设计要点：
+ * - 零硬编码：所有色值/尺寸/时长引用 tokens.css 的 CSS 变量
+ * - 无边框优先：区域分隔用透明度差异 + backdrop-blur
+ * - 流体尺寸：关键路径用 clamp()，响应 600-2400px 视口无断裂
+ * - 完整三态：所有可交互元素具备 hover/active/focus-visible
+ * - GPU 友好：动画仅使用 transform 与 opacity
+ * - 透明度分层：surface-secondary/tertiary/elevated/glass 逐层累加
+ * - Tabular Numbers：所有数值使用 font-variant-numeric: tabular-nums
+ * - 骨架屏加载态 + 图片淡入动画
+ */
+
+/* ============================================================
+ * 主布局
+ * ============================================================ */
+
+.pr-culture {
+    display: flex;
+    flex-direction: column;
+    /* v7 布局修复：页面级区块间距从稳带(24px)提升至松带(32px)
+     * 计算依据：设计规范 5.3——页面级锚点切换必须使用松带(32-96px)
+     * 24px 属于稳带，不足以分离 Hero 区与三栏主体内容区 */
+    gap: var(--space-xl);
+    width: 100%;
+    position: relative;
+    isolation: isolate;
+}
+
+/* 入场动画类与页面布局类并存时，明确保持纵向 Flex 排序语义 */
+.pr-culture.pr-v5-enter-culture {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 主体网格：三栏（诗列表 | 主内容 | 投屏控制） */
+.pr-culture-body {
+    display: grid;
+    /* 左栏是索引、右栏是辅助面板，正文才是主角。
+       原分配下中栏只剩 633px，比右侧辅助栏宽不了多少，
+       译文/背景这些真正要读的内容因此显得局促（"中间太空"的观感来源）。
+       两侧各收一档，把宽度让给正文。 */
+    grid-template-columns:
+        clamp(200px, 16vw, 250px) minmax(0, 1fr) clamp(260px, 20vw, 310px);
+    gap: var(--space-lg);
+    align-items: start;
+    /* 核心教学流程紧随 Hero，装饰性探索组件后置 */
+    order: 1;
+}
+
+.pr-culture-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    min-width: 0;
+    /* P0-C4：移除 GlowBorder 包裹后，main 直接承载视觉样式 */
+    padding: var(--space-lg);
+    border-radius: var(--radius-xl);
+    background: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* 三层叠加阴影：近距 + 中距 + 远距，模拟自然光照下的玻璃材质纵深感 */
+    box-shadow: var(--shadow-glass-layered);
+    transition: box-shadow var(--dur-medium) var(--ease-out);
+}
+
+/* 选中诗后激活光晕（替代 GlowBorder active prop） */
+.pr-culture-main.is-active {
+    box-shadow:
+        0 0 0 1px var(--accent-primary-20),
+        0 0 24px var(--accent-primary-10),
+        var(--shadow-card-hover),
+        0 8px 32px rgb(var(--c-text-primary) / 0.07);
+}
+
+/**
+ * 右栏 —— 与左栏同样粘附限高
+ *
+ * 与诗篇列表同理：右栏是辅助面板，不该由它决定整页高度。
+ * 三栏都能各自滚动，页面才不会被最长的那一栏绑架。
+ */
+.pr-culture-side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    position: sticky;
+    top: var(--space-md);
+    max-height: calc(100dvh - var(--space-2xl));
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* 响应式：平板双栏
+ *
+ * 断点从 1500px 下调到 1280px。
+ * 原来的 1500px 意味着 1440/1489 这类**最常见的笔记本宽度**也会退化成双栏，
+ * 三栏版式几乎没人见得到；更糟的是退化后 .pr-culture-side 会
+ * `grid-column: 1 / -1` 撑成整宽，把「沉浸式投屏」变成一条
+ * 1293×1008px 的整幅横带压在正文下方——这正是"右侧投屏完全没有用"的由来。
+ * 1280px 才是真正需要放弃第三栏的宽度。 */
+@media (max-width: 1280px) {
+    .pr-culture-body {
+        grid-template-columns:
+            clamp(200px, 22vw, 260px) minmax(0, 1fr);
+    }
+
+    .pr-culture-side {
+        grid-column: 1 / -1;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .pr-culture-side>* {
+        flex: 1 1 320px;
+    }
+}
+
+/* 响应式：移动单列 */
+@media (max-width: 768px) {
+    .pr-culture-body {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pr-culture-side {
+        flex-direction: column;
+    }
+}
+
+/* ============================================================
+ * v5.0 Hero 区 —— 卷轴铺展意象（Task A.4）
+ * ------------------------------------------------------------
+ * 设计意图：左侧文字区（eyebrow + 巨型标题 + 副标题 + AI 协作标注）+
+ *   右侧装饰性卷轴 SVG（展开的卷轴 + 8 列竖排装饰线条），
+ *   呼应 pr-v5-enter-culture 的"卷轴铺展"入场动效。
+ * 非对称：左 1fr 文字区 + 右 1.5fr 视觉锚点，避免容器对容器对称。
+ * 视觉个性：橄榄绿渐变（--page-culture-hero-gradient）模拟古卷色调。
+ * ============================================================ */
+
+.pr-v5-hero--culture {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    gap: var(--space-xl);
+    align-items: center;
+    padding: clamp(var(--space-lg), 3vw, var(--space-2xl)) clamp(var(--space-xl), 4vw, var(--space-3xl));
+    background-color: var(--surface-secondary-alpha);
+    background-image: var(--page-culture-hero-gradient), var(--noise-texture);
+    background-size: 100% 100%, 160px 160px;
+    background-blend-mode: normal, overlay;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* 径向光晕装饰：左侧卷轴光晕，强化"铺展"意象 */
+.pr-v5-hero--culture::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    left: -10%;
+    width: 55%;
+    height: 180%;
+    background: radial-gradient(ellipse at center,
+            rgb(var(--c-accent-primary) / 0.08) 0%,
+            transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 平板取消非对称，改为单列 */
+@media (max-width: 900px) {
+    .pr-v5-hero--culture {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-md);
+        padding: var(--space-md) var(--space-lg);
+    }
+}
+
+/* Hero 主文字区 */
+.pr-v5-hero--culture .pr-v5-hero-main {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    min-width: 0;
+}
+
+.pr-culture-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--page-culture-hero-accent);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+    align-self: flex-start;
+}
+
+/* eyebrow 圆点：脉冲呼吸，呼应"卷轴铺展"意象 */
+.pr-culture-hero-eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--page-culture-hero-accent);
+    flex-shrink: 0;
+    animation: pr-culture-hero-pulse 2.4s var(--ease-in-out) infinite;
+}
+
+@keyframes pr-culture-hero-pulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.3);
+    }
+}
+
+.pr-culture-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-loose);
+    line-height: var(--leading-2xl);
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+    text-wrap: balance;
+}
+
+.pr-culture-hero-subtitle {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-base);
+    letter-spacing: var(--tracking-tight);
+    max-width: 560px;
+    margin: 0;
+}
+
+/* Hero AI 协作标注 badge */
+.pr-culture-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+    /* v5.0 Task A.4：与标题区基线错落 8px，避免容器对容器对称 */
+    margin-top: var(--space-xs);
+    align-self: flex-start;
+}
+
+/* Hero 视觉锚点区：真实生成的文化语境主视觉 */
+.pr-v5-hero--culture .pr-v5-hero-stat {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(180px, 20vw, 260px);
+    align-self: stretch;
+    overflow: hidden;
+    border-radius: calc(var(--radius-lg) - 2px);
+    box-shadow:
+        0 18px 44px rgb(var(--c-ink) / 0.08),
+        inset 0 0 0 1px rgb(255 255 255 / 0.58);
+}
+
+.pr-culture-hero-image {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.015);
+    transition: transform 800ms var(--ease-out);
+}
+
+.pr-v5-hero--culture:hover .pr-culture-hero-image {
+    transform: scale(1.035);
+}
+
+/* ============================================================
+ * v5.0 Task A.4：交错错落布局 —— 容器子元素基线 offset
+ * ------------------------------------------------------------
+ * 在 .pr-culture 的 gap 基础上叠加 margin-top，让 body 与 Hero
+ * 形成"疏-密"节奏，避免等距堆叠的僵化感（规范 3.3）。
+ * 平板/移动端取消错落，回归等距以适应窄屏。
+ * ============================================================ */
+
+.pr-culture>.pr-culture-body {
+    margin-top: var(--space-sm);
+}
+
+/* 平板/移动端取消错落 */
+@media (max-width: 1100px) {
+    .pr-culture>.pr-culture-body {
+        margin-top: 0;
+    }
+}
+
+/* prefers-reduced-motion：禁用 Hero 装饰动效 */
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-culture-hero-image,
+    .pr-culture-hero-eyebrow-dot {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .pr-v5-hero--culture .pr-v5-hero-stat {
+        min-height: clamp(180px, 40vw, 260px);
+    }
+}
+
+/* ============================================================
+ * Header（旧版保留兼容，Hero 已替代其功能）
+ * ============================================================ */
+
+.pr-culture-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.pr-culture-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    min-width: 0;
+}
+
+.pr-culture-header-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-loose);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-2xl);
+    margin: 0;
+}
+
+.pr-culture-header-subtitle {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-sm);
+}
+
+.pr-culture-header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+}
+
+/* ============================================================
+ * 通用区块卡片
+ * ============================================================ */
+
+.pr-culture-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+}
+
+.pr-culture-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-culture-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-normal);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-lg);
+    margin: 0;
+}
+
+.pr-culture-section-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-culture-section-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+ * 诗列表 PoemList
+ * ============================================================ */
+
+/**
+ * 诗篇列表 —— 定高 + 内部滚动 + 随页粘附
+ *
+ * ── 为什么必须限高 ──
+ * 此前这里被改成「relative 随文档流、max-height: none、overflow: visible」，
+ * 理由写的是"页面内非全局导航"。但列表里是**148 首诗的全量卡片**：
+ * 实测该列渲染高度 14114px，把整页顶到 16744px（约 18 屏），
+ * 而它自己只有 255px 宽。用户想看中间的译文/背景，得先滚过十几屏的诗名。
+ *
+ * 一个用于「选一首诗」的索引栏，绝不应该决定整页的高度。
+ * 现在：列容器粘附在视口内、自身限高，卡片在内部滚动；
+ * 搜索与筛选行固定在列顶，滚动时始终可见。
+ */
+.pr-culture-poem-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    position: sticky;
+    top: var(--space-md);
+    /* 留出上下各一个稳带的呼吸，避免贴死视口边缘 */
+    max-height: calc(100dvh - var(--space-2xl));
+    /* 滚动交给内部的 items 容器，容器本身只做裁切 */
+    overflow: hidden;
+}
+
+.pr-culture-poem-list-items {
+    flex: 1 1 auto;
+    /* flex 子项默认 min-height:auto 会拒绝收缩，必须归零，
+       否则 max-height 传不下来，列表照样把父容器撑破 */
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* 为滚动条留出内缩，避免卡片右缘被压 */
+    padding-right: 2px;
+}
+
+.pr-culture-poem-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding: 0 var(--space-xs);
+}
+
+.pr-culture-poem-list-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+}
+
+.pr-culture-poem-list-count {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-culture-poem-search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-height: var(--control-height-default);
+    padding: 0 var(--space-md);
+    border-radius: var(--radius-sm);
+    background: var(--surface-elevated-soft);
+    color: rgb(var(--c-text-tertiary));
+    box-shadow: inset 0 0 0 1px var(--border-primary-alpha);
+}
+
+.pr-culture-poem-search:focus-within {
+    color: rgb(var(--c-accent-primary));
+    box-shadow: inset 0 0 0 1px rgb(var(--c-accent-primary) / 0.45), var(--shadow-focus-accent);
+}
+
+.pr-culture-poem-search input {
+    width: 100%;
+    min-width: 0;
+    min-height: var(--control-height-compact);
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: rgb(var(--c-text-primary));
+    font: inherit;
+    font-size: var(--text-sm);
+}
+
+/* ── Task 28.5：筛选器组容器（搜索 + 朝代/体裁 Combobox） ── */
+.pr-culture-poem-filters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+/* 筛选行：两个 Combobox 并排，平板以上水平排列，移动端自动换行 */
+.pr-culture-poem-filter-row {
+    display: flex;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+/* 每个 Combobox 自适应占据剩余空间 */
+.pr-culture-poem-filter-row>.pr-combobox {
+    flex: 1 1 120px;
+    min-width: 0;
+}
+
+.pr-culture-poem-search-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xl) var(--space-md);
+    color: rgb(var(--c-text-secondary));
+    text-align: center;
+    font-size: var(--text-sm);
+}
+
+.pr-culture-poem-search-empty button {
+    min-height: var(--control-height-compact);
+    padding: 0 var(--space-md);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font: inherit;
+    cursor: pointer;
+}
+
+.pr-culture-poem-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    background-color: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+    position: relative;
+    overflow: hidden;
+    min-height: var(--control-height-default);
+}
+
+.pr-culture-poem-card:hover {
+    background-color: var(--surface-tertiary-alpha);
+}
+
+.pr-culture-poem-card:active {
+    transform: scale(0.98);
+}
+
+.pr-culture-poem-card:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-culture-poem-card.is-selected {
+    /* v5.1：默认选中态保留通用 accent-primary 10% alpha
+     * 下面按 data-genre 覆写为对应体裁色 10% alpha */
+    background-color: var(--accent-primary-10);
+}
+
+/* v5.1：按体裁色覆写选中态背景（10% alpha） */
+.pr-culture-poem-card.is-selected[data-genre='landscape'] {
+    background-color: var(--genre-landscape-10);
+}
+
+.pr-culture-poem-card.is-selected[data-genre='pastoral'] {
+    background-color: var(--genre-pastoral-10);
+}
+
+.pr-culture-poem-card.is-selected[data-genre='frontier'] {
+    background-color: var(--genre-frontier-10);
+}
+
+.pr-culture-poem-card.is-selected[data-genre='imagery'] {
+    background-color: var(--genre-imagery-10);
+}
+
+.pr-culture-poem-card.is-selected[data-genre='farewell'] {
+    background-color: var(--genre-farewell-10);
+}
+
+.pr-culture-poem-card.is-selected[data-genre='nostalgia'] {
+    background-color: var(--genre-nostalgia-10);
+}
+
+/* 移除原 ::before 竖线，改用 .pr-culture-poem-card-stripe 元素以支持体裁色 */
+
+.pr-culture-poem-card-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-sm);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-culture-poem-card.is-selected .pr-culture-poem-card-title {
+    color: rgb(var(--c-accent-primary));
+}
+
+/* v5.1：选中态标题颜色按体裁色覆写 */
+.pr-culture-poem-card.is-selected[data-genre='landscape'] .pr-culture-poem-card-title {
+    color: rgb(var(--c-genre-landscape));
+}
+
+.pr-culture-poem-card.is-selected[data-genre='pastoral'] .pr-culture-poem-card-title {
+    color: rgb(var(--c-genre-pastoral));
+}
+
+.pr-culture-poem-card.is-selected[data-genre='frontier'] .pr-culture-poem-card-title {
+    color: rgb(var(--c-genre-frontier));
+}
+
+.pr-culture-poem-card.is-selected[data-genre='imagery'] .pr-culture-poem-card-title {
+    color: rgb(var(--c-genre-imagery));
+}
+
+.pr-culture-poem-card.is-selected[data-genre='farewell'] .pr-culture-poem-card-title {
+    color: rgb(var(--c-genre-farewell));
+}
+
+.pr-culture-poem-card.is-selected[data-genre='nostalgia'] .pr-culture-poem-card-title {
+    color: rgb(var(--c-genre-nostalgia));
+}
+
+.pr-culture-poem-card-meta {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-culture-poem-card-content {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-xs);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* —— v5.1 体裁色融合（千问 Color10/20/100 三阶 alpha 色阶启发）
+ *   每首诗根据标题/内容/作者推断体裁（6 种），用体裁色区分诗类
+ *   - 体裁标签：10% alpha 背景 + 100% 实色文字 + 0.5px 内阴影
+ *   - 卡片头部：标题与体裁标签左右对齐
+ *   - 选中态竖线：体裁色 100% 实色（替代通用 accent-primary） */
+.pr-culture-poem-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-xs);
+}
+
+.pr-culture-poem-card-genre {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 18px;
+    padding: 0 var(--space-sm);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tightest);
+    border-radius: var(--radius-xs);
+    /* 无边框优先策略：不使用 1px 实色边框
+     * 颜色通过 Tailwind 工具类提供：
+     *   - 背景使用 bg-genre-{name}/10 (10% alpha 背景)
+     *   - 文字使用 text-genre-{name} (100% 实色文字)
+     * 透明度差异自然区分标签与卡片背景 */
+    transition: transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-poem-card:hover .pr-culture-poem-card-genre {
+    transform: scale(1.05);
+}
+
+/* 推断题材（无教材标注）：以极轻的虚线下沿暗示"此标签为推断"，
+   不用额外文字、不用图标，避免在密集列表里制造视觉噪音。
+   悬停时 title 属性会给出完整说明。 */
+.pr-culture-poem-card-genre[data-inferred='true'] {
+    text-decoration: underline dotted currentColor;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    opacity: 0.82;
+}
+
+/* 选中态竖线（替代 ::before，支持体裁色） */
+.pr-culture-poem-card-stripe {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-accent-primary));
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease-out);
+    pointer-events: none;
+}
+
+.pr-culture-poem-card.is-selected .pr-culture-poem-card-stripe {
+    opacity: 1;
+}
+
+/* 6 种体裁色竖线 —— data-genre 属性匹配 */
+.pr-culture-poem-card-stripe[data-genre='landscape'] {
+    background-color: rgb(var(--c-genre-landscape));
+}
+
+.pr-culture-poem-card-stripe[data-genre='pastoral'] {
+    background-color: rgb(var(--c-genre-pastoral));
+}
+
+.pr-culture-poem-card-stripe[data-genre='frontier'] {
+    background-color: rgb(var(--c-genre-frontier));
+}
+
+.pr-culture-poem-card-stripe[data-genre='imagery'] {
+    background-color: rgb(var(--c-genre-imagery));
+}
+
+.pr-culture-poem-card-stripe[data-genre='farewell'] {
+    background-color: rgb(var(--c-genre-farewell));
+}
+
+.pr-culture-poem-card-stripe[data-genre='nostalgia'] {
+    background-color: rgb(var(--c-genre-nostalgia));
+}
+
+/* 选中态背景按体裁色 10% alpha 叠加（替代通用 accent-primary-10） */
+.pr-culture-poem-card.is-selected[data-genre='landscape'] .pr-culture-poem-card-genre,
+.pr-culture-poem-card.is-selected .pr-culture-poem-card-genre {
+    /* 标签自身保持体裁色，仅放大微调 */
+    transform: scale(1.05);
+}
+
+/* 骨架屏 */
+.pr-culture-poem-skeleton {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+}
+
+.pr-culture-poem-skeleton-line {
+    height: 14px;
+    border-radius: var(--radius-xs);
+    background: linear-gradient(90deg,
+            var(--surface-tertiary-alpha) 0%,
+            var(--surface-tertiary-medium) 50%,
+            var(--surface-tertiary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-culture-shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+.pr-culture-poem-skeleton-line:nth-child(1) {
+    width: 60%;
+    margin-bottom: var(--space-xs);
+}
+
+.pr-culture-poem-skeleton-line:nth-child(2) {
+    width: 40%;
+}
+
+@keyframes pr-culture-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* 空状态 */
+.pr-culture-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-2xl) var(--space-lg);
+    text-align: center;
+}
+
+.pr-culture-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-culture-empty-text {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-sm);
+}
+
+/* 全国一等奖冲刺：空状态四要素齐全（图标+标题+描述+CTA） */
+.pr-culture-empty-title {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-tight);
+}
+
+.pr-culture-empty-desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-relaxed);
+    max-width: 32ch;
+}
+
+.pr-culture-empty-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
+    min-height: var(--control-height-compact);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-accent-primary));
+    background: var(--accent-primary-05);
+    box-shadow: inset 0 0 0 1px var(--accent-primary-20);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy);
+}
+
+.pr-culture-empty-cta:hover {
+    background: var(--accent-primary-10);
+    transform: translateY(-1px);
+}
+
+.pr-culture-empty-cta:active {
+    transform: scale(0.97);
+}
+
+.pr-culture-empty-cta:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--accent-primary-20), var(--shadow-focus-accent);
+}
+
+/* ============================================================
+ * 背景包 BackgroundPanel
+ * ============================================================ */
+
+.pr-culture-background-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md);
+}
+
+@media (max-width: 768px) {
+    .pr-culture-background-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.pr-culture-bg-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-glass);
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-bg-section:hover {
+    background-color: var(--surface-elevated-soft);
+}
+
+.pr-culture-bg-section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.pr-culture-bg-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-xs);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-culture-bg-section-label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-culture-bg-section-content {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-base);
+}
+
+.pr-culture-bg-skeleton {
+    height: 120px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(90deg,
+            var(--surface-tertiary-alpha) 0%,
+            var(--surface-tertiary-soft) 50%,
+            var(--surface-tertiary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-culture-shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+/* ============================================================
+ * 图片库 ImageGallery
+ * ============================================================ */
+
+.pr-culture-image-grid {
+    display: grid;
+    /* Task 28.4：按规范统一最小列宽为 180px，确保 4:3 卡片视觉一致
+     * 计算依据：规范要求 minmax(180px, 1fr)，原 clamp(160px, 18vw, 220px) 在窄屏
+     * 下会缩至 160px 导致卡片内容拥挤；180px 是 4:3 比例下文字可读性的下限 */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-md);
+}
+
+.pr-culture-image-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    min-width: 0;
+    padding: 0;
+    text-align: left;
+    transition:
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-image-card:hover {
+    transform: translateY(-2px);
+}
+
+.pr-culture-image-card.is-selected .pr-culture-image-frame {
+    box-shadow: 0 0 0 2px rgb(var(--c-accent-primary));
+}
+
+.pr-culture-image-card:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.pr-culture-image-card:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+    border-radius: var(--radius-sm);
+}
+
+.pr-culture-image-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background-color: var(--surface-tertiary-alpha);
+}
+
+.pr-culture-image-frame.is-portrait {
+    aspect-ratio: 3 / 4;
+}
+
+.pr-culture-image-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity var(--dur-small) var(--ease-out);
+}
+
+.pr-culture-image-img.is-loaded {
+    opacity: 1;
+}
+
+.pr-culture-image-skeleton {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+            var(--surface-tertiary-alpha) 0%,
+            var(--surface-tertiary-soft) 50%,
+            var(--surface-tertiary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-culture-shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+.pr-culture-image-skeleton.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-small) var(--ease-out);
+}
+
+.pr-culture-image-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-sm);
+    background: linear-gradient(to top,
+            rgb(var(--c-text-primary) / 0.55) 0%,
+            rgb(var(--c-text-primary) / 0) 60%);
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-image-card:hover .pr-culture-image-overlay {
+    opacity: 1;
+}
+
+.pr-culture-image-overlay-text {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-inverse));
+    line-height: var(--leading-xs);
+}
+
+.pr-culture-image-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-sm);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-culture-image-desc {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    line-height: var(--leading-xs);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* 图片详情弹层 */
+.pr-culture-image-detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.pr-culture-image-detail-img {
+    width: 100%;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background-color: var(--surface-tertiary-alpha);
+}
+
+.pr-culture-image-detail-img img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.pr-culture-image-detail-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-lg);
+}
+
+.pr-culture-image-detail-desc {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-base);
+}
+
+.pr-culture-image-detail-perspectives {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-culture-image-detail-perspective {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    border-radius: var(--radius-xs);
+    background-color: var(--surface-glass);
+}
+
+.pr-culture-image-detail-perspective-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-accent-primary));
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-culture-image-detail-perspective-text {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-sm);
+}
+
+/* ============================================================
+ * 意象解读 ImageryPanel
+ * ============================================================ */
+
+.pr-culture-imagery-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.pr-culture-imagery-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    border: none;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: var(--tracking-tight);
+    cursor: pointer;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-imagery-tag:hover {
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-culture-imagery-tag:active {
+    transform: scale(0.95);
+}
+
+.pr-culture-imagery-tag:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-culture-imagery-tag.is-active {
+    background-color: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+}
+
+.pr-culture-imagery-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.pr-culture-imagery-base {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    background-color: var(--accent-primary-02);
+    box-shadow: inset 3px 0 0 rgb(var(--c-accent-primary));
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-base);
+}
+
+.pr-culture-imagery-deep {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-base);
+}
+
+.pr-culture-imagery-dimensions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.pr-culture-imagery-dimension {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-xs);
+    background-color: var(--accent-info-10);
+    color: rgb(var(--c-accent-info));
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+}
+
+.pr-culture-imagery-related {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-culture-imagery-related-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tight);
+    text-transform: uppercase;
+}
+
+.pr-culture-imagery-related-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+}
+
+.pr-culture-imagery-related-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-xs);
+    background-color: var(--surface-tertiary-alpha);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-culture-imagery-related-item-dynasty {
+    color: rgb(var(--c-text-tertiary));
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-culture-imagery-skeleton {
+    height: 80px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg,
+            var(--surface-tertiary-alpha) 0%,
+            var(--surface-tertiary-soft) 50%,
+            var(--surface-tertiary-alpha) 100%);
+    background-size: 200% 100%;
+    animation: pr-culture-shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+/* ============================================================
+ * 沉浸式投屏 ImmersiveProjector
+ * ============================================================ */
+
+.pr-culture-projector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+}
+
+.pr-culture-projector-preview {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: rgb(var(--c-text-primary));
+}
+
+.pr-culture-projector-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    transition: opacity var(--dur-medium) var(--ease-out);
+}
+
+.pr-culture-projector-preview-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    color: rgb(var(--c-text-inverse));
+    opacity: 0.6;
+}
+
+.pr-culture-projector-preview-empty-text {
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-culture-projector-status {
+    position: absolute;
+    top: var(--space-sm);
+    right: var(--space-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-full);
+    background-color: var(--surface-glass-heavy);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-culture-projector-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-accent-success));
+}
+
+.pr-culture-projector-status-dot.is-idle {
+    background-color: rgb(var(--c-text-tertiary));
+}
+
+.pr-culture-projector-status-dot.is-stopped {
+    background-color: rgb(var(--c-accent-error));
+}
+
+.pr-culture-projector-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.pr-culture-projector-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+    cursor: pointer;
+    min-height: var(--control-height-compact);
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-projector-btn:active {
+    transform: scale(0.97);
+}
+
+.pr-culture-projector-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-culture-projector-btn-start {
+    background-color: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-text-inverse));
+}
+
+.pr-culture-projector-btn-start:hover {
+    background-color: rgb(var(--c-accent-primary-hover));
+}
+
+/* ============================================================
+ * spec v7 Phase 5 —— z-index 层级修正
+ * ------------------------------------------------------------
+ * .pr-culture 已设 position: relative + isolation: isolate
+ * 子元素需显式 z-index: 1 以位于背景层之上
+ * ============================================================ */
+
+.pr-v5-hero--culture {
+    z-index: 1;
+}
+
+.pr-culture-body {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================================
+ * P0-C4 修复：GlowBorder/ScrollReveal 包裹改造
+ * ------------------------------------------------------------
+ * 原 GlowBorder（490 行组件）包裹 <main> + ScrollReveal 包裹布局容器
+ * 违反"大容器嵌套小容器禁止"原则
+ * 现改为：
+ * - main 直接使用 box-shadow + is-active class（见上方 .pr-culture-main）
+ * - 布局容器使用 pr-v5-fade-in-up CSS animation 替代 ScrollReveal
+ * ============================================================ */
+
+.pr-v5-fade-in-up {
+    animation: pr-v5-fade-in-up 350ms var(--ease-out) both;
+}
+
+@keyframes pr-v5-fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-v5-fade-in-up {
+        animation: none;
+    }
+}
+
+/* ============================================================
+ * spec v7 Phase 5 —— MasonryGrid 文化卡片瀑布流
+ * ------------------------------------------------------------
+ * 六张文化知识卡片，CSS Columns 瀑布流布局
+ * 每张卡片：体裁标签 + 标题 + 描述
+ * hover 微升 + 透明微边框
+ * ============================================================ */
+
+.pr-culture-cards-section {
+    order: 4;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-secondary-alpha);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    background-blend-mode: overlay;
+}
+
+.pr-culture-cards-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.pr-culture-cards-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-normal);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-xl);
+    margin: 0;
+}
+
+.pr-culture-cards-meta {
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-tertiary));
+    letter-spacing: var(--tracking-tight);
+    font-variant-numeric: tabular-nums;
+}
+
+.pr-culture-card {
+    display: flex;
+    flex-direction: column;
+    /* v7 布局修复：卡片内部信息层级间距从紧带(4px)提升至紧带高端(8px)
+     * 计算依据：规范 5.3——tag/title/desc 是不同信息层级，
+     * 非同一语义组内的紧贴元素，需用 8px 区分层级 */
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition:
+        transform var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out);
+    break-inside: avoid;
+    /* v7 布局修复：移除 margin-bottom——瀑布流行间距已由 MasonryGrid
+     * 的 --masonry-gap 变量(24px)统一管理，此处叠加会导致双重间距 */
+}
+
+.pr-culture-card:hover {
+    transform: translateY(-2px);
+    background-color: var(--surface-elevated-soft);
+    box-shadow: var(--shadow-card-hover);
+}
+
+.pr-culture-card-tag {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-xs);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tightest);
+    text-transform: uppercase;
+}
+
+.pr-culture-card-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-culture-card-desc {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: var(--leading-relaxed);
+}
+
+/* 卡片头部：tag + AI 生成徽标并排 */
+.pr-culture-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+}
+
+/* AI 生成徽标：accent-info 微底 + sparkle 图标 */
+.pr-culture-card-ai {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 2px var(--space-xs);
+    border-radius: var(--radius-full);
+    background: var(--accent-info-10);
+    color: rgb(var(--c-accent-info));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tightest);
+}
+
+/* 加载态卡片：脉动动画暗示生成中 */
+.pr-culture-card--loading {
+    background: var(--surface-tertiary-alpha);
+    animation: pr-culture-card-pulse 1.5s var(--ease-in-out) infinite;
+}
+
+@keyframes pr-culture-card-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* ============================================================
+ * spec v7 Phase 5 —— prefers-reduced-motion 降级
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-culture-card {
+        transition: none;
+    }
+}
+
+/* ============================================================
+ * spec v7 Phase 5 —— 响应式：平板/移动
+ * ============================================================ */
+
+@media (max-width: 900px) {
+    .pr-culture-cards-section {
+        padding: var(--space-md);
+    }
+}
+
+.pr-culture-projector-btn-stop {
+    background-color: var(--accent-error-10);
+    color: rgb(var(--c-accent-error));
+}
+
+.pr-culture-projector-btn-stop:hover {
+    background-color: var(--accent-error-20);
+}
+
+.pr-culture-projector-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.pr-culture-projector-settings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.pr-culture-projector-setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    min-height: var(--control-height-default);
+}
+
+.pr-culture-projector-setting-slider input[type='range'] {
+    min-height: var(--control-height-compact);
+}
+
+.pr-culture-projector-setting-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-culture-projector-setting-value {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-primary));
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--weight-medium);
+}
+
+/* 开关组件 */
+.pr-culture-toggle {
+    position: relative;
+    width: var(--control-icon-size);
+    height: var(--control-height-compact);
+    border: none;
+    padding: 0;
+    border-radius: var(--radius-full);
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-toggle:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 规范第14章：补齐 focus-visible 态，完成5态反馈链路 */
+.pr-culture-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+.pr-culture-toggle::before {
+    content: '';
+    position: absolute;
+    left: var(--space-xs);
+    top: 10px;
+    width: 36px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    background-color: var(--surface-tertiary-alpha);
+    transition: background-color var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-toggle.is-on::before {
+    background-color: rgb(var(--c-accent-primary));
+}
+
+.pr-culture-toggle-thumb {
+    position: absolute;
+    top: 12px;
+    left: 6px;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-text-inverse));
+    transition: transform var(--dur-micro) var(--spring-snappy);
+}
+
+.pr-culture-toggle.is-on .pr-culture-toggle-thumb {
+    transform: translateX(16px);
+}
+
+/* 投屏信息 */
+.pr-culture-projector-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    /* 0.40 alpha 对齐 --surface-tertiary-light 的 alpha 阶梯，保持原视觉外观 */
+    background-color: rgb(var(--c-surface-elevated) / 0.40);
+}
+
+.pr-culture-projector-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    font-size: var(--text-xs);
+}
+
+.pr-culture-projector-info-label {
+    color: rgb(var(--c-text-tertiary));
+}
+
+.pr-culture-projector-info-value {
+    color: rgb(var(--c-text-secondary));
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--weight-medium);
+}
+
+/* ============================================================
+ * AI 生成标注
+ * ============================================================ */
+
+.pr-culture-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 2px var(--space-xs);
+    border-radius: var(--radius-xs);
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tightest);
+}
+
+/* ============================================================
+ * 加载旋转动画
+ * ============================================================ */
+
+.pr-culture-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-xl);
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-sm);
+}
+
+.pr-culture-loading-spinner {
+    display: inline-flex;
+    /* 规范7.2：禁止线性缓动。spinner 旋转采用 ease-in-out 替代 linear，避免机械感
+     * 注：无限旋转动画的 ease-in-out 会产生"呼吸"节奏，符合规范"物理运动"要求 */
+    animation: pr-culture-spin 0.8s var(--ease-in-out) infinite;
+}
+
+@keyframes pr-culture-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================================
+ * 入场动画
+ * ============================================================ */
+
+.pr-culture-fade-in {
+    animation: pr-culture-fade-in var(--dur-small) var(--ease-out);
+}
+
+@keyframes pr-culture-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+ * 无障碍：减少动画
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-culture-poem-card,
+    .pr-culture-image-card,
+    .pr-culture-imagery-tag,
+    .pr-culture-projector-btn,
+    .pr-culture-toggle,
+    .pr-culture-toggle-thumb,
+    .pr-culture-image-img,
+    .pr-culture-image-skeleton,
+    .pr-culture-poem-skeleton-line,
+    .pr-culture-bg-skeleton,
+    .pr-culture-imagery-skeleton,
+    .pr-culture-fade-in,
+    .pr-culture-loading-spinner,
+    .pr-culture-card--loading,
+    .pr-culture-hero-image,
+    .pr-culture-hero-eyebrow-dot {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ============================================================
+ * spec v7 Phase 6 —— PixelTransition 诗境像素揭示区
+ * ------------------------------------------------------------
+ * 严格移植自《优质前端部件组/19_像素过渡.md》
+ * 3 张诗境切换卡片，hover 触发像素化 stagger 揭示
+ * 暖金像素色 + 4:3 比例 + 居中布局
+ * ============================================================ */
+.pr-culture-pixel-section {
+    margin-top: var(--space-xl);
+    position: relative;
+    order: 3;
+    z-index: 1;
+}
+
+.pr-culture-pixel-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.pr-culture-pixel-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+}
+
+.pr-culture-pixel-meta {
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-accent-primary));
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+}
+
+.pr-culture-pixel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(260px, 30vw, 360px), 1fr));
+    gap: var(--space-lg);
+}
+
+.pr-culture-pixel-card {
+    width: 100%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+/* 初始态内容：诗题 + 朝代标签 */
+.pr-culture-pixel-first {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-lg);
+    /* 规范2.4：禁止AI味渐变（accent → surface 跨色相跨度大）
+     * 改为 accent-primary 同色相微渐变（8% → 4% alpha），符合微渐变规范 */
+    background: linear-gradient(135deg,
+            rgb(var(--c-accent-primary) / 0.08) 0%,
+            rgb(var(--c-accent-primary) / 0.04) 100%);
+    text-align: center;
+}
+
+.pr-culture-pixel-tag {
+    display: inline-block;
+    padding: 2px var(--space-sm);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-accent-primary));
+    background: var(--accent-primary-10);
+    border-radius: var(--radius-full);
+    letter-spacing: var(--tracking-tightest);
+}
+
+.pr-culture-pixel-poem-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    color: rgb(var(--c-text-primary));
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+}
+
+.pr-culture-pixel-dynasty {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    letter-spacing: var(--tracking-tight);
+}
+
+/* 揭示态内容：文化场景描述 + AI 生成标注 */
+.pr-culture-pixel-second {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: var(--space-xs);
+    padding: var(--space-lg);
+    /* 同色相透明度渐变（text-primary 82% → 36% → 0%），属合法微渐变 */
+    background: linear-gradient(to top,
+            rgb(var(--c-text-primary) / 0.82) 0%,
+            rgb(var(--c-text-primary) / 0.36) 50%,
+            transparent 100%);
+}
+
+.pr-culture-pixel-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 2px var(--space-sm);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-accent-primary));
+    background: var(--surface-elevated);
+    border-radius: var(--radius-full);
+    backdrop-filter: blur(8px);
+}
+
+.pr-culture-pixel-scene {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-inverse));
+    line-height: var(--leading-relaxed);
+    letter-spacing: var(--tracking-tight);
+    text-shadow: 0 1px 4px rgb(var(--c-text-primary) / 0.5);
+}
+
+/* 平板以下：像素揭示区压缩 */
+@media (max-width: 1100px) {
+    .pr-culture-pixel-section {
+        margin-top: var(--space-lg);
+    }
+
+    .pr-culture-pixel-grid {
+        grid-template-columns: repeat(auto-fit, minmax(clamp(220px, 45vw, 320px), 1fr));
+        gap: var(--space-md);
+    }
+}
+
+/* prefers-reduced-motion：PixelTransition 降级为静态展示 */
+@media (prefers-reduced-motion: reduce) {
+    .pr-culture-pixel-section {
+        display: none;
+    }
+}
+
+/* ============================================================
+ * PixelSnow 冬季诗篇轻量雪境背景 + FallingText 诗题物理入场
+ * ------------------------------------------------------------
+ * 设计意图：选诗后，main 区域底层渲染确定性 DOM/CSS 雪片（仅冬季题材），
+ * 顶部以有限 CSS 词级入场呈现诗题，强化"卷轴铺展"的仪式感。
+ * - PixelSnow 层：absolute 全屏底层，pointer-events:none，opacity 0.55
+ * - FallingText 层：relative 顶部带高度，静态标题始终先于增强效果可读
+ * - 透明度叠加：雪花层不影响上层内容可读性（WCAG AA 合规）
+ * ============================================================ */
+
+/* main 区域需建立定位上下文，承载 absolute 雪花层（不设 overflow:hidden 以免裁剪子面板下拉） */
+.pr-culture-main {
+    position: relative;
+}
+
+/* 雪花背景层：全屏底层装饰，自身裁剪避免溢出 */
+.pr-culture-main-snow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+    opacity: 0.55;
+    /* 顶部到底部的渐变遮罩，避免雪花干扰底部内容可读性
+     * 规范2.2：禁止纯硬色（含纯黑 #000000）。mask-image 仅取 alpha 通道，
+     * 故改用暖调 text-primary 通道（44 36 26）替代纯黑，视觉等价且合规 */
+    mask-image: linear-gradient(to bottom,
+            rgb(var(--c-text-primary) / 0.9) 0%,
+            rgb(var(--c-text-primary) / 0.5) 60%,
+            rgb(var(--c-text-primary) / 0.15) 100%);
+    -webkit-mask-image: linear-gradient(to bottom,
+            rgb(var(--c-text-primary) / 0.9) 0%,
+            rgb(var(--c-text-primary) / 0.5) 60%,
+            rgb(var(--c-text-primary) / 0.15) 100%);
+}
+
+.pr-culture-snow-field {
+    width: 100%;
+    height: 100%;
+}
+
+/* 诗题入场容器：为完整静态标题与渐进增强动效提供稳定空间。 */
+.pr-culture-falling-title-wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: clamp(80px, 12vh, 120px);
+    margin-bottom: var(--space-md);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    /* 极淡的暖色底板，衬托物理文字 */
+    background: rgb(var(--c-surface-elevated) / 0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.pr-culture-falling-title {
+    width: 100%;
+    height: 100%;
+}
+
+/* main 内的子内容面板需提升 z-index 至雪花层之上 */
+.pr-culture-main>section,
+.pr-culture-main>div:not(.pr-culture-main-snow):not(.pr-culture-falling-title-wrap):not(.pr-culture-empty) {
+    position: relative;
+    z-index: 1;
+}
+
+/* 平板以下：压缩诗题入场区高度 */
+@media (max-width: 1100px) {
+    .pr-culture-falling-title-wrap {
+        min-height: clamp(64px, 10vh, 96px);
+    }
+}
+
+/* prefers-reduced-motion：雪花保留为低透明度静态氛围，标题入场同步降级。 */
+@media (prefers-reduced-motion: reduce) {
+    .pr-culture-main-snow {
+        opacity: 0.18;
+    }
+
+    .pr-culture-falling-title-wrap {
+        min-height: auto;
+        padding: var(--space-md);
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
+/* ============================================================
+ * Task 28：Tab 分区样式（译文/背景/意象/图集）
+ * ------------------------------------------------------------
+ * 设计要点：
+ * - 玻璃态 tablist 容器（surface-glass + backdrop-blur 12px）
+ * - tab 按钮 hover/active/focus-visible 三态完整（规范 7.1 / 7.2）
+ * - 激活态使用 accent-primary 10% alpha 背景（规范 2.4 强调色应用规则）
+ * - 面板切换 200ms opacity + translateY 8px 入场动画（规范 6.3）
+ * - 无硬边框：区域分隔用透明度差异（规范第 4 章）
+ * - WAI-ARIA Tab 模式：role=tablist/tab/tabpanel，aria-controls/aria-selected
+ * - 切换不重新渲染：通过 HTML hidden 属性切换 display（保留组件状态）
+ * ============================================================ */
+
+/* tablist 容器：玻璃态横向滚动条 */
+.pr-culture-tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-primary-alpha) transparent;
+    position: relative;
+    z-index: 1;
+}
+
+/* Webkit 滚动条：极淡 alpha 线 */
+.pr-culture-tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.pr-culture-tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pr-culture-tabs::-webkit-scrollbar-thumb {
+    background: var(--border-primary-alpha);
+    border-radius: var(--radius-full);
+}
+
+.pr-culture-tabs::-webkit-scrollbar-thumb:hover {
+    background: var(--border-primary-hover-alpha);
+}
+
+/* 单个 Tab 按钮 */
+.pr-culture-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: rgb(var(--c-text-secondary));
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-sm);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-culture-tab:hover {
+    background-color: var(--surface-tertiary-alpha);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-culture-tab:active {
+    transform: scale(0.97);
+}
+
+.pr-culture-tab:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+/* 激活态：accent-primary 10% alpha 背景 + 100% 实色文字 */
+.pr-culture-tab.is-active {
+    background-color: var(--accent-primary-10);
+    color: rgb(var(--c-accent-primary));
+    font-weight: var(--weight-semibold);
+}
+
+/* 激活态指示器：底部 2px 圆角线条，accent-primary 100% 实色 */
+.pr-culture-tab-indicator {
+    position: absolute;
+    bottom: var(--space-xs);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background-color: rgb(var(--c-accent-primary));
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+.pr-culture-tab-label {
+    line-height: var(--leading-sm);
+}
+
+/* Tab 面板容器：定位上下文 + 最小高度避免切换抖动 */
+.pr-culture-tab-panels {
+    position: relative;
+    z-index: 1;
+    min-height: 240px;
+}
+
+/* 单个 Tab 面板：默认通过 HTML hidden 属性隐藏（display: none） */
+.pr-culture-tab-panel {
+    width: 100%;
+}
+
+/* 激活面板：200ms opacity + translateY 8px 入场动画（规范 6.3） */
+.pr-culture-tab-panel--active {
+    animation: pr-culture-tab-panel-enter 200ms var(--ease-out) both;
+}
+
+@keyframes pr-culture-tab-panel-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* prefers-reduced-motion：禁用面板入场动画与 Tab 过渡 */
+@media (prefers-reduced-motion: reduce) {
+    .pr-culture-tab-panel--active {
+        animation: none;
+    }
+
+    .pr-culture-tab {
+        transition: none;
+    }
+}
+
+/* 响应式：平板以下 Tab 紧凑化 */
+@media (max-width: 768px) {
+    .pr-culture-tabs {
+        gap: var(--space-xs);
+        padding: var(--space-xs);
+    }
+
+    .pr-culture-tab {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--text-xs);
+    }
+
+    .pr-culture-tab-indicator {
+        width: 50%;
+    }
+}
+
+.pr-culture-imagery-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 30px;
+    padding: 4px 10px;
+    border: 1px solid var(--border-primary-alpha);
+    border-radius: var(--radius-full);
+    color: var(--accent-primary);
+    background: var(--surface-elevated-soft);
+    font: inherit;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    cursor: pointer;
+}
+
+.pr-culture-imagery-refresh:hover:not(:disabled) { background: var(--accent-primary-10); }
+.pr-culture-imagery-refresh:focus-visible { outline: none; box-shadow: var(--shadow-focus-accent); }
+.pr-culture-imagery-refresh:disabled { cursor: wait; opacity: .6; }

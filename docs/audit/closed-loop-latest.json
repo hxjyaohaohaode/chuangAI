@@ -1,0 +1,46 @@
+{
+  "startedAt": "2026-08-10T07:18:14.330Z",
+  "finishedAt": "2026-08-10T07:18:14.480Z",
+  "baseUrl": "http://127.0.0.1:60791",
+  "status": "passed",
+  "checks": {
+    "health": true,
+    "signedSession": true,
+    "classAndStudentResolved": true,
+    "sixBloomLevelsCovered": true,
+    "classroomStarted": true,
+    "answerNotExposed": true,
+    "untrustedStudentNameNotExposed": true,
+    "answerSubmitted": true,
+    "learningEventObservedByHotspot": true,
+    "trendAlertsExplicitlyRefreshed": true,
+    "trendAlertsPersistentlyReadable": true,
+    "nextQuestionIndex": 1,
+    "classroomEnded": true,
+    "reportPersistentlyReadable": true,
+    "spaDeepLink": true,
+    "contentSecurityPolicy": true,
+    "unknownApiReturns404": true
+  },
+  "entities": {
+    "classId": "class-001",
+    "studentId": "class001-student-S01",
+    "poemId": "tongbian-001",
+    "lessonId": "lesson-69229553-e2de-4c5f-b544-a92db6c9fd9d",
+    "questionId": "baseline-tongbian-001-1",
+    "joinCode": "BBXK62",
+    "questionCount": 6,
+    "bloomCoverage": {
+      "记忆": 1,
+      "理解": 1,
+      "应用": 1,
+      "分析": 1,
+      "评价": 1,
+      "创造": 1
+    }
+  },
+  "report": {
+    "summary": "本堂课共 6 题，1 名学生参与，提交答题 1 次，正确率 0%。课堂氛围：困惑，认知负荷 25，推送启发提示 0 次。",
+    "aiGenerated": false
+  }
+}

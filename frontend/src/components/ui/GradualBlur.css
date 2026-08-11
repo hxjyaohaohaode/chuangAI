@@ -1,0 +1,27 @@
+.pr-gradual-blur {
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.pr-gradual-blur--page {
+    inset-inline: 0;
+}
+
+.pr-gradual-blur-layer {
+    position: absolute;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+    .pr-gradual-blur-layer {
+        background: linear-gradient(to bottom, transparent, rgb(var(--c-surface-primary) / 0.18));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pr-gradual-blur {
+        transition: none !important;
+    }
+}

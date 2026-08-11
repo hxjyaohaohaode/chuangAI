@@ -1,0 +1,579 @@
+/**
+ * 403 权限拦截页面样式（B3.5）
+ *
+ * 设计依据（规范第 2、3、4、6 章）：
+ * - 浅色基底：surface-primary 背景，深石墨色文字
+ * - 非对称构图：hero 区左 55%（巨型数字）+ 右 45%（描述操作）
+ * - Bento Grid：上下文区 2fr 1fr 1fr，主卡片 2 倍宽度
+ * - 玻璃质感：身份卡片 backdrop-blur + 半透明背景
+ * - Spring 动效：translateY + opacity 入场，ease-out 200ms，错峰 80ms
+ * - 无纯硬色：所有色彩经灰度调和
+ * - 渐进式入场：hero → identity → context → help 依次展开
+ * - 与 NotFoundPage 视觉同源：色调从 error(珊瑚红) 改为 info(靛青)，区分"权限"与"404"
+ */
+
+/* ===== 容器 ===== */
+.pr-forbidden {
+    min-height: 100vh;
+    padding: clamp(24px, 4vw, 64px) clamp(20px, 5vw, 80px);
+    background:
+        radial-gradient(ellipse 80% 60% at 20% 0%,
+            rgb(var(--c-accent-info) / 0.05) 0%,
+            transparent 50%),
+        rgb(var(--c-surface-primary));
+    display: flex;
+    flex-direction: column;
+    gap: clamp(32px, 5vw, 64px);
+    position: relative;
+    isolation: isolate;
+}
+
+/* ===== 星空背景层 ===== */
+.pr-forbidden-starfield-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.5;
+}
+
+/* 所有内容 section 提升至背景层之上 */
+.pr-forbidden>section {
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== 首屏钩子层：非对称构图 ===== */
+.pr-forbidden-hero {
+    display: flex;
+    align-items: center;
+    gap: clamp(24px, 4vw, 56px);
+    flex-wrap: wrap;
+    /* 非对称：左侧占更大视觉重量 */
+}
+
+.pr-forbidden-numeral {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 左侧视觉重量约 55% */
+    min-width: clamp(180px, 30vw, 360px);
+}
+
+.pr-forbidden-numeral-main {
+    font-size: clamp(80px, 18vw, 220px);
+    font-weight: var(--weight-bold);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    /* 微渐变：深石墨色 + 靛青色调（规范 2.4 反 AI 渐变，色相跨度 <15°） */
+    background: linear-gradient(135deg,
+            rgb(var(--c-text-primary)) 0%,
+            rgb(var(--c-accent-info) / 0.85) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* 入场动效：从下方滑入 + 淡入（规范 6.4） */
+    animation: pr-forbidden-numeral-enter var(--dur-large) var(--ease-out) both;
+}
+
+.pr-forbidden-numeral-glow {
+    position: absolute;
+    inset: -20% -10%;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%,
+            rgb(var(--c-accent-info) / 0.1) 0%,
+            transparent 70%);
+    filter: blur(40px);
+    z-index: -1;
+    /* 缓慢呼吸光晕（规范 6.1 装饰性动效 500ms-2000ms） */
+    animation: pr-forbidden-glow-breathe 3s var(--ease-in-out) infinite alternate;
+}
+
+/* GlowBorder 包装器：承担 flex 布局职责 */
+.pr-forbidden-summary-wrap {
+    flex: 1 1 320px;
+    min-width: 280px;
+}
+
+.pr-forbidden-summary {
+    padding: var(--space-lg);
+    border-radius: var(--radius-xl);
+    /* 玻璃质感背景（规范 4.5）—— 配合 GlowBorder 光韵 */
+    background: rgb(var(--c-surface-elevated) / 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    /* 入场动效：比 numeral 延迟 80ms（错峰，规范 6.4） */
+    animation: pr-forbidden-summary-enter var(--dur-large) var(--ease-out) 80ms both;
+}
+
+.pr-forbidden-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: rgb(var(--c-accent-info));
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.pr-forbidden-title {
+    font-size: clamp(var(--text-2xl), 3vw, var(--text-4xl));
+    font-weight: var(--weight-bold);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+}
+
+.pr-forbidden-desc {
+    font-size: var(--text-md);
+    line-height: 1.7;
+    color: rgb(var(--c-text-secondary));
+    max-width: 52ch;
+    margin: 0;
+}
+
+.pr-forbidden-identity,
+.pr-forbidden-path {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-sm);
+    background: rgb(var(--c-accent-info) / 0.08);
+    color: rgb(var(--c-accent-info));
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: calc(var(--text-sm) * 0.95);
+    word-break: break-all;
+}
+
+.pr-forbidden-actions {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+/* ===== 展开层：身份切换面板 ===== */
+.pr-forbidden-identity-panel {
+    /* 入场动效：延迟 160ms（条件展开时） */
+    animation: pr-forbidden-identity-enter var(--dur-large) var(--ease-out) both;
+}
+
+.pr-forbidden-identity-card {
+    /* 亚克力质感（规范 4.5）—— 退让、含蓄 */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgb(var(--c-surface-elevated) / 0.7);
+    border: 1px solid rgb(var(--c-text-primary) / 0.06);
+    max-width: 640px;
+}
+
+.pr-forbidden-identity-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: rgb(var(--c-accent-info));
+    margin-bottom: var(--space-sm);
+}
+
+.pr-forbidden-identity-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+}
+
+.pr-forbidden-identity-hint {
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-secondary));
+    line-height: 1.6;
+    margin: 0 0 var(--space-md) 0;
+}
+
+.pr-forbidden-identity-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.pr-forbidden-identity-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.pr-forbidden-identity-label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-forbidden-identity-input {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid rgb(var(--c-text-primary) / 0.12);
+    border-radius: var(--radius-sm);
+    background: rgb(var(--c-surface-elevated) / 0.6);
+    font-size: var(--text-md);
+    color: rgb(var(--c-text-primary));
+    transition:
+        border-color var(--dur-small) var(--ease-out),
+        box-shadow var(--dur-small) var(--ease-out);
+}
+
+.pr-forbidden-identity-input:focus {
+    outline: none;
+    border-color: rgb(var(--c-accent-info) / 0.5);
+    box-shadow: 0 0 0 3px rgb(var(--c-accent-info) / 0.12);
+}
+
+.pr-forbidden-identity-actions {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+}
+
+/* ===== 展开层：当前身份信息 Bento Grid ===== */
+.pr-forbidden-context {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    /* 入场动效：延迟 240ms（规范 6.4 渐进式） */
+    animation: pr-forbidden-context-enter var(--dur-large) var(--ease-out) 240ms both;
+}
+
+.pr-forbidden-context-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: rgb(var(--c-accent-info));
+}
+
+.pr-forbidden-context-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+    margin: 0;
+}
+
+.pr-forbidden-bento {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--space-md);
+    align-items: stretch;
+}
+
+.pr-forbidden-bento-card {
+    /* 玻璃质感（规范 4.2） */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgb(var(--c-surface-elevated) / 0.65);
+    border: 1px solid rgb(var(--c-text-primary) / 0.06);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    transition:
+        transform var(--dur-small) var(--ease-out),
+        box-shadow var(--dur-small) var(--ease-out),
+        background var(--dur-small) var(--ease-out);
+}
+
+.pr-forbidden-bento-card:hover,
+.pr-forbidden-bento-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 24px rgb(var(--c-text-primary) / 0.08),
+        0 2px 6px rgb(var(--c-text-primary) / 0.04);
+    background: rgb(var(--c-surface-elevated) / 0.8);
+}
+
+.pr-forbidden-bento-card--primary {
+    /* 主卡片：更大内边距 + 靛青色微边框 */
+    padding: var(--space-lg) !important;
+    border-color: rgb(var(--c-accent-info) / 0.15);
+    background: rgb(var(--c-accent-info) / 0.04);
+}
+
+.pr-forbidden-bento-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: rgb(var(--c-accent-info) / 0.08);
+    color: rgb(var(--c-accent-info));
+}
+
+.pr-forbidden-bento-card--primary .pr-forbidden-bento-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    background: rgb(var(--c-accent-info) / 0.12);
+}
+
+.pr-forbidden-bento-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    min-width: 0;
+    flex: 1;
+}
+
+.pr-forbidden-bento-label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-secondary));
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.pr-forbidden-bento-card--primary .pr-forbidden-bento-label {
+    font-size: var(--text-md);
+}
+
+.pr-forbidden-bento-detail {
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+    color: rgb(var(--c-text-primary));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pr-forbidden-bento-card--primary .pr-forbidden-bento-detail {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+}
+
+.pr-forbidden-bento-sub {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-forbidden-bento-path {
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+    opacity: 0.85;
+    word-break: break-all;
+}
+
+/* ===== 深化层：帮助卡片 ===== */
+.pr-forbidden-help {
+    /* 入场动效：延迟 320ms */
+    animation: pr-forbidden-help-enter var(--dur-large) var(--ease-out) 320ms both;
+}
+
+.pr-forbidden-help-card {
+    /* 纸张质感（规范 4.7）—— 可靠、稳重 */
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    background: rgb(var(--c-surface-elevated) / 0.85);
+    border: 1px solid rgb(var(--c-text-primary) / 0.05);
+    box-shadow: 0 1px 3px rgb(var(--c-text-primary) / 0.03);
+}
+
+.pr-forbidden-help-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: rgb(var(--c-accent-info) / 0.08);
+    color: rgb(var(--c-accent-info));
+}
+
+.pr-forbidden-help-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    flex: 1;
+}
+
+.pr-forbidden-help-title {
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    color: rgb(var(--c-text-primary));
+}
+
+.pr-forbidden-help-desc {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: rgb(var(--c-text-secondary));
+}
+
+/* ===== 遥测信息（开发模式） ===== */
+.pr-forbidden-telemetry {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: rgb(var(--c-accent-info) / 0.06);
+    border-radius: var(--radius-sm);
+    color: rgb(var(--c-accent-info));
+    font-size: var(--text-xs);
+    /* 入场动效：延迟 400ms */
+    animation: pr-forbidden-telemetry-enter var(--dur-large) var(--ease-out) 400ms both;
+}
+
+/* ===== 关键帧动画 ===== */
+@keyframes pr-forbidden-numeral-enter {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pr-forbidden-summary-enter {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pr-forbidden-identity-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pr-forbidden-context-enter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pr-forbidden-help-enter {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pr-forbidden-telemetry-enter {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pr-forbidden-glow-breathe {
+    from {
+        opacity: 0.6;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .pr-forbidden {
+        padding: clamp(20px, 6vw, 32px) clamp(16px, 4vw, 24px);
+        gap: var(--space-xl);
+    }
+
+    .pr-forbidden-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+    }
+
+    .pr-forbidden-numeral {
+        min-width: 100%;
+        justify-content: flex-start;
+    }
+
+    .pr-forbidden-numeral-main {
+        font-size: clamp(64px, 22vw, 120px);
+    }
+
+    .pr-forbidden-bento {
+        grid-template-columns: 1fr;
+    }
+
+    .pr-forbidden-bento-card--primary {
+        padding: var(--space-md) !important;
+    }
+
+    .pr-forbidden-actions {
+        width: 100%;
+    }
+
+    .pr-forbidden-actions>* {
+        flex: 1;
+    }
+
+    .pr-forbidden-identity-actions {
+        flex-direction: column;
+    }
+
+    .pr-forbidden-identity-actions>* {
+        width: 100%;
+    }
+}
+
+/* ===== Reduce Motion 降级（规范 6.5） ===== */
+@media (prefers-reduced-motion: reduce) {
+
+    .pr-forbidden-numeral-main,
+    .pr-forbidden-summary,
+    .pr-forbidden-identity-panel,
+    .pr-forbidden-context,
+    .pr-forbidden-help,
+    .pr-forbidden-telemetry {
+        animation: none !important;
+    }
+
+    .pr-forbidden-numeral-glow {
+        animation: none !important;
+        opacity: 0.6;
+    }
+
+    .pr-forbidden-bento-card {
+        transition: none !important;
+    }
+}

@@ -1,0 +1,231 @@
+/**
+ * DanceTimeline 样式 —— 三泳道时间轴
+ *
+ * 设计规范合规：
+ * - 无硬边框：泳道分隔使用透明度差异（规范 4.1）
+ * - 透明度分层：泳道背景 surface-secondary alpha（规范 2.3）
+ * - staggered 入场动画 50ms × N（规范 6.3）
+ * - transform/opacity 动画（规范 6.6）
+ */
+
+.pr-dance-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    /* 玻璃态容器（规范 2.3 第 2 层 surface-secondary） */
+    background-color: rgb(var(--c-surface-secondary) / 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    /* 规范 14.2：border-radius: 12px 替换为 var(--radius-lg) token */
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm);
+    min-height: clamp(180px, 22vh, 280px);
+}
+
+/* 泳道表头 */
+.pr-dance-timeline__lanes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xs);
+    padding: 0 var(--space-xs) var(--space-xs);
+}
+
+.pr-dance-timeline__lane-head {
+    display: flex;
+    align-items: center;
+    /* 规范 14.2：gap: 6px 替换为 var(--space-xs) token（4px 最近档，统一紧带间距） */
+    gap: var(--space-xs);
+    font-size: var(--text-xs);
+    color: rgb(var(--c-text-secondary));
+}
+
+.pr-dance-timeline__lane-dot {
+    width: 8px;
+    height: 8px;
+    /* 规范 14.2：border-radius: 50% 替换为 var(--radius-full) token */
+    border-radius: var(--radius-full);
+    opacity: 0.85;
+}
+
+.pr-dance-timeline__lane-name {
+    /* 规范 14.2：font-weight: 500 替换为 var(--weight-medium) token */
+    font-weight: var(--weight-medium);
+    /* 规范 14.2：letter-spacing: -0.01em 替换为 var(--tracking-tight) token */
+    letter-spacing: var(--tracking-tight);
+}
+
+.pr-dance-timeline__lane-count {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-2xs);
+    color: rgb(var(--c-text-tertiary));
+    background-color: rgb(var(--c-text-primary) / 0.06);
+    padding: 1px 6px;
+    /* 规范 14.2：border-radius: 4px 替换为 var(--radius-xs) token */
+    border-radius: var(--radius-xs);
+}
+
+/* 时间轴主体 —— 可滚动 */
+.pr-dance-timeline__body {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    /* 自定义滚动条（半透明，规范 9.2 代码块滚动条同源） */
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--c-text-primary) / 0.15) transparent;
+}
+
+.pr-dance-timeline__body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.pr-dance-timeline__body::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--c-text-primary) / 0.15);
+    /* 规范 14.2：border-radius: 2px 替换为 var(--radius-xs) token（4px 最近档） */
+    border-radius: var(--radius-xs);
+}
+
+/* 三泳道网格 */
+.pr-dance-timeline__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xs);
+    padding: 0 var(--space-xs);
+}
+
+.pr-dance-timeline__lane {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    /* 泳道背景：极淡透明度差异分隔（规范 4.1） */
+    background-color: rgb(var(--c-surface-tertiary) / 0.35);
+    /* 规范 14.2：border-radius: 8px 替换为 var(--radius-sm) token */
+    border-radius: var(--radius-sm);
+    padding: var(--space-xs);
+    min-height: 60px;
+}
+
+/* 节点 */
+.pr-dance-timeline__node {
+    display: flex;
+    align-items: flex-start;
+    /* 规范 14.2：gap: 6px 替换为 var(--space-xs) token */
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    /* 规范 14.2：border-radius: 6px 替换为 var(--radius-sm) token（8px 最近档） */
+    border-radius: var(--radius-sm);
+    background-color: rgb(var(--c-surface-elevated) / 0.65);
+    /* 规范 7.2：cubic-bezier(0.16,1,0.3,1) 等价 var(--ease-out) token；200ms → var(--dur-small) */
+    animation: pr-dance-node-enter var(--dur-small) var(--ease-out) both;
+    /* 规范 7.2：禁止 ease-out 关键字，改用 var(--ease-out)；150ms → var(--dur-micro) */
+    transition: background-color var(--dur-micro) var(--ease-out),
+        box-shadow var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--ease-out);
+}
+
+.pr-dance-timeline__window-note {
+    margin: 0;
+    padding: 0 var(--space-xs);
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+    line-height: 1.5;
+}
+
+.pr-dance-timeline__node:hover {
+    background-color: rgb(var(--c-surface-elevated) / 0.85);
+    /* 规范 7.3：补齐 hover 态（5 态反馈链路 —— 微升 + 阴影） */
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-card);
+}
+
+/* 规范 7.3：补齐 focus-visible 态（5 态反馈链路） */
+.pr-dance-timeline__node:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus-accent);
+}
+
+/* 规范 7.3：补齐 active 态（5 态反馈链路 —— 按下微下沉） */
+.pr-dance-timeline__node:active {
+    transform: translateY(0) scale(0.99);
+}
+
+.pr-dance-timeline__node-dot {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    /* 规范 14.2：border-radius: 50% 替换为 var(--radius-full) token */
+    border-radius: var(--radius-full);
+    margin-top: 5px;
+    background-color: var(--node-accent, rgb(var(--c-accent-primary)));
+    opacity: 0.9;
+}
+
+.pr-dance-timeline__node-text {
+    font-size: var(--text-2xs);
+    line-height: 1.45;
+    color: rgb(var(--c-text-primary));
+    /* 规范 14.2：letter-spacing: -0.01em 替换为 var(--tracking-tight) token */
+    letter-spacing: var(--tracking-tight);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* 最新节点高亮 */
+.pr-dance-timeline__node--latest {
+    background-color: rgb(var(--c-accent-primary) / 0.08);
+    box-shadow: 0 0 0 1px rgb(var(--c-accent-primary) / 0.12);
+}
+
+/* 空状态 */
+.pr-dance-timeline__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 120px;
+    padding: var(--space-md);
+    font-size: var(--text-sm);
+    color: rgb(var(--c-text-tertiary));
+    text-align: center;
+    /* 规范 14.2：letter-spacing: -0.01em 替换为 var(--tracking-tight) token */
+    letter-spacing: var(--tracking-tight);
+}
+
+/* 入场动画 */
+@keyframes pr-dance-node-enter {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 规范 7.11：prefers-reduced-motion 降级 —— 装饰性动效完全移除，必要状态变化改为瞬时切换 */
+@media (prefers-reduced-motion: reduce) {
+    .pr-dance-timeline__node {
+        animation: none;
+        transition: none;
+    }
+
+    .pr-dance-timeline__node:hover {
+        transform: none;
+    }
+
+    .pr-dance-timeline__body {
+        scroll-behavior: auto;
+    }
+}
+
+/* 响应式：窄屏切换单列堆叠 */
+@media (max-width: 767px) {
+    .pr-dance-timeline__lanes,
+    .pr-dance-timeline__grid {
+        grid-template-columns: 1fr;
+    }
+    .pr-dance-timeline__lane-head {
+        justify-content: flex-start;
+    }
+}

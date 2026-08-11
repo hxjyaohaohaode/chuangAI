@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=https://render.com/schema/render.yaml.json
+services:
+  - type: web
+    name: poetic-realm-ai
+    runtime: node
+    region: singapore
+    plan: starter
+    numInstances: 1
+    buildCommand: node scripts/render-build.mjs
+    startCommand: node scripts/render-start.mjs
+    healthCheckPath: /api/health
+    maxShutdownDelaySeconds: 60
+    disk:
+      name: poetic-realm-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.0
+      - key: SKIP_INSTALL_DEPS
+        value: "true"
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: APP_DATA_DIR
+        value: /var/data
+      - key: SQLITE_PATH
+        value: /var/data/poetic-realm.db
+      - key: DEMO_MODE
+        value: "false"
+      - key: ALLOW_UNAUTHENTICATED_NON_LOOPBACK
+        value: "false"
+      - key: AUTH_MODE
+        value: password
+      - key: AUTH_COOKIE_SECURE
+        value: "true"
+      - key: AUTH_SESSION_TTL_MINUTES
+        value: "480"
+      - key: AUTH_SESSION_SECRET
+        generateValue: true
+      - key: AUTH_PASSWORD_SCRYPT
+        sync: false
+      - key: AUTH_TEACHER_ID
+        value: teacher-001
+      - key: AUTH_TEACHER_NAME
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: MIMO_API_KEY
+        sync: false
+      - key: DASHSCOPE_API_KEY
+        sync: false
+      - key: WAN_IMAGE_BASE_URL
+        sync: false

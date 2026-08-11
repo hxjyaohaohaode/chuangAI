@@ -1,0 +1,420 @@
+/**
+ * Button 组件样式（从 ui.css 拆分，B3.4 CSS 代码分割）
+ * 设计依据：规范第 14.1 章
+ */
+
+.pr-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: 0 var(--space-md);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-tight);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    isolation: isolate;
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy),
+        box-shadow var(--dur-micro) var(--ease-out),
+        border-color var(--dur-micro) var(--ease-out),
+        opacity var(--dur-micro) var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pr-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pr-btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+/* focus-visible 双环光晕 —— 内环 surface-primary + 外环 accent 40% */
+.pr-btn:focus-visible {
+    box-shadow:
+        0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px var(--accent-primary-40);
+    outline: none;
+}
+
+/* 尺寸 */
+.pr-btn--sm {
+    padding: 0 12px;
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+    min-height: var(--control-height-compact);
+}
+
+.pr-btn--md {
+    padding: 0 var(--space-md);
+    min-height: var(--control-height-default);
+}
+
+.pr-btn--lg {
+    padding: 0 var(--space-lg);
+    font-size: var(--text-base);
+    min-height: var(--control-height-prominent);
+}
+
+.pr-btn--icon-only {
+    width: var(--control-icon-size);
+    min-width: var(--control-icon-size);
+    padding-inline: 0;
+}
+
+.pr-btn--icon-only.pr-btn--sm {
+    width: var(--control-height-compact);
+    min-width: var(--control-height-compact);
+}
+
+.pr-btn--icon-only.pr-btn--lg {
+    width: var(--control-height-prominent);
+    min-width: var(--control-height-prominent);
+}
+
+.pr-btn__icon,
+.pr-btn__loading {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.pr-btn__loading {
+    gap: var(--space-sm);
+}
+
+.pr-btn__spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: var(--radius-full);
+    animation: pr-btn-spin 700ms linear infinite;
+}
+
+@keyframes pr-btn-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* primary —— accent 主色背景 + 噪点纹理 + hover 上浮 + shadow */
+/* accent-primary 加深至 #986227 后，text-inverse on primary = 4.81:1 WCAG AA 合规 */
+.pr-btn--primary {
+    background-color: rgb(var(--c-accent-primary));
+    color: rgb(var(--c-text-inverse));
+    box-shadow: var(--shadow-button);
+}
+
+.pr-btn--primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.pr-btn--primary:hover:not(:disabled) {
+    background-color: rgb(var(--c-accent-primary-hover));
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-primary-hover);
+}
+
+.pr-btn--primary:active:not(:disabled) {
+    transform: scale(0.97);
+    box-shadow: var(--shadow-button-active);
+}
+
+/* secondary —— 透明 + alpha 30% 边框 + hover alpha 6% 背景 */
+.pr-btn--secondary {
+    background-color: transparent;
+    color: rgb(var(--c-accent-primary));
+    border: 1px solid var(--accent-primary-40);
+}
+
+.pr-btn--secondary:hover:not(:disabled) {
+    background-color: var(--accent-primary-10);
+    border-color: var(--accent-primary-40);
+}
+
+.pr-btn--secondary:active:not(:disabled) {
+    background-color: var(--accent-primary-20);
+}
+
+/* ghost —— 全透明 + hover alpha 5% 背景 */
+.pr-btn--ghost {
+    background-color: transparent;
+    color: rgb(var(--c-accent-primary));
+    border: none;
+}
+
+.pr-btn--ghost:hover:not(:disabled) {
+    background-color: rgb(var(--c-accent-primary) / 0.06);
+}
+
+.pr-btn--ghost:active:not(:disabled) {
+    background-color: var(--accent-primary-10);
+}
+
+/* danger —— error 色系 */
+.pr-btn--danger {
+    background-color: rgb(var(--c-accent-error));
+    color: rgb(var(--c-text-inverse));
+    box-shadow: var(--shadow-button-danger);
+}
+
+.pr-btn--danger::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.pr-btn--danger:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-danger-hover);
+}
+
+/* success —— success 色系 */
+.pr-btn--success {
+    background-color: rgb(var(--c-accent-success));
+    color: rgb(var(--c-text-inverse));
+    box-shadow: var(--shadow-button-success);
+}
+
+.pr-btn--success::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: var(--noise-texture);
+    background-size: 160px 160px;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.pr-btn--success:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button-success-hover);
+}
+
+/* block 撑满 */
+.pr-btn--block {
+    width: 100%;
+}
+
+/* ============================================================
+ * v5.1 —— 高质量前端界面精髓融合（2026-07-04）
+ * ------------------------------------------------------------
+ * 设计来源：MiMo Studio opacity 三态 + Lusion CTA 圆点吞噬
+ * 严格遵循暖调浅色基底 + 无边框优先 + GPU 友好动画
+ * 每个变体均为可选修饰类，不破坏现有 variant API
+ * ============================================================ */
+
+/* —— 1. MiMo Studio opacity 三态变体
+ *   原理：用 opacity 层级（1 → 0.85 → 0.65）替代色变
+ *   优势：在透明背景上更优雅，避免色相突变
+ *   用于：玻璃态底栏上的工具按钮、浮动操作按钮
+ *   触发：className="pr-btn pr-btn--ghost pr-btn--v51-opacity" */
+.pr-btn--v51-opacity {
+    background-color: transparent;
+    color: var(--icon-n2);
+    border: none;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 1;
+    transition:
+        opacity var(--dur-micro) var(--ease-out),
+        background-color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy),
+        color var(--dur-micro) var(--ease-out);
+}
+
+.pr-btn--v51-opacity:hover:not(:disabled) {
+    background-color: rgb(var(--c-bg-ultra-glow) / 0.12);
+    color: var(--icon-n1);
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.pr-btn--v51-opacity:active:not(:disabled) {
+    background-color: rgb(var(--c-accent-primary) / 0.10);
+    color: rgb(var(--c-accent-primary));
+    opacity: 0.65;
+    transform: scale(0.97);
+}
+
+.pr-btn--v51-opacity.is-active,
+.pr-btn--v51-opacity[aria-pressed='true'] {
+    background-color: var(--accent-primary-20);
+    color: rgb(var(--c-accent-primary));
+    opacity: 1;
+}
+
+/* focus-visible 双环光晕（继承自 .pr-btn，但增强外环以适配玻璃态） */
+.pr-btn--v51-opacity:focus-visible {
+    box-shadow:
+        0 0 0 2px rgb(var(--c-bg-ultra-glow)),
+        0 0 0 4px var(--accent-primary-40);
+}
+
+/* —— 2. Lusion CTA 圆点吞噬 hover 变体
+ *   原理：主按钮 hover 时，内部小圆点 scale(20) 扩散成强调色背景
+ *         文字微左移让位，营造"被吞噬"的戏剧感
+ *   用于：Hero CTA、引导按钮、关键转化点
+ *   触发：className="pr-btn pr-btn--primary pr-btn--cta"
+ *   结构：按钮内需包含 .pr-btn-cta-dot 与 .pr-btn-cta-label */
+.pr-btn--cta {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-right: calc(var(--space-md) + var(--cta-dot-size) + var(--space-xs));
+    transition:
+        background-color var(--dur-micro) var(--ease-out),
+        color var(--dur-micro) var(--ease-out),
+        transform var(--dur-micro) var(--spring-snappy),
+        box-shadow var(--dur-micro) var(--ease-out);
+}
+
+/* 圆点 —— 初始小圆点位于按钮右侧 */
+.pr-btn--cta .pr-btn-cta-dot {
+    position: absolute;
+    right: var(--space-md);
+    top: 50%;
+    transform: translate(0, -50%);
+    width: var(--cta-dot-size);
+    height: var(--cta-dot-size);
+    border-radius: var(--radius-full);
+    background: rgb(var(--c-bg-ultra-glow));
+    opacity: 0.9;
+    z-index: -1;
+    transition: var(--cta-dot-transition);
+    pointer-events: none;
+}
+
+/* 文字标签 —— hover 时左移让位 */
+.pr-btn--cta .pr-btn-cta-label {
+    display: inline-block;
+    transition: transform 400ms var(--ease-in-out);
+}
+
+/* hover 吞噬：圆点放大 + 右移扩散，覆盖整个按钮 */
+.pr-btn--cta:hover:not(:disabled) .pr-btn-cta-dot {
+    transform: translate(var(--cta-dot-translate), -50%) scale(var(--cta-dot-scale));
+    background: rgb(var(--c-accent-primary-hover));
+}
+
+.pr-btn--cta:hover:not(:disabled) .pr-btn-cta-label {
+    transform: translateX(var(--cta-label-translate));
+}
+
+/* active 时圆点回弹，文字复位 */
+.pr-btn--cta:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.pr-btn--cta:active:not(:disabled) .pr-btn-cta-dot {
+    transform: translate(0, -50%) scale(1);
+}
+
+.pr-btn--cta:active:not(:disabled) .pr-btn-cta-label {
+    transform: translateX(0);
+}
+
+/* disabled 时圆点静止 */
+.pr-btn--cta:disabled .pr-btn-cta-dot {
+    opacity: 0.38;
+    transform: translate(0, -50%) scale(1);
+}
+
+/* focus-visible 增强 —— CTA 按钮通常更醒目 */
+.pr-btn--cta:focus-visible {
+    box-shadow:
+        0 0 0 2px rgb(var(--c-surface-primary)),
+        0 0 0 4px var(--accent-primary-40),
+        0 4px 16px rgb(var(--c-accent-primary) / 0.20);
+}
+
+/* —— 3. 渐变文字标签变体（MiMo tag-gradient 启发）
+ *   用于：难度等级按钮、精选标签、状态徽章
+ *   触发：className="pr-btn pr-btn--ghost pr-btn--v51-gradient-text" */
+.pr-btn--v51-gradient-text {
+    background-color: transparent;
+    border: none;
+    padding: 4px var(--space-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-tight);
+    font-size: var(--text-xs);
+    line-height: 1;
+    min-height: auto;
+    color: transparent;
+    background-image: var(--gradient-text-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    transition: transform var(--dur-micro) var(--spring-snappy),
+        opacity var(--dur-micro) var(--ease-out);
+}
+
+.pr-btn--v51-gradient-text:hover:not(:disabled) {
+    transform: translateY(-1px);
+    opacity: 0.88;
+}
+
+.pr-btn--v51-gradient-text:active:not(:disabled) {
+    /* I-P1-8：active 缩放修正为规范值 0.97（原 0.96 偏离规范 7.2/14.1） */
+    transform: scale(0.97);
+}
+
+.pr-btn--v51-gradient-text--success {
+    background-image: var(--gradient-text-success);
+}
+
+.pr-btn--v51-gradient-text--info {
+    background-image: var(--gradient-text-info);
+}
+
+/* —— 4. v5.1 reduce-motion 降级（规范 6.5 / 6.6） */
+[data-reduce-motion='1'] .pr-btn--cta .pr-btn-cta-dot,
+[data-reduce-motion='1'] .pr-btn--cta .pr-btn-cta-label,
+[data-reduce-motion='1'] .pr-btn--v51-opacity,
+[data-reduce-motion='1'] .pr-btn--v51-gradient-text {
+    transition: none !important;
+}
+
+[data-reduce-motion='1'] .pr-btn--cta:hover:not(:disabled) .pr-btn-cta-dot {
+    transform: translate(0, -50%) scale(1);
+}
+
+[data-reduce-motion='1'] .pr-btn--cta:hover:not(:disabled) .pr-btn-cta-label {
+    transform: translateX(0);
+}
+
+[data-reduce-motion='1'] .pr-btn--v51-opacity:hover:not(:disabled) {
+    transform: none;
+}

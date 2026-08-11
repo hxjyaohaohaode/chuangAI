@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-08-04T12:54:54.643Z",
+  "root": ".",
+  "scannedFiles": 248,
+  "totalLines": 98608,
+  "deadLinks": [],
+  "redundant": [],
+  "placeholders": [],
+  "summary": {
+    "deadLinkCount": 0,
+    "redundantCount": 0,
+    "placeholderCount": 0,
+    "byKind": {}
+  }
+}

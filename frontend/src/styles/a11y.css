@@ -1,0 +1,103 @@
+/**
+ * A11y 可访问性增强样式（B6.1：WCAG 2.1 AA 全面达标）
+ *
+ * 设计依据（规范第 9.3 章 + WCAG 2.1）：
+ * - SC 2.4.1 跳过块：skip-to-content 链接，键盘用户可跳过导航直达主内容
+ * - SC 2.4.7 焦点可见：全局 focus-visible fallback（tokens.css 已实现）
+ * - SC 1.3.1 信息与关系：sr-only 工具类，为屏幕阅读器提供额外语义
+ * - SC 1.4.11 非文本对比度：焦点环对比度 ≥ 3:1
+ *
+ * skip-link 行为：
+ * - 默认 visually hidden（clip + opacity 0）
+ * - 获得焦点时滑入顶部居中，玻璃质感胶囊
+ * - 点击后焦点移至 #pr-main-content，跳过 sidebar/nav
+ */
+
+/* ===== Skip-to-content 链接（WCAG 2.4.1 Bypass Blocks） ===== */
+.pr-skip-link {
+    position: fixed;
+    top: var(--space-md, 16px);
+    left: 50%;
+    transform: translate(-50%, -200%);
+    z-index: 9999;
+    padding: var(--space-sm, 8px) var(--space-lg, 24px);
+    background: rgb(var(--c-bg-ultra-glow) / 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgb(var(--c-accent-primary) / 0.2);
+    border-radius: var(--radius-full, 9999px);
+    color: rgb(var(--c-text-primary));
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    min-height: var(--control-height-compact);
+    box-shadow:
+        0 8px 24px rgb(var(--c-text-primary) / 0.12),
+        0 2px 6px rgb(var(--c-text-primary) / 0.06);
+    opacity: 0;
+    transition:
+        transform var(--dur-small, 200ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+        opacity var(--dur-small, 200ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.pr-skip-link:focus,
+.pr-skip-link:focus-visible {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    outline: 2px solid rgb(var(--c-accent-primary) / 0.6);
+    outline-offset: 2px;
+}
+
+/* ===== sr-only 工具类（屏幕阅读器专用，视觉隐藏） ===== */
+.pr-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ===== 焦点环组件级覆盖规范 ===== */
+/* 组件如需自定义焦点环，使用以下模式覆盖全局 fallback：
+ *
+ *   .my-component:focus-visible {
+ *     outline: none;
+ *     box-shadow: 0 0 0 2px rgb(var(--c-accent-primary) / 0.5);
+ *   }
+ *
+ * 禁止：outline: none 且无替代焦点指示器（违反 WCAG 2.4.7）
+ */
+
+/* ===== Reduce Motion 增强（规范 6.5） ===== */
+@media (prefers-reduced-motion: reduce) {
+    .pr-skip-link {
+        transition: none !important;
+    }
+}
+
+/* ===== 高对比度模式支持（Windows High Contrast Mode） ===== */
+@media (forced-colors: active) {
+    .pr-skip-link {
+        background: Canvas;
+        color: CanvasText;
+        border: 1px solid CanvasText;
+    }
+
+    /* 交给系统色重映射；只有已完整使用系统色的局部组件才可自行设为 none。 */
+    button,
+    a,
+    [role='button'],
+    [role='link'],
+    input,
+    textarea,
+    select,
+    [tabindex]:not([tabindex='-1']) {
+        forced-color-adjust: auto;
+    }
+}
