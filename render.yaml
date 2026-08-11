@@ -9,7 +9,6 @@ services:
     buildCommand: node scripts/render-build.mjs
     startCommand: node scripts/render-start.mjs
     healthCheckPath: /api/health
-    maxShutdownDelaySeconds: 60
     disk:
       name: poetic-realm-data
       mountPath: /var/data
