@@ -9,6 +9,8 @@ import {
 } from './auth.js'
 
 const apps: FastifyInstance[] = []
+const DEMO_PHONE = '13177091153'
+const DEMO_PASSWORD = 'Chy101713'
 
 afterEach(async () => {
     await Promise.all(apps.splice(0).map((app) => app.close()))
@@ -22,6 +24,7 @@ function options(overrides: Partial<AuthServiceOptions> = {}): AuthServiceOption
         cookieSecure: 'false',
         teacherId: 'teacher-001',
         teacherName: '王雅琴',
+        teacherPhone: '13900000000',
         passwordScrypt: '',
         corsOrigins: ['http://localhost:5173'],
         ...overrides,
@@ -62,11 +65,11 @@ function cookieHeader(response: { headers: Record<string, string | string[] | nu
     return cookies.map((cookie) => cookie.split(';', 1)[0]).join('; ')
 }
 
-async function login(app: FastifyInstance, teacherId = 'teacher-001', extra: Record<string, unknown> = {}) {
+async function login(app: FastifyInstance, phone = DEMO_PHONE, extra: Record<string, unknown> = {}) {
     const response = await app.inject({
         method: 'POST',
         url: '/api/auth/login',
-        payload: { teacherId, ...extra },
+        payload: { phone, password: DEMO_PASSWORD, ...extra },
     })
     return {
         response,
@@ -137,12 +140,14 @@ describe('server authentication boundary', () => {
 
     it('演示模式只接受服务器白名单档案并返回权威姓名', async () => {
         const app = await build()
-        const rejected = await login(app, 'teacher-arbitrary')
+        const rejected = await login(app, '13900000000')
         expect(rejected.response.statusCode).toBe(401)
 
-        const accepted = await login(app, 'teacher-001', { name: '伪造姓名' })
+        const accepted = await login(app)
         expect(accepted.response.statusCode).toBe(200)
-        expect(accepted.body.user).toEqual({ id: 'teacher-001', name: '王雅琴', role: 'teacher' })
+        expect(accepted.body.user).toEqual({
+            id: 'teacher-001', name: '演示教师', role: 'teacher', accountType: 'demo',
+        })
         expect(accepted.cookie).toContain('pr_session=')
         expect(accepted.cookie).toContain('pr_csrf=')
         const setCookie = accepted.response.headers['set-cookie']
@@ -341,13 +346,15 @@ describe('server authentication boundary', () => {
             N: 16_384, r: 8, p: 1, maxmem: 128 * 1024 * 1024,
         })
         const passwordScrypt = `scrypt$16384$8$1$${salt.toString('base64url')}$${expected.toString('base64url')}`
-        const service = new AuthService(options({ mode: 'password', passwordScrypt }))
+        const service = new AuthService(options({
+            mode: 'password', passwordScrypt, teacherPhone: '13900000000',
+        }))
         const app = await build(service)
 
         for (let attempt = 0; attempt < 5; attempt += 1) {
-            const response = await login(app, 'teacher-001', { password: 'wrong' })
+            const response = await login(app, '13900000000', { password: 'wrong' })
             expect(response.response.statusCode).toBe(401)
         }
-        expect((await login(app, 'teacher-001', { password: 'correct horse battery staple' })).response.statusCode).toBe(429)
+        expect((await login(app, '13900000000', { password: 'correct horse battery staple' })).response.statusCode).toBe(429)
     })
 })

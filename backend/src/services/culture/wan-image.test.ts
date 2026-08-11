@@ -8,10 +8,14 @@ const mocks = vi.hoisted(() => ({
         },
     },
     getKey: vi.fn<() => string | undefined>(),
+    getWanImageBaseUrl: vi.fn(() => ''),
 }))
 
 vi.mock('../../config.js', () => ({ config: mocks.config }))
-vi.mock('../../lib/credentials.js', () => ({ getKey: mocks.getKey }))
+vi.mock('../../lib/credentials.js', () => ({
+    getKey: mocks.getKey,
+    getWanImageBaseUrl: mocks.getWanImageBaseUrl,
+}))
 
 import {
     generateWanImage,
@@ -51,6 +55,7 @@ beforeEach(() => {
         'https://workspace-123.cn-beijing.maas.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation'
     mocks.getKey.mockReset()
     mocks.getKey.mockReturnValue('dashscope-test-key')
+    mocks.getWanImageBaseUrl.mockImplementation(() => mocks.config.wanImage.baseUrl)
 })
 
 afterEach(() => {

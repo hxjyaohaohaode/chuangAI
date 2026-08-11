@@ -38,17 +38,13 @@ services:
         value: "480"
       - key: AUTH_SESSION_SECRET
         generateValue: true
+      - key: CREDENTIAL_VAULT_MASTER_KEY
+        generateValue: true
       - key: AUTH_PASSWORD_SCRYPT
         sync: false
       - key: AUTH_TEACHER_ID
         value: teacher-001
       - key: AUTH_TEACHER_NAME
         sync: false
-      - key: DEEPSEEK_API_KEY
-        sync: false
-      - key: MIMO_API_KEY
-        sync: false
-      - key: DASHSCOPE_API_KEY
-        sync: false
-      - key: WAN_IMAGE_BASE_URL
+      - key: AUTH_TEACHER_PHONE
         sync: false

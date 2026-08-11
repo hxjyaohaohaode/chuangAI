@@ -9,11 +9,13 @@ export interface SessionUser {
     id: string
     name: string
     role: UserRole
+    accountType: 'owner' | 'demo'
 }
 
 export interface DemoTeacher extends SessionUser {
     role: 'teacher'
     classLabel: string
+    phone: string
 }
 
 export interface AuthStatusResponse {
@@ -149,9 +151,8 @@ export async function getAuthStatus(signal?: AbortSignal): Promise<AuthStatusRes
 }
 
 export async function loginSession(input: {
-    teacherId: string
-    name?: string
-    password?: string
+    phone: string
+    password: string
 }): Promise<LoginResponse> {
     return withAuthTimeout(undefined, async (requestSignal) => {
         const response = await authenticatedFetch('/api/auth/login', {

@@ -19,6 +19,7 @@ export interface AuthUser {
     id: string
     name: string
     role: 'teacher'
+    accountType?: 'owner' | 'demo'
 }
 
 export interface AuthenticatedSession extends AuthUser {
@@ -42,22 +43,23 @@ export interface AuthServiceOptions {
     cookieSecure: CookieSecurePolicy
     teacherId: string
     teacherName: string
+    teacherPhone?: string
     passwordScrypt: string
     corsOrigins: readonly string[]
     now?: () => number
 }
 
 export interface LoginInput {
-    teacherId: string
-    name?: string
-    password?: string
+    phone: string
+    password: string
 }
 
 interface SessionPayload {
-    v: 1
+    v: 2
     sub: string
     name: string
     role: 'teacher'
+    accountType: 'owner' | 'demo'
     iat: number
     exp: number
     csrf: string
@@ -77,15 +79,22 @@ const LOGIN_LOCK_MS = 5 * 60_000
 const LOGIN_MAX_FAILURES = 5
 const MAX_COOKIE_HEADER_LENGTH = 8_192
 
-/** 演示档案是产品公开数据，不是现实世界身份；单租户构建只允许一个固定主体。 */
-export const DEMO_TEACHERS: readonly (AuthUser & { classLabel: string })[] = [
-    { id: 'teacher-001', name: '王雅琴', role: 'teacher', classLabel: '三年二班' },
+/** 公共演示账户仅映射合成教学数据，不具备模型凭据管理权限。 */
+export const DEMO_TEACHERS: readonly (AuthUser & { phone: string; passwordScrypt: string; classLabel: string })[] = [
+    {
+        id: 'teacher-001',
+        name: '演示教师',
+        role: 'teacher',
+        accountType: 'demo',
+        phone: '13177091153',
+        passwordScrypt: 'scrypt$16384$8$1$xE1QJPQtPxD7uTMsvy-jYg$Ol3joviyOl1ng1DiPNDVLdtkAZ0hSdEAZd9TEGyUPjwNIrHBWJ-O0Ffus9EisWX4g3kyCvLVOWIa8J6cYIq02A',
+        classLabel: '合成演示班级',
+    },
 ]
 
 const loginBodySchema = z.object({
-    teacherId: z.string().trim().min(1).max(128),
-    name: z.string().trim().min(1).max(80).optional(),
-    password: z.string().min(1).max(512).optional(),
+    phone: z.string().trim().regex(/^1[3-9]\d{9}$/u),
+    password: z.string().min(1).max(512),
 }).strict()
 
 function base64UrlJson(payload: SessionPayload): string {
@@ -196,31 +205,47 @@ export class AuthService {
     }
 
     async authenticate(input: LoginInput, source: string): Promise<AuthUser> {
-        if (this.mode === 'demo') {
-            const account = DEMO_TEACHERS.find((item) => item.id === input.teacherId)
-            if (!account) throw new LoginRejectedError(401, '教师账号或凭据无效')
-            return { id: account.id, name: account.name, role: 'teacher' }
+        const failureKey = `${source}:${createHmac('sha256', this.secret).update(input.phone).digest('base64url')}`
+        this.assertNotLocked(failureKey)
+
+        const demoAccount = DEMO_TEACHERS.find((item) => safeEqual(item.phone, input.phone))
+        const demoMatches = demoAccount
+            ? await verifyScryptPassword(input.password, demoAccount.passwordScrypt)
+            : false
+        if (demoAccount && demoMatches) {
+            this.failures.delete(failureKey)
+            return {
+                id: demoAccount.id,
+                name: demoAccount.name,
+                role: demoAccount.role,
+                accountType: 'demo',
+            }
         }
 
-        this.assertNotLocked(source)
-        const idMatches = safeEqual(input.teacherId, this.options.teacherId)
-        const passwordMatches = typeof input.password === 'string'
+        const ownerMatches = this.mode === 'password'
+            && safeEqual(input.phone, this.options.teacherPhone ?? '')
             && await verifyScryptPassword(input.password, this.options.passwordScrypt)
-        if (!idMatches || !passwordMatches) {
-            this.recordFailure(source)
+        if (!ownerMatches) {
+            this.recordFailure(failureKey)
             throw new LoginRejectedError(401, '教师账号或凭据无效')
         }
-        this.failures.delete(source)
-        return { id: this.options.teacherId, name: this.options.teacherName, role: 'teacher' }
+        this.failures.delete(failureKey)
+        return {
+            id: this.options.teacherId,
+            name: this.options.teacherName,
+            role: 'teacher',
+            accountType: 'owner',
+        }
     }
 
     issue(user: AuthUser): { token: string; session: AuthenticatedSession } {
         const issuedAt = Math.floor(this.now() / 1_000)
         const payload: SessionPayload = {
-            v: 1,
+            v: 2,
             sub: user.id,
             name: user.name,
             role: 'teacher',
+            accountType: user.accountType ?? 'owner',
             iat: issuedAt,
             exp: issuedAt + this.options.sessionTtlSeconds,
             csrf: randomBytes(32).toString('base64url'),
@@ -249,7 +274,8 @@ export class AuthService {
             return null
         }
         const nowSeconds = Math.floor(this.now() / 1_000)
-        if (payload.v !== 1 || payload.role !== 'teacher') return null
+        if (payload.v !== 2 || payload.role !== 'teacher') return null
+        if (payload.accountType !== 'owner' && payload.accountType !== 'demo') return null
         if (!payload.sub || !payload.name || !payload.csrf || !payload.sid) return null
         if (!Number.isInteger(payload.iat) || !Number.isInteger(payload.exp)) return null
         if (payload.iat > nowSeconds + 60 || payload.exp <= nowSeconds || payload.exp <= payload.iat) return null
@@ -310,6 +336,7 @@ export class AuthService {
             id: payload.sub,
             name: payload.name,
             role: payload.role,
+            accountType: payload.accountType,
             issuedAt: payload.iat,
             expiresAt: payload.exp,
             csrfToken: payload.csrf,
@@ -477,11 +504,11 @@ export const authRoutes: FastifyPluginAsync<{ service: AuthService }> = async (a
             status: 'ok',
             mode: service.mode,
             authenticated: session !== null,
-            user: session ? { id: session.id, name: session.name, role: session.role } : null,
+            user: session ? { id: session.id, name: session.name, role: session.role, accountType: session.accountType } : null,
             expiresAt: session?.expiresAt ?? null,
-            demoTeachers: service.mode === 'demo'
-                ? service.demoTeachers.map(({ id, name, role, classLabel }) => ({ id, name, role, classLabel }))
-                : [],
+            demoTeachers: service.demoTeachers.map(({ id, name, role, accountType, classLabel, phone }) => ({
+                id, name, role, accountType, classLabel, phone,
+            })),
         }
     })
 

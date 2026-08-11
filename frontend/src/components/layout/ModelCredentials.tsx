@@ -1,8 +1,8 @@
 /**
  * 模型接入配置 —— 设置面板中的「模型密钥」分区
  *
- * 本地部署中，教师可以在这里换成自己的 API Key；Render 部署中，密钥只由
- * Dashboard Environment 管理，前端保持只读且不渲染任何明文输入入口。
+ * 系统所有者可以在这里换成自己的 API Key；本地部署原子写入 .env，Render
+ * 部署写入持久盘上的 AES-256-GCM 加密保险柜。演示账号始终只读。
  *
  * ─────────────────────────────────────────────────────────────
  * 安全设计
@@ -56,7 +56,8 @@ const RENDER_MANAGEMENT: ModelCredentialManagement = {
 export function canEditModelCredentials(
     management: ModelCredentialManagement | null | undefined,
 ): boolean {
-    return management?.mutable === true && management.managedBy === 'local-env'
+    return management?.mutable === true
+        && (management.managedBy === 'local-env' || management.managedBy === 'encrypted-vault')
 }
 
 /** 保存端点的 409 在该专用契约中表示部署平台已经接管密钥。 */
@@ -79,14 +80,14 @@ export function CredentialManagementNotice({ management }: CredentialManagementN
         <section className="pr-cred-item" role="note" aria-label="模型密钥管理位置">
             <header className="pr-cred-item-head">
                 <span className="pr-cred-item-name">
-                    {renderManaged ? '模型密钥由 Render Environment 托管' : '模型密钥暂时只读'}
+                    {renderManaged ? '模型密钥由 Render Environment 托管' : '演示账号为只读体验'}
                 </span>
                 <span className="pr-cred-item-state is-set">只读</span>
             </header>
             <p className="pr-cred-item-powers">
                 {renderManaged
                     ? '请前往 Render Dashboard → 对应服务 → Environment 修改密钥；本页面不会接收或保存密钥明文。'
-                    : '服务端未明确授权浏览器修改密钥。请刷新后重试，或联系部署管理员检查配置。'}
+                    : '请使用系统所有者账号登录后管理模型凭据；公开演示账号不会接触密钥掩码或付费连通测试。'}
             </p>
             {renderManaged && (
                 <a
@@ -138,14 +139,16 @@ export function CredentialProviderCard({
                 {mutable && (
                     <>
                         <input
-                            type="password"
+                            type={p.inputKind === 'url' ? 'url' : 'password'}
                             className="pr-cred-input"
                             value={draft.value}
-                            placeholder={p.configured ? '输入新密钥以替换' : '粘贴 API Key'}
+                            placeholder={p.configured
+                                ? (p.inputKind === 'url' ? '输入新的 Workspace HTTPS 地址' : '输入新密钥以替换')
+                                : (p.inputKind === 'url' ? '粘贴 Workspace 同步生图地址' : '粘贴 API Key')}
                             onChange={(event) => onDraftChange(event.target.value)}
                             autoComplete="off"
                             spellCheck={false}
-                            aria-label={`${p.label} API Key`}
+                            aria-label={p.inputKind === 'url' ? `${p.label}` : `${p.label} API Key`}
                         />
                         <button
                             type="button"
@@ -157,15 +160,17 @@ export function CredentialProviderCard({
                         </button>
                     </>
                 )}
-                <button
-                    type="button"
-                    className="pr-cred-btn"
-                    onClick={onTest}
-                    disabled={draft.testing || !p.configured}
-                    title={p.configured ? '用当前生效的密钥发一次最小请求' : '请先配置密钥'}
-                >
-                    {draft.testing ? '检测中…' : '测试连通'}
-                </button>
+                {p.inputKind !== 'url' && (
+                    <button
+                        type="button"
+                        className="pr-cred-btn"
+                        onClick={onTest}
+                        disabled={draft.testing || !p.configured}
+                        title={p.configured ? '用当前生效的密钥发一次最小请求' : '请先配置密钥'}
+                    >
+                        {draft.testing ? '检测中…' : '测试连通'}
+                    </button>
+                )}
             </div>
 
             {draft.result && (
@@ -342,7 +347,9 @@ export const ModelCredentials = memo(function ModelCredentials() {
             })}
             <p className="pr-cred-note">
                 {canEditModelCredentials(management)
-                    ? '密钥保存在服务端并持久化到 .env，浏览器不留存明文；此处仅回显掩码。'
+                    ? (management?.managedBy === 'encrypted-vault'
+                        ? '凭据经认证加密后保存在持久盘保险柜，浏览器不留存明文；修改后立即生效。'
+                        : '凭据保存在服务端并持久化到 .env，浏览器不留存明文；此处仅回显掩码。')
                     : '密钥仅由部署环境读取；本页不接收、不保存明文，仅回显服务端提供的掩码。'}
             </p>
         </div>

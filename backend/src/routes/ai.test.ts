@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
         },
     },
     getKey: vi.fn(() => 'dashscope-test-key'),
+    getWanImageBaseUrl: vi.fn(() => ''),
     getOrCreateImage: vi.fn(),
     asr: vi.fn(),
     tts: vi.fn(),
@@ -20,7 +21,10 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('../config.js', () => ({ config: mocks.config }))
-vi.mock('../lib/credentials.js', () => ({ getKey: mocks.getKey }))
+vi.mock('../lib/credentials.js', () => ({
+    getKey: mocks.getKey,
+    getWanImageBaseUrl: mocks.getWanImageBaseUrl,
+}))
 vi.mock('../services/culture/image-cache.js', () => ({
     getOrCreateImage: mocks.getOrCreateImage,
 }))
@@ -92,6 +96,7 @@ beforeEach(() => {
     mocks.config.wanImage.enabled = true
     mocks.getKey.mockReset()
     mocks.getKey.mockReturnValue('dashscope-test-key')
+    mocks.getWanImageBaseUrl.mockImplementation(() => mocks.config.wanImage.baseUrl)
     mocks.getOrCreateImage.mockReset()
     mocks.getOrCreateImage.mockResolvedValue({
         url: '/uploads/generated/real.webp',

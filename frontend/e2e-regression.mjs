@@ -17,12 +17,13 @@ import { chromium } from 'playwright'
 const BASE_URL = process.env.E2E_BASE_URL ?? 'http://127.0.0.1:4173'
 const AUTH_MODE = process.env.E2E_AUTH_MODE ?? 'demo'
 const AUTH_PASSWORD = process.env.E2E_AUTH_PASSWORD ?? ''
+const AUTH_PHONE = process.env.E2E_AUTH_PHONE ?? ''
 const E2E_SCOPE = process.env.E2E_SCOPE ?? 'full'
 if (!['demo', 'password'].includes(AUTH_MODE)) {
     throw new Error(`E2E_AUTH_MODE 不受支持：${AUTH_MODE}`)
 }
-if (AUTH_MODE === 'password' && !AUTH_PASSWORD) {
-    throw new Error('密码认证 E2E 缺少进程内临时 E2E_AUTH_PASSWORD')
+if (!AUTH_PASSWORD || !/^1[3-9]\d{9}$/u.test(AUTH_PHONE)) {
+    throw new Error('手机号密码认证 E2E 缺少有效的 E2E_AUTH_PHONE / E2E_AUTH_PASSWORD')
 }
 if (!['full', 'report-sharing'].includes(E2E_SCOPE)) {
     throw new Error(`E2E_SCOPE 不受支持：${E2E_SCOPE}`)
@@ -9393,16 +9394,10 @@ async function run() {
         if (E2E_SCOPE === 'report-sharing') {
             activeRoute = `${AUTH_MODE}-login-for-report-sharing`
             await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' })
-            if (AUTH_MODE === 'password') {
-                await page.locator('#login-password').waitFor({ state: 'visible', timeout: 10_000 })
-                await page.locator('#login-id').fill('teacher-001')
-                await page.locator('#login-password').fill(AUTH_PASSWORD)
-                await page.locator('.pr-login-submit').click()
-            } else {
-                const demoButton = page.locator('.pr-login-demo-btn').first()
-                await demoButton.waitFor({ state: 'visible', timeout: 10_000 })
-                await demoButton.click()
-            }
+            await page.locator('#login-password').waitFor({ state: 'visible', timeout: 10_000 })
+            await page.locator('#login-phone').fill(AUTH_PHONE)
+            await page.locator('#login-password').fill(AUTH_PASSWORD)
+            await page.locator('.pr-login-submit').click()
             await page.waitForURL((url) => url.pathname === '/dashboard', { timeout: 15_000 })
             await waitForSettledPage(page)
             await checkReportShareManagementContract(context)
@@ -9445,20 +9440,14 @@ async function run() {
         }
 
         activeRoute = `${AUTH_MODE}-login`
-        if (AUTH_MODE === 'password') {
-            const passwordInput = page.locator('#login-password')
-            await passwordInput.waitFor({ state: 'visible', timeout: 10_000 })
-            if (await page.locator('.pr-login-demo-btn').count() !== 0) {
-                fail('密码认证模式仍暴露免密码 DEMO 快捷入口')
-            }
-            await page.locator('#login-id').fill('teacher-001')
-            await passwordInput.fill(AUTH_PASSWORD)
-            await page.locator('.pr-login-submit').click()
-        } else {
-            const demoButton = page.locator('.pr-login-demo-btn').first()
-            await demoButton.waitFor({ state: 'visible', timeout: 10_000 })
-            await demoButton.click()
+        const passwordInput = page.locator('#login-password')
+        await passwordInput.waitFor({ state: 'visible', timeout: 10_000 })
+        if (await page.locator('.pr-login-demo-btn').count() !== 0) {
+            fail('登录页仍暴露免密码 DEMO 快捷入口')
         }
+        await page.locator('#login-phone').fill(AUTH_PHONE)
+        await passwordInput.fill(AUTH_PASSWORD)
+        await page.locator('.pr-login-submit').click()
         await page.waitForURL((url) => url.pathname === '/dashboard', { timeout: 15_000 })
         await waitForSettledPage(page)
 

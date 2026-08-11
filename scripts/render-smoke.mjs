@@ -64,9 +64,11 @@ const childEnvironment = {
     AUTH_MODE: 'password',
     AUTH_COOKIE_SECURE: 'true',
     AUTH_SESSION_SECRET: randomBytes(32).toString('base64url'),
+    CREDENTIAL_VAULT_MASTER_KEY: randomBytes(48).toString('base64url'),
     AUTH_PASSWORD_SCRYPT: createTestPasswordHash(),
     AUTH_TEACHER_ID: 'teacher-001',
     AUTH_TEACHER_NAME: 'Render Smoke Teacher',
+    AUTH_TEACHER_PHONE: '13900000000',
 }
 
 function sleep(milliseconds) {
@@ -216,7 +218,7 @@ try {
             'Content-Type': 'application/json',
             Origin: 'https://render-smoke.onrender.com',
         },
-        body: JSON.stringify({ teacherId: 'teacher-001', password: smokePassword }),
+        body: JSON.stringify({ phone: '13900000000', password: smokePassword }),
     })
     if (!login.ok) throw new Error(`密码登录烟测失败（${login.status}）`)
     const loginBody = await login.json()
@@ -230,16 +232,16 @@ try {
     }
     const sessionCookie = `pr_session=${sessionMatch[1]}; pr_csrf=${encodeURIComponent(loginBody.csrfToken)}`
 
-    // Render 上凭据必须只由 Dashboard Environment 管理。这里走完整认证路由，
-    // 同时放入随机明文探针，证明 PUT 稳定失败且探针没有进入项目根 .env。
+    // Render 上凭据由持久盘加密保险柜管理。这里走完整认证路由并写入随机探针，
+    // 证明设置页可热更新、项目根 .env 不变且保险柜文件不存在明文。
     const credentialStatus = await fetch(`${baseUrl}/api/settings/credentials`, {
         headers: { Cookie: sessionCookie },
     })
     const credentialStatusBody = await credentialStatus.json()
     if (!credentialStatus.ok
-        || credentialStatusBody?.management?.mutable !== false
-        || credentialStatusBody?.management?.managedBy !== 'render-dashboard') {
-        throw new Error('Render 凭据 GET 未声明 Dashboard 托管只读策略')
+        || credentialStatusBody?.management?.mutable !== true
+        || credentialStatusBody?.management?.managedBy !== 'encrypted-vault') {
+        throw new Error('Render 凭据 GET 未声明持久盘加密保险柜策略')
     }
     const credentialWriteProbe = `render-smoke-secret-${randomBytes(24).toString('base64url')}`
     const projectEnvironmentFile = join(repositoryRoot, '.env')
@@ -257,13 +259,8 @@ try {
         body: JSON.stringify({ apiKey: credentialWriteProbe }),
     })
     const credentialMutationBody = await credentialMutation.json()
-    if (credentialMutation.status !== 409
-        || credentialMutationBody?.error !== 'SETTINGS_MANAGED_EXTERNALLY'
-        || credentialMutationBody?.management?.mutable !== false) {
-        throw new Error(
-            'Render 凭据 PUT 未按稳定 409 契约失败关闭'
-            + `（实际 ${credentialMutation.status}/${String(credentialMutationBody?.error ?? 'NO_ERROR_CODE')}）`,
-        )
+    if (!credentialMutation.ok || credentialMutationBody?.configured !== true) {
+        throw new Error(`Render 加密凭据 PUT 未成功（实际 ${credentialMutation.status}）`)
     }
     const environmentAfterMutation = existsSync(projectEnvironmentFile)
         ? readFileSync(projectEnvironmentFile)
@@ -273,7 +270,12 @@ try {
             && environmentAfterMutation !== null
             && !environmentBeforeMutation.equals(environmentAfterMutation))
         || environmentAfterMutation?.includes(Buffer.from(credentialWriteProbe, 'utf8'))) {
-        throw new Error('Render 凭据 PUT 改写了项目根 .env 或泄露明文探针')
+        throw new Error('Render 凭据 PUT 改写了项目根 .env')
+    }
+    const credentialVaultFile = join(smokeRoot, 'provider-credentials.v1.json')
+    if (!existsSync(credentialVaultFile)
+        || readFileSync(credentialVaultFile).includes(Buffer.from(credentialWriteProbe, 'utf8'))) {
+        throw new Error('Render 凭据保险柜缺失或泄露明文探针')
     }
 
     const databaseFile = join(smokeRoot, 'poetic-realm.db')
@@ -304,6 +306,16 @@ try {
         || readFileSync(generatedWriteProbe, 'utf8') !== generatedWriteMarker) {
         throw new Error('生成目录写入探针没有跨同一 APP_DATA_DIR 重启保留')
     }
+    const credentialAfterRestart = await fetch(`${baseUrl}/api/settings/credentials`, {
+        headers: { Cookie: sessionCookie },
+    })
+    const credentialAfterRestartBody = await credentialAfterRestart.json()
+    const deepseekAfterRestart = credentialAfterRestartBody?.providers?.find?.(
+        (provider) => provider?.provider === 'deepseek',
+    )
+    if (!credentialAfterRestart.ok || deepseekAfterRestart?.configured !== true) {
+        throw new Error('加密凭据没有跨同一 APP_DATA_DIR 重启恢复')
+    }
 
     process.stdout.write(`${JSON.stringify({
         status: 'passed',
@@ -322,10 +334,12 @@ try {
         renderOriginAllowed: true,
         hostileOriginAllowed: false,
         securePasswordCookie: true,
-        credentialsManagedByRender: true,
-        credentialMutationRejected: true,
+        credentialsManagedByEncryptedVault: true,
+        ownerCredentialMutationAccepted: true,
         projectEnvironmentUnchanged: true,
         plaintextCredentialProbeAbsentFromProjectEnv: true,
+        plaintextCredentialProbeAbsentFromVault: true,
+        encryptedCredentialPersistedAcrossRestart: true,
         databaseUnderAppData: true,
         allRuntimeDirectoriesUnderAppData: true,
         generatedDirectoryUnderAppData: true,

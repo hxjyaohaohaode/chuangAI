@@ -50,6 +50,7 @@ import { isPublicSharedReportPage, shouldServeSpaFallback } from './lib/spa-fall
 import { AuthService, authRoutes, installAuthBoundary } from './security/auth.js'
 import { db, initDatabase, closeDatabase, seedDatabase } from './db/index.js'
 import { enforceSingleTenantDataBoundary } from './security/single-tenant-data-boundary.js'
+import { initializeCredentialStore } from './lib/credentials.js'
 import {
     initOrchestrator,
     orchestratorRoutes,
@@ -78,7 +79,10 @@ async function startServer() {
     validateNetworkBoundary()
     validateAuthConfiguration()
 
-    // 启动期校验 API 密钥（DEMO_MODE=true 时跳过）
+    // Render 先从持久盘加密保险柜恢复运行时凭据；本地仍以 .env 为真源。
+    initializeCredentialStore()
+
+    // 启动期校验 API 密钥（Render 首次部署允许登录后在界面补齐）
     validateApiKeys()
 
     // 初始化 SQLite 学情数据库（幂等）
@@ -330,11 +334,9 @@ async function startServer() {
     // 教学场景插画路由 —— 受控 prompt 生图 + 落盘缓存（驾驶舱闭环卡片等使用）
     await app.register(illustrationRoutes, { prefix: '/api/illustration' })
 
-    // 系统设置路由：本地可更新 .env；Render 必须由 Dashboard Environment
-    // 托管并保持只读，绝不把明文密钥写入项目根或持久盘。
+    // 系统设置路由：本地写入 .env；Render 写入持久盘加密保险柜。
     await app.register(settingsRoutes, {
         prefix: '/api/settings',
-        externallyManagedCredentials: config.isRender,
     })
 
     // 长期记忆治理路由 —— 教师显式查看/新增/修改/删除，默认按 TTL 自动清理

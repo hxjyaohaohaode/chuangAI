@@ -229,13 +229,14 @@ async function waitForHealth(baseUrl, server, timeoutMs = 30_000) {
 }
 
 async function acquireSession(baseUrl, password) {
+    const phone = password ? '13900000000' : '13177091153'
+    const effectivePassword = password || 'Chy101713'
     const response = await fetch(`${baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            teacherId: 'teacher-001',
-            name: '王雅琴',
-            ...(password ? { password } : {}),
+            phone,
+            password: effectivePassword,
         }),
     })
     if (response.status !== 200) throw new Error(`生产 E2E 认证会话建立失败：HTTP ${response.status}`)
@@ -332,14 +333,17 @@ async function verifySecurityHeaders(baseUrl, session) {
     }
 }
 
-async function verifyGeneratedMediaBoundary(baseUrl, session) {
-    const generatedDirectory = path.join(projectRoot, 'data', 'uploads', 'generated')
-    const entries = await fs.readdir(generatedDirectory, { withFileTypes: true })
+async function verifyGeneratedMediaBoundary(baseUrl, session, runtimeRoot) {
+    const sourceDirectory = path.join(projectRoot, 'data', 'uploads', 'generated')
+    const entries = await fs.readdir(sourceDirectory, { withFileTypes: true })
     const mediaFile = entries
         .filter((entry) => entry.isFile() && !entry.isSymbolicLink() && entry.name.endsWith('.webp'))
         .map((entry) => entry.name)
         .sort()[0]
     if (!mediaFile) throw new Error('生成媒体认证边界 E2E 缺少可验证的 WebP 夹具')
+    const generatedDirectory = path.join(runtimeRoot, 'uploads', 'generated')
+    await fs.mkdir(generatedDirectory, { recursive: true })
+    await fs.copyFile(path.join(sourceDirectory, mediaFile), path.join(generatedDirectory, mediaFile))
 
     const mediaUrl = `${baseUrl}/uploads/generated/${encodeURIComponent(mediaFile)}`
     const unauthenticated = await fetch(mediaUrl)
@@ -648,7 +652,8 @@ function runE2E(baseUrl, password) {
                 ...process.env,
                 E2E_BASE_URL: baseUrl,
                 E2E_AUTH_MODE: authMode,
-                ...(password ? { E2E_AUTH_PASSWORD: password } : {}),
+                E2E_AUTH_PHONE: password ? '13900000000' : '13177091153',
+                E2E_AUTH_PASSWORD: password || 'Chy101713',
             },
             stdio: 'inherit',
             windowsHide: true,
@@ -708,6 +713,7 @@ async function main() {
             NODE_ENV: 'production',
             HOST: '127.0.0.1',
             PORT: String(port),
+            APP_DATA_DIR: temporaryRoot,
             SQLITE_PATH: path.join(temporaryRoot, 'production-e2e.db'),
             DEMO_MODE: 'true',
             // 隔离回归只验证受控 UI/API 契约，绝不继承开发机的真实供应商密钥。
@@ -723,6 +729,7 @@ async function main() {
             AUTH_MODE: authMode,
             AUTH_SESSION_SECRET: passwordConfiguration?.sessionSecret ?? '',
             AUTH_PASSWORD_SCRYPT: passwordConfiguration?.hash ?? '',
+            AUTH_TEACHER_PHONE: '13900000000',
             AUTH_COOKIE_SECURE: 'false',
         },
         windowsHide: true,
@@ -740,7 +747,7 @@ async function main() {
             throw new Error(`未认证业务 API 未失败关闭：HTTP ${unauthenticatedBoundary.status}`)
         }
         const session = await acquireSession(baseUrl, passwordConfiguration?.password)
-        const generatedMediaBoundary = await verifyGeneratedMediaBoundary(baseUrl, session)
+        const generatedMediaBoundary = await verifyGeneratedMediaBoundary(baseUrl, session, temporaryRoot)
         const cultureDemoGalleryFallback = await verifyCultureDemoGalleryFallback(baseUrl, session)
         const ttsBinaryContract = await verifyTtsBinaryContract(baseUrl, session)
         const recitationAudioReferenceBoundary = await verifyRecitationAudioReferenceBoundary(baseUrl, session)

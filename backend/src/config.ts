@@ -80,6 +80,7 @@ export const config = {
 
     // SQLite、批改上传、生成 WebP、朗诵录音与 TTS 缓存共享同一数据根。
     runtimePaths: resolveRuntimePaths(env.APP_DATA_DIR),
+    credentialVaultMasterKey: env.CREDENTIAL_VAULT_MASTER_KEY,
 
     // 演示模式：跳过 API 密钥校验
     demoMode: env.DEMO_MODE === 'true',
@@ -95,6 +96,7 @@ export const config = {
         cookieSecure: env.AUTH_COOKIE_SECURE,
         teacherId: env.AUTH_TEACHER_ID,
         teacherName: env.AUTH_TEACHER_NAME,
+        teacherPhone: env.AUTH_TEACHER_PHONE,
         passwordScrypt: env.AUTH_PASSWORD_SCRYPT,
     },
 
@@ -158,6 +160,9 @@ export function validateAuthConfiguration(): void {
  * 演示模式（DEMO_MODE=true）下跳过校验，便于无密钥环境联调。
  */
 export function validateApiKeys(): void {
+    // Render 的模型凭据由登录后的所有者写入持久盘加密保险柜；首次部署必须先能
+    // 启动，才能完成这一步。具体 AI 路由在未配置时已有明确降级响应。
+    if (config.isRender) return
     if (config.demoMode) {
         console.warn('[config] 演示模式已开启（DEMO_MODE=true），跳过 API 密钥校验。AI 调用将无法正常工作。')
         return

@@ -2,13 +2,13 @@
  * 系统设置路由 —— 模型凭据配置与连通性检测
  *
  * 端点：
- *   GET  /api/settings/credentials        列出三家供应商的配置状态（仅掩码）
- *   PUT  /api/settings/credentials/:id    保存某供应商密钥（明文入、掩码出）
+ *   GET  /api/settings/credentials        列出供应商密钥与 Wan 端点状态（仅掩码）
+ *   PUT  /api/settings/credentials/:id    保存密钥或受控端点（明文入、掩码出）
  *   POST /api/settings/credentials/:id/test  用当前密钥发一次最小请求验证连通性
  *
  * 安全约定：
  * - 任何响应都不回传密钥明文，只回传 `sk-****3f2a` 形式的掩码；
- * - Render 部署由 Dashboard Environment 托管密钥，路由严格只读且不会写 `.env`；
+ * - Render 部署写入持久盘 AES-GCM 加密保险柜，本地部署仍原子写入 `.env`；
  * - 连通性检测发的是**最小代价**请求（deepseek/mimo 各 1 token，
  *   百炼只校验密钥格式与鉴权），不产生实质费用；
  * - 检测失败时把供应商返回的原始 message 透传给前端——
@@ -23,33 +23,27 @@ import { handleRouteError } from './_helpers.js'
 import {
     getKey,
     listCredentialStatus,
+    getWanImageBaseUrl,
     maskKey,
     setKey,
     PROVIDER_META,
     type CredentialProvider,
 } from '../lib/credentials.js'
 import { config } from '../config.js'
-import { normalizeCredentialKey } from '../security/credential-file.js'
 import { readBoundedProviderErrorText, sanitizeProviderDetail } from '../security/provider-response.js'
+
+const credentialParamsSchema = z.object({
+    id: z.enum(['deepseek', 'mimo', 'dashscope', 'wanBaseUrl']),
+})
 
 const providerParamsSchema = z.object({
     id: z.enum(['deepseek', 'mimo', 'dashscope']),
 })
 
 const saveBodySchema = z.object({
-    /** 密钥明文；传空串表示清除该供应商配置 */
-    apiKey: z.string().transform((value, ctx) => {
-        try {
-            return normalizeCredentialKey(value)
-        } catch (error) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: error instanceof Error ? error.message : '密钥格式无效',
-            })
-            return z.NEVER
-        }
-    }),
-})
+    /** 密钥或 Workspace URL 明文；具体格式由 setKey 按 id 失败关闭。 */
+    apiKey: z.string().trim().max(16_384),
+}).strict()
 
 /** 单次连通性检测的超时（ms）——不能让设置面板长时间卡住 */
 const TEST_TIMEOUT_MS = 15_000
@@ -146,7 +140,7 @@ async function testOpenAICompatible(
 async function testDashscope(apiKey: string): Promise<TestResult> {
     const started = Date.now()
     try {
-        const result = await fetchWithTimeout(config.wanImage.baseUrl, {
+        const result = await fetchWithTimeout(getWanImageBaseUrl(), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -213,22 +207,16 @@ async function runTest(provider: CredentialProvider): Promise<TestResult> {
     return testDashscope(key)
 }
 
-export interface SettingsRoutesOptions {
-    /**
-     * 公有云部署必须显式禁止通过 HTTP 修改凭据。未传时仍以启动期解析的
-     * Render 标志为准，避免未来新增注册点时意外恢复写权限。
-     */
-    externallyManagedCredentials?: boolean
-}
+export type SettingsRoutesOptions = Record<never, never>
 
 export type CredentialManagement = Readonly<{
     mutable: boolean
-    managedBy: 'render-dashboard' | 'local-env'
+    managedBy: 'encrypted-vault' | 'local-env'
 }>
 
-const RENDER_MANAGEMENT: CredentialManagement = Object.freeze({
-    mutable: false,
-    managedBy: 'render-dashboard',
+const VAULT_MANAGEMENT: CredentialManagement = Object.freeze({
+    mutable: true,
+    managedBy: 'encrypted-vault',
 })
 
 const LOCAL_MANAGEMENT: CredentialManagement = Object.freeze({
@@ -236,41 +224,51 @@ const LOCAL_MANAGEMENT: CredentialManagement = Object.freeze({
     managedBy: 'local-env',
 })
 
-export const settingsRoutes: FastifyPluginAsync<SettingsRoutesOptions> = async (app, options) => {
-    const management = (options.externallyManagedCredentials ?? config.isRender)
-        ? RENDER_MANAGEMENT
-        : LOCAL_MANAGEMENT
+export const settingsRoutes: FastifyPluginAsync<SettingsRoutesOptions> = async (app, _options) => {
+    const storageManagement = config.isRender ? VAULT_MANAGEMENT : LOCAL_MANAGEMENT
+
+    function managementFor(request: FastifyRequest): CredentialManagement {
+        return request.auth?.accountType === 'demo'
+            ? { ...storageManagement, mutable: false }
+            : storageManagement
+    }
 
     /** GET /credentials —— 三家供应商配置状态 */
-    app.get('/credentials', async (_req, reply) => {
+    app.get('/credentials', async (req, reply) => {
+        const management = managementFor(req)
+        const providers = listCredentialStatus().map((provider) => (
+            req.auth?.accountType === 'demo' ? { ...provider, masked: '' } : provider
+        ))
         return reply.send({
             status: 'ok',
-            providers: listCredentialStatus(),
+            providers,
             management,
         })
     })
 
     /** PUT /credentials/:id —— 保存密钥 */
     app.put('/credentials/:id', async (req: FastifyRequest, reply) => {
-        // 必须在参数/正文解析和 setKey 之前 fail closed：Render 上无论提交何种
-        // 请求体都不会触达文件写入逻辑，并返回可供前端稳定识别的 409 契约。
+        // 必须在参数/正文解析和 setKey 之前 fail closed：公开演示账号无论提交
+        // 何种请求体都不会触达加密保险柜或本地 .env 写入逻辑。
+        const management = managementFor(req)
         if (!management.mutable) {
-            return reply.code(409).send({
+            return reply.code(403).send({
                 status: 'error',
-                error: 'SETTINGS_MANAGED_EXTERNALLY',
-                message: 'Render 部署的模型凭据由 Dashboard Environment 管理，请在 Render 控制台更新后重新部署。',
-                statusCode: 409,
+                error: 'DEMO_ACCOUNT_READ_ONLY',
+                message: '演示账号不能查看或修改模型凭据，请使用系统所有者账号。',
+                statusCode: 403,
                 management,
             })
         }
 
-        const params = validateParams(providerParamsSchema, req, reply)
+        const params = validateParams(credentialParamsSchema, req, reply)
         if (!params) return
         const body = validateBody(saveBodySchema, req, reply)
         if (!body) return
 
         try {
             setKey(params.id, body.apiKey)
+            const updated = listCredentialStatus().find((item) => item.provider === params.id)
             // 日志绝不打印明文，只记录是哪家、以及是否被清空
             req.log.info(
                 { provider: params.id, cleared: body.apiKey.length === 0 },
@@ -280,8 +278,8 @@ export const settingsRoutes: FastifyPluginAsync<SettingsRoutesOptions> = async (
                 status: 'ok',
                 provider: params.id,
                 label: PROVIDER_META[params.id].label,
-                configured: body.apiKey.length > 0,
-                masked: maskKey(body.apiKey),
+                configured: updated?.configured ?? body.apiKey.length > 0,
+                masked: updated?.masked ?? maskKey(body.apiKey),
             })
         } catch (err) {
             handleRouteError(err, req, reply, '密钥保存失败')
@@ -291,6 +289,12 @@ export const settingsRoutes: FastifyPluginAsync<SettingsRoutesOptions> = async (
 
     /** POST /credentials/:id/test —— 连通性检测 */
     app.post('/credentials/:id/test', async (req: FastifyRequest, reply) => {
+        if (req.auth?.accountType === 'demo') {
+            return reply.code(403).send({
+                status: 'error', error: 'DEMO_ACCOUNT_READ_ONLY',
+                message: '演示账号不能发起供应商凭据检测。', statusCode: 403,
+            })
+        }
         const params = validateParams(providerParamsSchema, req, reply)
         if (!params) return
         try {

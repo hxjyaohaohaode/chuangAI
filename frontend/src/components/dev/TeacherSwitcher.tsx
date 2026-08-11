@@ -21,21 +21,21 @@ export function TeacherSwitcher() {
     const teacherName = useAuthStore((s) => s.teacherName)
     const setTeacher = useAuthStore((s) => s.setTeacher)
     const [open, setOpen] = useState(false)
-    const [inputId, setInputId] = useState('')
-    const [inputName, setInputName] = useState('')
+    const [inputPhone, setInputPhone] = useState('')
+    const [inputPassword, setInputPassword] = useState('')
     const buttonRef = useRef<HTMLButtonElement | null>(null)
     const panelRef = useRef<HTMLFormElement | null>(null)
     const lastFocused = useRef<HTMLElement | null>(null)
 
     const handleSubmit = async () => {
-        const id = inputId.trim()
-        if (!id) return
+        const phone = inputPhone.trim()
+        if (!phone || !inputPassword) return
         try {
-            const session = await loginSession({ teacherId: id, name: inputName.trim() || undefined })
+            const session = await loginSession({ phone, password: inputPassword })
             setTeacher(session.user.id, session.user.name)
             setOpen(false)
-            setInputId('')
-            setInputName('')
+            setInputPhone('')
+            setInputPassword('')
         } catch (error) {
             toast.error({
                 title: '身份切换失败',
@@ -158,20 +158,21 @@ export function TeacherSwitcher() {
                     <input
                         className="pr-teacher-switcher-input"
                         type="text"
-                        placeholder="新教师账号"
-                        value={inputId}
-                        onChange={(e) => setInputId(e.target.value)}
-                        aria-label="新教师账号"
+                        inputMode="numeric"
+                        placeholder="教师手机号"
+                        value={inputPhone}
+                        onChange={(e) => setInputPhone(e.target.value.replace(/\D/gu, '').slice(0, 11))}
+                        aria-label="教师手机号"
                     />
                     <input
                         className="pr-teacher-switcher-input"
-                        type="text"
-                        placeholder="教师名称（可选）"
-                        value={inputName}
-                        onChange={(e) => setInputName(e.target.value)}
-                        aria-label="教师名称"
+                        type="password"
+                        placeholder="登录密码"
+                        value={inputPassword}
+                        onChange={(e) => setInputPassword(e.target.value)}
+                        aria-label="登录密码"
                     />
-                    <Button type="submit" size="sm" disabled={!inputId.trim()}>
+                    <Button type="submit" size="sm" disabled={inputPhone.length !== 11 || !inputPassword}>
                         <Icon name="check" size={14} />
                         <span>切换</span>
                     </Button>

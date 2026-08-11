@@ -6219,7 +6219,7 @@ export interface WeeklyProgressData {
 
 /** 单个模型供应商的配置状态（后端只回传掩码，永不回传明文） */
 export interface ModelCredentialStatus {
-    provider: 'deepseek' | 'mimo' | 'dashscope'
+    provider: 'deepseek' | 'mimo' | 'dashscope' | 'wanBaseUrl'
     label: string
     /** 该密钥驱动的能力说明 */
     powers: string
@@ -6228,12 +6228,13 @@ export interface ModelCredentialStatus {
     configured: boolean
     /** 掩码，如 sk-****3f2a；未配置时为空串 */
     masked: string
+    inputKind?: 'secret' | 'url'
 }
 
-/** 模型密钥由哪里管理；Render 托管时浏览器端必须保持只读。 */
+/** 模型凭据由哪里管理；Render 使用持久盘加密保险柜。 */
 export interface ModelCredentialManagement {
     mutable: boolean
-    managedBy: 'render-dashboard' | 'local-env'
+    managedBy: 'encrypted-vault' | 'local-env' | 'render-dashboard'
 }
 
 /** 模型凭据列表的完整服务端契约。 */

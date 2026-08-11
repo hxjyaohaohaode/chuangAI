@@ -6,34 +6,29 @@ const mocks = vi.hoisted(() => ({
         isRender: false,
         deepseek: { baseUrl: 'https://api.deepseek.com' },
         mimo: { baseUrl: 'https://api.xiaomimimo.com/v1' },
-        wanImage: {
-            baseUrl: 'https://workspace-123.cn-beijing.maas.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation',
-            model: 'wan2.7-image',
-        },
+        wanImage: { model: 'wan2.7-image' },
     },
     getKey: vi.fn(() => ''),
+    getWanImageBaseUrl: vi.fn(() => 'https://workspace-123.cn-beijing.maas.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation'),
     listCredentialStatus: vi.fn(() => [{
-        provider: 'deepseek',
-        label: 'DeepSeek',
-        powers: '命题',
-        console: 'https://platform.deepseek.com',
-        configured: false,
-        masked: '',
+        provider: 'deepseek', label: 'DeepSeek', powers: '命题',
+        console: 'https://platform.deepseek.com', configured: true,
+        masked: 'dee****alue', inputKind: 'secret',
     }]),
-    maskKey: vi.fn((key: string) => key ? 'sk-****cdef' : ''),
+    maskKey: vi.fn((key: string) => key ? 'dee****alue' : ''),
     setKey: vi.fn(),
 }))
 
 vi.mock('../config.js', () => ({ config: mocks.config }))
 vi.mock('../lib/credentials.js', () => ({
     getKey: mocks.getKey,
+    getWanImageBaseUrl: mocks.getWanImageBaseUrl,
     listCredentialStatus: mocks.listCredentialStatus,
     maskKey: mocks.maskKey,
     setKey: mocks.setKey,
     PROVIDER_META: {
-        deepseek: { label: 'DeepSeek' },
-        mimo: { label: 'MiMo（小米）' },
-        dashscope: { label: '阿里云百炼' },
+        deepseek: { label: 'DeepSeek' }, mimo: { label: 'MiMo（小米）' },
+        dashscope: { label: '阿里云百炼' }, wanBaseUrl: { label: 'Wan 地址' },
     },
 }))
 
@@ -41,114 +36,61 @@ import { settingsRoutes } from './settings.js'
 
 let app: FastifyInstance | undefined
 
-async function buildSettingsApp(externallyManagedCredentials?: boolean): Promise<FastifyInstance> {
+async function buildSettingsApp(accountType: 'owner' | 'demo' = 'owner'): Promise<FastifyInstance> {
     const instance = Fastify({ logger: false })
-    await instance.register(settingsRoutes, {
-        prefix: '/api/settings',
-        ...(externallyManagedCredentials === undefined ? {} : { externallyManagedCredentials }),
+    instance.addHook('onRequest', async (request) => {
+        request.auth = {
+            id: 'teacher-001', name: '测试教师', role: 'teacher', accountType,
+            issuedAt: 1, expiresAt: 9_999_999_999, csrfToken: 'csrf', sessionId: 'session',
+        }
     })
+    await instance.register(settingsRoutes, { prefix: '/api/settings' })
     await instance.ready()
     app = instance
     return instance
 }
 
 describe('settings credentials management contract', () => {
-    beforeEach(() => {
-        vi.clearAllMocks()
-        mocks.config.isRender = false
-    })
+    beforeEach(() => { vi.clearAllMocks(); mocks.config.isRender = false })
+    afterEach(async () => { await app?.close(); app = undefined })
 
-    afterEach(async () => {
-        await app?.close()
-        app = undefined
-    })
+    it('Render 所有者使用持久盘加密保险柜并可热更新', async () => {
+        mocks.config.isRender = true
+        const instance = await buildSettingsApp('owner')
+        const status = await instance.inject({ url: '/api/settings/credentials' })
+        expect(status.json().management).toEqual({ mutable: true, managedBy: 'encrypted-vault' })
 
-    it('Render GET 显式声明 Dashboard 托管且不可修改', async () => {
-        const instance = await buildSettingsApp(true)
-
-        const response = await instance.inject({
-            method: 'GET',
-            url: '/api/settings/credentials',
-        })
-
-        expect(response.statusCode).toBe(200)
-        expect(response.json()).toEqual({
-            status: 'ok',
-            providers: expect.any(Array),
-            management: {
-                mutable: false,
-                managedBy: 'render-dashboard',
-            },
-        })
-    })
-
-    it.each([
-        { apiKey: 'valid-credential-placeholder' },
-        { apiKey: 42 },
-        {},
-    ])('Render PUT 对任意正文稳定返回 409，且绝不调用写入函数：%j', async (payload) => {
-        const instance = await buildSettingsApp(true)
-
-        const response = await instance.inject({
-            method: 'PUT',
-            url: '/api/settings/credentials/deepseek',
-            payload,
-        })
-
-        expect(response.statusCode).toBe(409)
-        expect(response.json()).toEqual({
-            status: 'error',
-            error: 'SETTINGS_MANAGED_EXTERNALLY',
-            message: expect.stringContaining('Render'),
-            statusCode: 409,
-            management: {
-                mutable: false,
-                managedBy: 'render-dashboard',
-            },
-        })
-        expect(mocks.setKey).not.toHaveBeenCalled()
-    })
-
-    it('非 Render GET 保持本地可变契约，PUT 仍可更新本地 .env', async () => {
-        const instance = await buildSettingsApp()
-
-        const getResponse = await instance.inject({
-            method: 'GET',
-            url: '/api/settings/credentials',
-        })
-        expect(getResponse.statusCode).toBe(200)
-        expect(getResponse.json().management).toEqual({
-            mutable: true,
-            managedBy: 'local-env',
-        })
-
-        const putResponse = await instance.inject({
-            method: 'PUT',
-            url: '/api/settings/credentials/deepseek',
+        const saved = await instance.inject({
+            method: 'PUT', url: '/api/settings/credentials/deepseek',
             payload: { apiKey: 'valid-credential-placeholder' },
         })
-        expect(putResponse.statusCode).toBe(200)
-        expect(putResponse.json()).toMatchObject({
-            status: 'ok',
-            provider: 'deepseek',
-            configured: true,
-        })
-        expect(mocks.setKey).toHaveBeenCalledOnce()
+        expect(saved.statusCode).toBe(200)
         expect(mocks.setKey).toHaveBeenCalledWith('deepseek', 'valid-credential-placeholder')
     })
 
-    it('未传插件选项时仍按启动期 Render 标志 fail closed', async () => {
+    it('演示账户不接收掩码，也不能保存或测试付费供应商凭据', async () => {
         mocks.config.isRender = true
-        const instance = await buildSettingsApp()
-
-        const response = await instance.inject({
-            method: 'PUT',
-            url: '/api/settings/credentials/mimo',
-            payload: { apiKey: 'mimo-valid-credential-value' },
+        const instance = await buildSettingsApp('demo')
+        const status = await instance.inject({ url: '/api/settings/credentials' })
+        expect(status.json()).toMatchObject({
+            management: { mutable: false, managedBy: 'encrypted-vault' },
+            providers: [{ masked: '' }],
         })
-
-        expect(response.statusCode).toBe(409)
-        expect(response.json().error).toBe('SETTINGS_MANAGED_EXTERNALLY')
+        const saved = await instance.inject({
+            method: 'PUT', url: '/api/settings/credentials/deepseek',
+            payload: { apiKey: 'valid-credential-placeholder' },
+        })
+        expect(saved.statusCode).toBe(403)
+        expect(saved.json().error).toBe('DEMO_ACCOUNT_READ_ONLY')
         expect(mocks.setKey).not.toHaveBeenCalled()
+        const tested = await instance.inject({ method: 'POST', url: '/api/settings/credentials/deepseek/test' })
+        expect(tested.statusCode).toBe(403)
+        expect(mocks.getKey).not.toHaveBeenCalled()
+    })
+
+    it('本地所有者仍使用 .env 可变契约', async () => {
+        const instance = await buildSettingsApp('owner')
+        const response = await instance.inject({ url: '/api/settings/credentials' })
+        expect(response.json().management).toEqual({ mutable: true, managedBy: 'local-env' })
     })
 })

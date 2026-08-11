@@ -6,22 +6,22 @@
 
 | 指标 | 数量 |
 |---|---:|
-| sourceFiles | 631 |
-| totalLines | 257294 |
-| totalNonBlankLines | 231778 |
-| typescriptFiles | 536 |
+| sourceFiles | 632 |
+| totalLines | 256935 |
+| totalNonBlankLines | 231487 |
+| typescriptFiles | 537 |
 | cssFiles | 94 |
 | sqlFiles | 1 |
-| functions | 10172 |
+| functions | 10181 |
 | backendEndpoints | 220 |
 | frontendRoutes | 25 |
 | frontendProductionRoutes | 23 |
 | frontendDevelopmentRoutes | 2 |
 | frontendApiReferences | 222 |
-| testDeclarations | 891 |
-| findings | 594 |
+| testDeclarations | 896 |
+| findings | 590 |
 
-生成时间：2026-08-11T05:50:04.245Z
+生成时间：2026-08-11T08:14:58.914Z
 
 ## 后端端点（完整）
 
@@ -38,9 +38,9 @@
 | GET | `/api/orchestrator/sessions` | `backend/src/orchestrator/routes.ts` | 432 |
 | GET | `/ws/orchestrator` | `backend/src/orchestrator/websocket/handlers.ts` | 63 |
 | POST | `/api/ai/image-generate` | `backend/src/routes/ai.ts` | 277 |
-| POST | `/api/ai/tts` | `backend/src/routes/ai.ts` | 392 |
-| POST | `/api/ai/asr` | `backend/src/routes/ai.ts` | 433 |
-| POST | `/api/ai/chat` | `backend/src/routes/ai.ts` | 600 |
+| POST | `/api/ai/tts` | `backend/src/routes/ai.ts` | 393 |
+| POST | `/api/ai/asr` | `backend/src/routes/ai.ts` | 434 |
+| POST | `/api/ai/chat` | `backend/src/routes/ai.ts` | 601 |
 | GET | `/api/appreciation/:poemId` | `backend/src/routes/appreciation.ts` | 251 |
 | GET | `/api/classroom/classes` | `backend/src/routes/classroom.ts` | 625 |
 | GET | `/api/classroom/readiness` | `backend/src/routes/classroom.ts` | 634 |
@@ -226,9 +226,9 @@
 | POST | `/api/report/home-school/:reportId/publish` | `backend/src/routes/report.ts` | 1322 |
 | POST | `/api/report/home-school/:reportId/feedback/read` | `backend/src/routes/report.ts` | 1345 |
 | POST | `/api/report/home-school/:reportId/activity/:activityId/complete` | `backend/src/routes/report.ts` | 1368 |
-| GET | `/api/settings/credentials` | `backend/src/routes/settings.ts` | 245 |
-| PUT | `/api/settings/credentials/:id` | `backend/src/routes/settings.ts` | 254 |
-| POST | `/api/settings/credentials/:id/test` | `backend/src/routes/settings.ts` | 293 |
+| GET | `/api/settings/credentials` | `backend/src/routes/settings.ts` | 237 |
+| PUT | `/api/settings/credentials/:id` | `backend/src/routes/settings.ts` | 250 |
+| POST | `/api/settings/credentials/:id/test` | `backend/src/routes/settings.ts` | 291 |
 | GET | `/api/students` | `backend/src/routes/students.ts` | 49 |
 | GET | `/api/students/:id/weak-points` | `backend/src/routes/students.ts` | 97 |
 | GET | `/api/agents/poems` | `backend/src/routes/workbench.ts` | 352 |
@@ -244,9 +244,9 @@
 | POST | `/api/agents/export` | `backend/src/routes/workbench.ts` | 1012 |
 | POST | `/api/agents/publish` | `backend/src/routes/workbench.ts` | 1066 |
 | POST | `/api/agents/orchestrate` | `backend/src/routes/workbench.ts` | 1362 |
-| GET | `/api/auth/status` | `backend/src/security/auth.ts` | 473 |
-| POST | `/api/auth/login` | `backend/src/security/auth.ts` | 488 |
-| POST | `/api/auth/logout` | `backend/src/security/auth.ts` | 523 |
+| GET | `/api/auth/status` | `backend/src/security/auth.ts` | 500 |
+| POST | `/api/auth/login` | `backend/src/security/auth.ts` | 515 |
+| POST | `/api/auth/logout` | `backend/src/security/auth.ts` | 550 |
 
 ## 前端路由（完整）
 
@@ -284,7 +284,7 @@
 
 | 行数 | 函数 | 端点 | 文件 |
 |---:|---:|---:|---|
-| 6363 | 8 | 0 | `frontend/src/lib/types.ts` |
+| 6364 | 8 | 0 | `frontend/src/lib/types.ts` |
 | 5621 | 0 | 0 | `frontend/src/pages/StarMapPage/StarMapPage.css` |
 | 4954 | 325 | 0 | `frontend/src/lib/api.ts` |
 | 3965 | 0 | 0 | `frontend/src/pages/LessonPlanPage/LessonPlanPage.css` |
@@ -351,7 +351,7 @@
 | 69 | 547 | `lessonPlanRoutes` | `backend/src/routes/lesson-plan.ts:430` |
 | 69 | 447 | `GradingPage` | `frontend/src/pages/GradingPage/GradingPage.tsx:65` |
 | 66 | 529 | `PoemRecitationPlayer` | `frontend/src/pages/ThinkingPalacePage/PoemRecitationPlayer.tsx:163` |
-| 66 | 452 | `aiRoutes` | `backend/src/routes/ai.ts:275` |
+| 66 | 453 | `aiRoutes` | `backend/src/routes/ai.ts:275` |
 | 63 | 348 | `StarMapDome` | `frontend/src/pages/StarMapPage/StarMapDome.tsx:55` |
 | 62 | 423 | `ScriptPlayer` | `frontend/src/components/dev/ScriptPlayer.tsx:70` |
 | 62 | 375 | `RadarCanvas` | `frontend/src/pages/DashboardPage/BloomRadarChart.tsx:161` |
@@ -380,7 +380,7 @@
 | css-important | 210 |
 | console | 71 |
 | hardcoded-localhost | 29 |
-| possible-secret | 13 |
+| possible-secret | 9 |
 | todo | 9 |
 | dangerous-html | 2 |
 

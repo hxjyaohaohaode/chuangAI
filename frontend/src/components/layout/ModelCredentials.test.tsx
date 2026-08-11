@@ -26,7 +26,7 @@ const EMPTY_DRAFT = {
 }
 
 describe('ModelCredentials Render management guard', () => {
-    it('fails closed unless the server explicitly grants local-env mutation', () => {
+    it('fails closed unless the server explicitly grants local or encrypted-vault mutation', () => {
         expect(canEditModelCredentials(undefined)).toBe(false)
         expect(canEditModelCredentials(null)).toBe(false)
         expect(canEditModelCredentials({
@@ -40,6 +40,10 @@ describe('ModelCredentials Render management guard', () => {
         expect(canEditModelCredentials({
             mutable: true,
             managedBy: 'local-env',
+        })).toBe(true)
+        expect(canEditModelCredentials({
+            mutable: true,
+            managedBy: 'encrypted-vault',
         })).toBe(true)
     })
 
@@ -84,6 +88,29 @@ describe('ModelCredentials Render management guard', () => {
         expect(card).toContain('type="password"')
         expect(card).toContain('DeepSeek API Key')
         expect(card).toContain('>保存</button>')
+    })
+
+    it('renders the Wan endpoint as a URL editor without a misleading provider test action', () => {
+        const card = renderToStaticMarkup(
+            <CredentialProviderCard
+                provider={{
+                    ...PROVIDER,
+                    provider: 'wanBaseUrl',
+                    label: 'Wan 2.7 Workspace 地址',
+                    inputKind: 'url',
+                    masked: 'workspace.cn-beijing.maas.aliyuncs.com',
+                }}
+                draft={EMPTY_DRAFT}
+                mutable
+                onDraftChange={vi.fn()}
+                onSave={vi.fn()}
+                onTest={vi.fn()}
+            />,
+        )
+
+        expect(card).toContain('type="url"')
+        expect(card).toContain('Workspace HTTPS 地址')
+        expect(card).not.toContain('测试连通')
     })
 
     it('recognizes the authoritative 409 as externally managed and not a success', () => {

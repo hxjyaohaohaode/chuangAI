@@ -1,5 +1,5 @@
 import { config } from '../../config.js'
-import { getKey } from '../../lib/credentials.js'
+import { getKey, getWanImageBaseUrl } from '../../lib/credentials.js'
 import { isTrustedDashscopeImageUrl } from '../../security/image-reference-policy.js'
 import { isTrustedProviderEndpoint } from '../../security/provider-endpoint-policy.js'
 import {
@@ -104,7 +104,8 @@ export async function generateWanImage(
     if (config.wanImage.model !== WAN_IMAGE_MODEL) {
         throw new Error(`Wan2.7 配置模型必须为 ${WAN_IMAGE_MODEL}`)
     }
-    if (!isTrustedProviderEndpoint('wan-image', config.wanImage.baseUrl)) {
+    const wanBaseUrl = getWanImageBaseUrl()
+    if (!isTrustedProviderEndpoint('wan-image', wanBaseUrl)) {
         throw new Error('Wan2.7 配置必须使用官方北京 Workspace MaaS 同步端点')
     }
 
@@ -116,7 +117,7 @@ export async function generateWanImage(
 
     try {
         const size = input.orientation === 'portrait' ? '1152*2048' : '2048*1152'
-        const response = await fetch(config.wanImage.baseUrl, {
+        const response = await fetch(wanBaseUrl, {
             method: 'POST',
             redirect: 'error',
             headers: {

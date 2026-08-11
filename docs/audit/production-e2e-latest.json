@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-11T05:49:05.465Z",
+  "generatedAt": "2026-08-11T08:14:36.932Z",
   "hosting": "fastify-production-same-origin",
   "nodeEnv": "production",
   "authMode": "demo",
@@ -121,7 +121,7 @@
     "externalTrackerUrlRejectedBeforePersistence": true,
     "generatedWebpPathAllowlisted": true
   },
-  "baseUrl": "http://127.0.0.1:52254",
+  "baseUrl": "http://127.0.0.1:56088",
   "routeViewportCombinations": 32,
   "warnings": 0,
   "failures": 0,

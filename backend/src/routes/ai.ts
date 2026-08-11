@@ -33,7 +33,7 @@ import { handleRouteError } from './_helpers.js'
 import { validateBody } from '../lib/validation.js'
 import { z } from 'zod'
 import { config } from '../config.js'
-import { getKey } from '../lib/credentials.js'
+import { getKey, getWanImageBaseUrl } from '../lib/credentials.js'
 import { inspectAudioUpload } from '../security/audio-upload-policy.js'
 import {
     isProtectedGeneratedImageUrl,
@@ -293,7 +293,8 @@ export const aiRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         // 密钥可能在设置页热更新，不能依赖启动时的 config.wanImage.enabled 快照。
         // WorkspaceId 无法安全猜测；端点或密钥缺失时只返回明确标记的本地占位图。
         const wanApiKey = getKey('dashscope')
-        if (!config.wanImage.baseUrl.trim() || !wanApiKey) {
+        const wanBaseUrl = getWanImageBaseUrl()
+        if (!wanBaseUrl || !wanApiKey) {
             return reply.send(buildPlaceholderImageResponse(
                 prompt,
                 orientation,
@@ -306,7 +307,7 @@ export const aiRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         // 项目官方文件规定 Wan2.7 必须走 Workspace MaaS 北京同步端点，且模型固定
         // wan2.7-image。当前环境若仍指向全球 DashScope 或 pro 变体，路由失败关闭，
         // 只给诚实的本地占位图，避免“能出图但违反参赛规则”的隐性事故。
-        const complianceIssue = getWanConfigComplianceIssue(config.wanImage.model, config.wanImage.baseUrl)
+        const complianceIssue = getWanConfigComplianceIssue(config.wanImage.model, wanBaseUrl)
         if (complianceIssue) {
             req.log.error({ complianceIssue }, 'Wan2.7 配置不符合项目官方模型规则，已拒绝外呼')
             return reply.send(buildPlaceholderImageResponse(

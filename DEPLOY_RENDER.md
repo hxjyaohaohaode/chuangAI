@@ -101,17 +101,16 @@ render blueprints validate render.yaml --workspace <WORKSPACE_ID>
 3. 首次创建时填写 `sync: false` 的值：
    - `AUTH_PASSWORD_SCRYPT`：上一步生成的完整 scrypt 摘要；
    - `AUTH_TEACHER_NAME`：部署主体显示名；
-   - `DEEPSEEK_API_KEY`、`MIMO_API_KEY` 与 `DASHSCOPE_API_KEY`：真实服务商密钥；
-   - `WAN_IMAGE_BASE_URL`：当前百炼 Workspace 的受控同步生图端点，格式为 `https://<WorkspaceId>.cn-beijing.maas.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation`。
-4. `AUTH_SESSION_SECRET` 由 Blueprint 的 `generateValue: true` 生成 256 位随机值，不要替换成短字符串。
+   - `AUTH_TEACHER_PHONE`：私有系统所有者手机号，不要填写公开演示手机号。
+4. `AUTH_SESSION_SECRET` 与 `CREDENTIAL_VAULT_MASTER_KEY` 由 Blueprint 的 `generateValue: true` 分别生成；不要手工替换、复制到仓库或在应用界面展示。
 5. 确认实例为 `starter`、单实例、持久盘名 `poetic-realm-data`、挂载路径 `/var/data`、初始容量 `1 GB`。Starter 或更高付费实例（Starter+）是持久盘的最低部署边界；持久盘和实例会产生费用，容量可增加但不能缩小。
 6. 创建并等待 Build、Deploy 和 `/api/health` 三项均成功。
 
 Render 会自动提供 `RENDER_EXTERNAL_URL=https://<service>.onrender.com`。应用只把这个精确 HTTPS Origin 加入 CORS、CSRF 和 WebSocket 白名单，**不要手动覆盖该变量**。
 
-云端模型凭据的唯一持久权威是 Render Environment。应用识别 Render 自动注入的 `RENDER=true` 后，设置面板会明确显示 `managedBy=render-dashboard` 并进入只读态；服务端也会对任何凭据 PUT 稳定返回 `409 / SETTINGS_MANAGED_EXTERNALLY`，在解析密钥前阻断项目根 `.env` 写入。轮换密钥必须在 Dashboard 更新相应的 `sync: false` 变量、重新部署并再次执行 provider canary；禁止把明文密钥改存到 `/var/data` 来绕过秘密管理。
+云端模型凭据的唯一持久权威是 `/var/data/provider-credentials.v1.json` 加密保险柜。系统所有者登录后在“系统设置 → 模型凭据”录入或轮换 DeepSeek、MiMo、DashScope 密钥以及 Wan Workspace 地址，保存后立即生效，无需重启。浏览器和 GET 接口只接收掩码；保险柜使用独立主密钥和 AES-256-GCM 完整性保护。公开演示账号只能体验合成数据，无法查看掩码、保存凭据或发起付费连通测试。
 
-Blueprint 已把三家模型密钥和 Workspace 生图端点全部声明为 `sync: false`，仓库中不会出现其真实值。若当前账号暂时没有可用的百炼 Workspace，不得伪造 URL 或密钥：应在创建前明确选择“暂不启用生图”，让系统显示已有的诚实降级状态，并在 Render 控制台具备真实值后再补齐、重部署和执行图像 canary。
+Blueprint 不再要求供应商密钥，因此首次部署可在零模型凭据下启动。缺少某项时对应能力必须展示诚实降级；不得伪造 URL 或密钥。具备真实值后由所有者在应用设置页补齐，并逐项执行 provider canary。
 
 Neo4j 仍是可选外部能力：需要时在 Dashboard 配置受控实例的 `NEO4J_URI`、`NEO4J_USER`、`NEO4J_PASSWORD`。未配置可用实例时知识图谱走已有降级路径，不能宣称已验证外部 Neo4j。
 
