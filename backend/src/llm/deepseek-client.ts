@@ -3,7 +3,7 @@
  *
  * 基于 OpenAI SDK（DeepSeek 完全兼容 OpenAI API），实现：
  * - 文本对话（chat）与流式输出（stream）
- * - 思考模式控制（reasoning_effort: low/medium/high/max）
+ * - 思考模式控制（V4 Flash: low/high/max；V4 Pro: high/max）
  * - JSON Output / Tool Calling
  * - 缓存命中 token 读取（DeepSeek 扩展字段 prompt_cache_hit_tokens）
  * - 思考过程分离（reasoning_content）
@@ -11,7 +11,7 @@
  *
  * 模型规格：
  * - deepseek-v4-pro: 1M 上下文, 384K 输出, 500 并发, 支持 max 思考模式
- * - deepseek-v4-flash: 1M 上下文, 384K 输出, 2500 并发, 不支持 max 思考模式
+ * - deepseek-v4-flash: 1M 上下文, 384K 输出, 2500 并发, 支持 low/high/max
  */
 
 import OpenAI from 'openai'
@@ -41,12 +41,12 @@ import type {
  * OpenAI SDK 4.67 不含 reasoning_effort 字段，需类型扩展
  */
 type DeepSeekCompletionParams = ChatCompletionCreateParamsNonStreaming & {
-    reasoning_effort?: ThinkingMode
+    reasoning_effort?: 'low' | 'high' | 'max'
     thinking?: { type: 'enabled' | 'disabled' }
 }
 
 type DeepSeekStreamingParams = ChatCompletionCreateParamsStreaming & {
-    reasoning_effort?: ThinkingMode
+    reasoning_effort?: 'low' | 'high' | 'max'
     thinking?: { type: 'enabled' | 'disabled' }
 }
 
@@ -169,7 +169,7 @@ export class DeepSeekClient {
         const startTime = Date.now()
         const thinking = params.thinking ?? 'medium'
 
-        // 校验 max 思考模式仅 v4-pro 支持
+        // 在供应商边界校验并归一化官方有效档位。
         this.validateThinking(params.model, thinking)
 
         // 构建请求参数
@@ -225,7 +225,7 @@ export class DeepSeekClient {
         this.assertConfigured()
         const thinking = params.thinking ?? 'medium'
 
-        // 校验 max 思考模式
+        // 在供应商边界校验并归一化官方有效档位。
         this.validateThinking(params.model, thinking)
 
         // 构建流式请求参数
@@ -295,15 +295,11 @@ export class DeepSeekClient {
 
     /**
      * 校验思考模式
-     * max 仅 deepseek-v4-pro 支持，其他模型传 max 抛出明确错误
+     * 模型名由类型锁定；档位兼容映射在 buildRequestParams 中完成。
      */
     private validateThinking(model: DeepSeekModel, thinking: ThinkingMode): void {
-        if (thinking === 'max' && model !== 'deepseek-v4-pro') {
-            throw new Error(
-                `思考模式 "max" 仅 deepseek-v4-pro 支持，当前模型为 ${model}。` +
-                `请使用 low / medium / high 之一。`,
-            )
-        }
+        void model
+        void thinking
     }
 
     /**
@@ -329,8 +325,13 @@ export class DeepSeekClient {
             base.temperature = params.temperature
         }
 
-        // 思考模式
-        base.reasoning_effort = thinking
+        // 官方当前：V4 Flash 支持 low/high/max；V4 Pro 暂只支持 high/max。
+        // medium 是兼容值，会被供应商映射到 high。这里显式归一，确保观测与实际一致。
+        base.reasoning_effort = thinking === 'max'
+            ? 'max'
+            : thinking === 'low' && params.model === 'deepseek-v4-flash'
+                ? 'low'
+                : 'high'
 
         // JSON Output
         if (params.jsonOutput) {

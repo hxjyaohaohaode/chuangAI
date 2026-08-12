@@ -508,10 +508,8 @@ const DIAGNOSIS_FOLLOW_UPS = [
 
 /** 思考模式选择 */
 const THINKING_MODES: Array<{ value: AiThinkingMode; label: string }> = [
-    { value: 'low', label: '浅思考' },
-    { value: 'medium', label: '中思考' },
-    { value: 'high', label: '深思考' },
-    { value: 'max', label: '超深思考' },
+    { value: 'high', label: '标准深度（DeepSeek high）' },
+    { value: 'max', label: '最大深度（仅 V4 Pro）' },
 ]
 
 /** 单条对话消息渲染 */
@@ -594,7 +592,7 @@ function SuggestionChatView({
     prescription?: PrescriptionOutput | null
 }) {
     const [input, setInput] = useState('')
-    const [thinkingMode, setThinkingMode] = useState<AiThinkingMode>('medium')
+    const [thinkingMode, setThinkingMode] = useState<AiThinkingMode>('high')
 
     // 订阅 store 中的 AI 建议流式状态
     const messages = useDiagnosisStore((s) => s.suggestionMessages)

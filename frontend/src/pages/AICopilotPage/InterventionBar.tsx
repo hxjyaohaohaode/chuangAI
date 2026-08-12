@@ -30,17 +30,22 @@ import { toast } from '@/stores/toast'
 const MODEL_OPTIONS: ComboboxOption[] = [
     { value: 'deepseek-v4-pro', label: 'DeepSeek V4 Pro · 深度推理' },
     { value: 'deepseek-v4-flash', label: 'DeepSeek V4 Flash · 快速响应' },
-    { value: 'mimo-v2.5-pro', label: 'MiMo V2.5 Pro · 多模态' },
-    { value: 'mimo-v2.5', label: 'MiMo V2.5 · 标准' },
+    { value: 'mimo-v2.5-pro', label: 'MiMo V2.5 Pro · 纯文本旗舰' },
+    { value: 'mimo-v2.5', label: 'MiMo V2.5 · 多模态' },
 ]
 
-/** 思考模式选项 —— max 仅 deepseek-v4-pro 支持 */
-const THINKING_MODE_OPTIONS: ComboboxOption[] = [
-    { value: 'low', label: '低 · 快速' },
-    { value: 'medium', label: '中 · 平衡' },
-    { value: 'high', label: '高 · 深度' },
-    { value: 'max', label: '超高 · 极致（仅 Pro）' },
-]
+const thinkingModeOptions = (model: string): ComboboxOption[] => model === 'deepseek-v4-flash'
+    ? [
+        { value: 'low', label: '低（V4 Flash 官方档）' },
+        { value: 'high', label: '高（官方默认）' },
+        { value: 'max', label: '最大（V4 Flash 官方档）' },
+    ]
+    : model === 'deepseek-v4-pro'
+        ? [
+            { value: 'high', label: '高（V4 Pro 官方档）' },
+            { value: 'max', label: '最大（V4 Pro 官方档）' },
+        ]
+        : [{ value: 'high', label: '开启思考（MiMo 官方开关）' }]
 
 // ─────────────────────────────────────────────────────────────
 // 主组件
@@ -52,13 +57,13 @@ export interface InterventionBarProps {
     /** 当前模型 */
     chatModel: string
     /** 当前思考模式 */
-    chatThinkingMode: 'low' | 'medium' | 'high' | 'max'
+    chatThinkingMode: 'low' | 'high' | 'max'
     /** 当前温度 */
     chatTemperature: number
     /** 模型变更回调 */
     onModelChange: (model: string) => void
     /** 思考模式变更回调 */
-    onThinkingModeChange: (mode: 'low' | 'medium' | 'high' | 'max') => void
+    onThinkingModeChange: (mode: 'low' | 'high' | 'max') => void
     /** 温度变更回调 */
     onTemperatureChange: (temp: number) => void
 }
@@ -90,7 +95,7 @@ export const InterventionBar = memo(function InterventionBar({
 
     const handleThinkingModeChange = useCallback(
         (value: string | string[]) => {
-            onThinkingModeChange(value as 'low' | 'medium' | 'high' | 'max')
+            onThinkingModeChange(value as 'low' | 'high' | 'max')
         },
         [onThinkingModeChange],
     )
@@ -234,7 +239,7 @@ export const InterventionBar = memo(function InterventionBar({
                             value={chatThinkingMode}
                             onChange={handleThinkingModeChange}
                             ariaLabel="选择思考模式"
-                            options={THINKING_MODE_OPTIONS}
+                            options={thinkingModeOptions(chatModel)}
                         />
                     </div>
 
@@ -254,6 +259,7 @@ export const InterventionBar = memo(function InterventionBar({
                             max={2}
                             step={0.1}
                             value={chatTemperature}
+                            disabled={chatModel.startsWith('mimo-')}
                             onChange={handleTemperatureChange}
                             className="pr-copilot-intervene-temperature-slider"
                             aria-label="采样温度"
@@ -261,6 +267,9 @@ export const InterventionBar = memo(function InterventionBar({
                             aria-valuemax={2}
                             aria-valuenow={chatTemperature}
                         />
+                        {chatModel.startsWith('mimo-') && (
+                            <span className="pr-copilot-intervene-param-note">MiMo 思考模式会按官网固定温度执行</span>
+                        )}
                     </div>
                 </div> : (
                     <div className="pr-copilot-routing-note" role="status">

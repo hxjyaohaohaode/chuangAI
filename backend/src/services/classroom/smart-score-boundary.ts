@@ -6,13 +6,14 @@ export type SmartScoreParticipantResolution =
 /**
  * 把“真实学生归属”与“课堂内合成参与者”分开处理。
  *
- * - 数据库真实学生必须属于当前课堂班级，且展示名只取脱敏真相源；
+ * - 数据库真实学生必须属于当前课堂班级；登录后的教师课堂使用名册真名展示；
+ * - anonymousName 仍由调用方用于模型提示、公开分享与外发材料，不能混入展示名回退；
  * - 查不到的 ID 可作为玩法内合成参与者，但永不允许写 mastery。
  */
 export function resolveSmartScoreParticipant(
     runtimeClassId: string,
     studentId: string,
-    knownStudent: { classId: string; anonymousName: string } | null,
+    knownStudent: { classId: string; name: string; anonymousName: string } | null,
     runtimeDisplayName: string | undefined,
     requestedDisplayName: string | undefined,
 ): SmartScoreParticipantResolution {
@@ -22,7 +23,7 @@ export function resolveSmartScoreParticipant(
     if (knownStudent) {
         return {
             accepted: true,
-            displayName: knownStudent.anonymousName,
+            displayName: knownStudent.name,
             persistent: true,
         }
     }

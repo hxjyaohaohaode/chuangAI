@@ -264,7 +264,6 @@ export const FlyingPosters = memo(function FlyingPosters({
                 ? scrollTarget
                 : scrollCurrent + difference * 0.095
 
-            const viewportWorldHeight = Math.max(1, 2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z)
             const scrollUnits = scrollCurrent / Math.max(itemSpacing, 0.001)
             const centerIndex = Math.round(scrollUnits)
             const fractionalOffset = scrollUnits - centerIndex
@@ -273,11 +272,12 @@ export const FlyingPosters = memo(function FlyingPosters({
                 loadMediaTexture(entry, itemIndex)
                 const positionY = (entry.offset - fractionalOffset) * itemSpacing
                 entry.mesh.position.y = positionY
-                const distance = Math.min(1, Math.abs(positionY) / Math.max(viewportWorldHeight * 0.5, 0.001))
                 // 中心卡必须以正面完整展示。旧基值 10 会令 fract(10 * .05)=.5，
                 // 恰好把中心平面旋转 90° 成一条细线；只让离中心距离驱动侧卡旋转。
                 entry.program.uniforms.uPosition.value = positionY * 0.42
-                entry.program.uniforms.uAlpha.value = entry.loaded ? 1 - distance * 0.62 : 0
+                // 诗境图承载真实教学内容，相邻图也不能为了“空间层次”被压暗成
+                // 看不清的装饰背景。深度只由几何位置表达，图片始终保持原色清晰。
+                entry.program.uniforms.uAlpha.value = entry.loaded ? 1 : 0
             }
             renderer.render({ scene, camera })
 

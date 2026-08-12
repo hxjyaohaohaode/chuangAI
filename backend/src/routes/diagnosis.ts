@@ -69,6 +69,8 @@ export interface BloomDistributionResponse {
 export interface HeatmapStudent {
     id: string
     anonymousName: string
+    /** 已认证教师界面显示的名册姓名；模型与外发仍使用 anonymousName */
+    displayName: string
 }
 
 /** 热力图诗列 */
@@ -98,6 +100,7 @@ export interface HeatmapResponse {
 export interface StudentProfileResponse {
     studentId: string
     anonymousName: string
+    displayName: string
     /** 六阶雷达（所有诗的六阶均值） */
     bloomRadar: Record<BloomLevel, number>
     /** 知识漏洞列表 */
@@ -127,6 +130,7 @@ export interface LearningPathNode {
 export interface LearningPathResponse {
     studentId: string
     anonymousName: string
+    displayName: string
     path: LearningPathNode[]
     aiGenerated: false
 }
@@ -144,6 +148,7 @@ export interface DarkMatterReportResponse extends DarkMatterReport {
 export interface StudentGapsResponse {
     studentId: string
     anonymousName: string
+    displayName: string
     gaps: StudentGap[]
     aiGenerated: false
 }
@@ -224,6 +229,7 @@ export interface RadarDimension {
 export interface StudentRadarResponse {
     studentId: string
     anonymousName: string
+    displayName: string
     /** 六阶详细雷达（按 bloom level 分项） */
     bloomRadar: Record<BloomLevel, number>
     /** 综合维度雷达（5 维聚合） */
@@ -495,6 +501,7 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                 return reply.send({
                     studentId,
                     anonymousName: '未知学生',
+                    displayName: '未知学生',
                     bloomRadar: emptyRadar,
                     gaps: [],
                     learningPath: [],
@@ -604,6 +611,7 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                 return reply.send({
                     studentId,
                     anonymousName: student.anonymousName,
+                    displayName: student.name,
                     gaps,
                     aiGenerated: false as const,
                 })
@@ -612,6 +620,7 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                 return reply.send({
                     studentId,
                     anonymousName: '未知学生',
+                    displayName: '未知学生',
                     gaps: [],
                     aiGenerated: false as const,
                 })
@@ -636,6 +645,7 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                 return reply.send({
                     studentId,
                     anonymousName: student.anonymousName,
+                    displayName: student.name,
                     path,
                     aiGenerated: false as const,
                 })
@@ -644,6 +654,7 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                 return reply.send({
                     studentId,
                     anonymousName: '未知学生',
+                    displayName: '未知学生',
                     path: [],
                     aiGenerated: false as const,
                 })
@@ -741,6 +752,12 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                 return reply.send({
                     status: 'ok',
                     ...response,
+                    profile: {
+                        ...response.profile,
+                        displayName: student.name,
+                        // 模型只见脱敏名；仅认证教师响应将精确匿名标识还原为名册姓名。
+                        description: response.profile.description.replaceAll(student.anonymousName, student.name),
+                    },
                     aiGenerated: response.profile.aiGenerated,
                 })
             } catch (err) {
@@ -778,6 +795,11 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                 return reply.send({
                     status: 'ok',
                     ...response,
+                    profile: {
+                        ...response.profile,
+                        displayName: student.name,
+                        description: response.profile.description.replaceAll(student.anonymousName, student.name),
+                    },
                     aiGenerated: response.profile.aiGenerated,
                 })
             } catch (err) {
@@ -1049,7 +1071,7 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                     })
                 }
 
-                const radar = computeStudentRadar(studentId, student.anonymousName)
+                const radar = computeStudentRadar(studentId, student.anonymousName, student.name)
                 return reply.send({ status: 'ok', ...radar })
             } catch (err) {
                 req.log.error({ err, studentId }, '学生综合雷达计算失败')
@@ -1060,6 +1082,7 @@ export const diagnosisRoutes: FastifyPluginAsync<DiagnosisRoutesOptions> = async
                     status: 'degraded',
                     studentId,
                     anonymousName: '未知学生',
+                    displayName: '未知学生',
                     bloomRadar: emptyRadar,
                     dimensions: [],
                     overallScore: 0,
@@ -1185,10 +1208,10 @@ function computeHeatmap(classId: string): {
     cells: HeatmapCell[]
 } {
     try {
-        // 1. 查询班级学生（脱敏名）
+        // 1. 教师热力图显示名册姓名，同时保留脱敏名供模型与外发边界使用。
         const students = repos.students
             .findByClassId(classId)
-            .map((s) => ({ id: s.id, anonymousName: s.anonymousName }))
+            .map((s) => ({ id: s.id, anonymousName: s.anonymousName, displayName: s.name }))
 
         if (students.length === 0) {
             return { students: [], poems: [], cells: [] }
@@ -1260,6 +1283,7 @@ function computeHeatmap(classId: string): {
 async function computeStudentProfile(studentId: string): Promise<Omit<StudentProfileResponse, 'aiGenerated'>> {
     const student = repos.students.findById(studentId)
     const anonymousName = student?.anonymousName ?? '未知学生'
+    const displayName = student?.name ?? '未知学生'
 
     // 六阶雷达
     const bloomRadar = services.mastery.getStudentBloomRadar(studentId)
@@ -1279,6 +1303,7 @@ async function computeStudentProfile(studentId: string): Promise<Omit<StudentPro
     return {
         studentId,
         anonymousName,
+        displayName,
         bloomRadar,
         gaps,
         learningPath,
@@ -2049,6 +2074,7 @@ function overallRadarScore(dims: RadarDimension[]): number {
 function computeStudentRadar(
     studentId: string,
     anonymousName: string,
+    displayName: string,
 ): Omit<StudentRadarResponse, 'aiGenerated'> {
     // 1. 六阶雷达
     const bloomRadar = services.mastery.getStudentBloomRadar(studentId)
@@ -2108,6 +2134,7 @@ function computeStudentRadar(
     return {
         studentId,
         anonymousName,
+        displayName,
         bloomRadar: bloomRecord,
         dimensions,
         overallScore: overallRadarScore(dimensions),

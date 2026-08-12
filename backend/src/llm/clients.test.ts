@@ -140,11 +140,16 @@ describe('DeepSeekClient SDK contract', () => {
         expect(sdk.chatCreate.mock.calls[0]?.[0]).toMatchObject({ stream: true, stream_options: { include_usage: true } })
     })
 
-    it('rejects unsupported max thinking and detects exhausted output budgets', async () => {
+    it('uses the official Flash max effort and detects exhausted output budgets', async () => {
         const client = new DeepSeekClient('key', 'https://deepseek.test/v1')
-        await expect(client.chat({
+        sdk.chatCreate.mockResolvedValueOnce({
+            choices: [{ finish_reason: 'stop', message: { content: '完成', tool_calls: [] } }],
+            usage: null,
+        })
+        await client.chat({
             model: 'deepseek-v4-flash', thinking: 'max', messages: [{ role: 'user', content: '分析' }],
-        })).rejects.toThrow('仅 deepseek-v4-pro 支持')
+        })
+        expect(sdk.chatCreate.mock.calls[0]?.[0]).toMatchObject({ reasoning_effort: 'max' })
 
         sdk.chatCreate.mockResolvedValue({
             choices: [{ finish_reason: 'length', message: { content: '', tool_calls: [] } }],

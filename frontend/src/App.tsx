@@ -7,6 +7,7 @@ import { NAV, getVariantForPath, getDefaultRoute } from '@/config/nav'
 import { useAuthStore } from '@/stores/auth'
 import { wsDispatcher } from '@/lib/ws-dispatcher'
 import { crossTabSync } from '@/lib/cross-tab-sync'
+import { installBusinessEventCrossTabBridge } from '@/lib/business-events'
 import { useDemoModeStore } from '@/lib/demo-mode'
 import { getAuthStatus } from '@/lib/auth-session'
 import type { ProactiveAlert, ProactiveTargetType } from '@/lib/types'
@@ -236,7 +237,9 @@ function DemoApp() {
     // 通知中心、业务事件、鉴权状态在多 Tab 间实时同步
     useEffect(() => {
         crossTabSync.init()
+        const removeBusinessBridge = installBusinessEventCrossTabBridge()
         return () => {
+            removeBusinessBridge()
             crossTabSync.destroy()
         }
     }, [])

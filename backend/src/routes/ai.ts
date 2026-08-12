@@ -603,7 +603,7 @@ export const aiRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
         }
         const chatModel = model as ChatModel
 
-        // 校验 thinking 模式（max 仅 deepseek-v4-pro 支持）
+        // 校验 thinking 模式与供应商真实能力。
         const thinkingError = validateThinkingMode(chatModel, thinking as ThinkingMode)
         if (thinkingError) {
             return reply.code(400).send({
@@ -801,10 +801,10 @@ function resolveModelFamily(model: string): ModelFamily | null {
     return null
 }
 
-/** 校验 thinking 模式与模型兼容性（max 仅 deepseek-v4-pro 支持） */
+/** 校验 thinking 模式与模型兼容性。MiMo 仅支持开关，不支持 max 强度。 */
 function validateThinkingMode(model: string, thinking: ThinkingMode): string | null {
-    if (thinking === 'max' && model !== 'deepseek-v4-pro') {
-        return 'max 思考模式仅 deepseek-v4-pro 支持'
+    if (thinking === 'max' && model.startsWith('mimo-')) {
+        return 'MiMo ChatCompletions 仅支持开启或关闭思考，不支持 max 强度；请选择标准深度'
     }
     return null
 }

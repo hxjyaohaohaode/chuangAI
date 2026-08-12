@@ -27,6 +27,8 @@
  * - 无防抖/节流，调用方需自行控制发射频率
  */
 
+import { crossTabSync } from './cross-tab-sync'
+
 /** 业务事件类型 */
 export type BusinessEventType =
     | 'diagnosis:updated'
@@ -373,6 +375,21 @@ export interface BusinessEvent<T extends BusinessEventType = BusinessEventType> 
     timestamp: number
 }
 
+const BUSINESS_EVENT_TYPES = new Set<BusinessEventType>([
+    'diagnosis:updated', 'recitation:completed', 'self-study:progress',
+    'workbench:question-ready', 'grading:reviewed', 'report:generated', 'classroom:ended',
+    'creation:submitted', 'creation:graded', 'creation:feedback', 'prompt:evolved', 'ab-test:won',
+    'lesson-plan:generated', 'lesson-plan:saved', 'error-notebook:review-completed',
+    'lesson:generated', 'lesson:refined', 'classroom:mode-changed', 'classroom:ai-suggested',
+    'classroom:report-generated', 'profile:refreshed', 'hotspot:detected', 'alert:triggered',
+    'report:exported', 'home-school:weekly-generated', 'grading:scored', 'grading:ocr-completed',
+    'diagnosis:prescribed', 'diagnosis:learning-path-generated',
+])
+
+export function isBusinessEventType(value: unknown): value is BusinessEventType {
+    return typeof value === 'string' && BUSINESS_EVENT_TYPES.has(value as BusinessEventType)
+}
+
 /** 业务事件订阅者 */
 type BusinessEventHandler<T extends BusinessEventType = BusinessEventType> = (
     event: BusinessEvent<T>,
@@ -423,14 +440,27 @@ class BusinessEventBus {
             payload,
             timestamp: Date.now(),
         }
-        const set = this.handlers.get(type)
+        this.dispatch(event)
+        crossTabSync.emit('business:event', { type, payload, timestamp: event.timestamp })
+    }
+
+    /** 接收其他 Tab 的事件；只做本地分发，绝不再次广播，避免事件回环。 */
+    emitFromCrossTab(event: BusinessEvent): void {
+        if (!isBusinessEventType(event.type)) return
+        if (!event.payload || typeof event.payload !== 'object' || Array.isArray(event.payload)) return
+        if (!Number.isFinite(event.timestamp) || event.timestamp <= 0) return
+        this.dispatch(event)
+    }
+
+    private dispatch<T extends BusinessEventType>(event: BusinessEvent<T>): void {
+        const set = this.handlers.get(event.type)
         if (!set || set.size === 0) return
         set.forEach((handler) => {
             try {
                 (handler as BusinessEventHandler<T>)(event)
             } catch (err) {
                 // 单个订阅者异常不影响其他订阅者
-                console.error(`[businessEvents] ${type} 订阅者异常:`, err)
+                console.error(`[businessEvents] ${event.type} 订阅者异常:`, err)
             }
         })
     }
@@ -464,3 +494,17 @@ class BusinessEventBus {
  * ```
  */
 export const businessEvents = new BusinessEventBus()
+
+/**
+ * 在 App 生命周期内安装一次跨 Tab 入站桥；返回清理函数供 StrictMode/卸载使用。
+ * 出站由 emit 同步完成，入站走 emitFromCrossTab，二者刻意分离以保证不回环。
+ */
+export function installBusinessEventCrossTabBridge(): () => void {
+    return crossTabSync.on('business:event', (message) => {
+        businessEvents.emitFromCrossTab({
+            type: message.type as BusinessEventType,
+            payload: message.payload as BusinessEventPayloadMap[BusinessEventType],
+            timestamp: message.timestamp,
+        })
+    })
+}

@@ -346,7 +346,7 @@ export interface ChatInterfaceProps {
     /** 当前选择的模型名称 */
     chatModel: string
     /** 思考模式 */
-    chatThinkingMode: 'low' | 'medium' | 'high' | 'max'
+    chatThinkingMode: 'low' | 'high' | 'max'
     /** 采样温度 */
     chatTemperature: number
     /** 待插入的物料引用（由 QuickActions 触发） */

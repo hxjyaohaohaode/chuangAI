@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-12T01:35:41.359Z",
+  "generatedAt": "2026-08-12T04:04:53.770Z",
   "mode": "demo",
   "deployment": "local",
   "status": "passed",
@@ -128,7 +128,7 @@
     {
       "id": "evidence.bundle",
       "status": "PASS",
-      "message": "初始 JS gzip 94774B / 120000B"
+      "message": "初始 JS gzip 95253B / 120000B"
     },
     {
       "id": "evidence.api-contract",

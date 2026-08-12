@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import './Modal.css'
@@ -92,15 +92,28 @@ export function Modal({
     // 焦点必须等面板退出可访问树后再交回来源；否则动画尚在显示 aria-modal
     // 对话框时，焦点已落在背景，会形成短暂但真实的焦点逃逸。
     const startClose = useCallback(() => {
+        // 系统已选择“减少动态效果”时没有离场动画可等待；同步进入卸载态，
+        // 再由 layout effect 在对话框真正离开 DOM 后恢复触发按钮焦点。
+        if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+            if (closingTimer.current) window.clearTimeout(closingTimer.current)
+            setLeaving(false)
+            setRender(false)
+            return
+        }
         setLeaving(true)
         // 遮罩延迟 100ms 后淡出，整体 200ms，故 300ms 后卸载
         if (closingTimer.current) window.clearTimeout(closingTimer.current)
         closingTimer.current = window.setTimeout(() => {
             setRender(false)
             setLeaving(false)
-            window.requestAnimationFrame(restoreFocus)
         }, 300)
-    }, [restoreFocus])
+    }, [])
+
+    // render=false 的提交已经把 aria-modal 对话框移出 DOM；使用 layout effect
+    // 可在下一次绘制前稳定交回焦点，也不会让 E2E/键盘用户观察到落在 body 的中间帧。
+    useLayoutEffect(() => {
+        if (!render && !open) restoreFocus()
+    }, [open, render, restoreFocus])
 
     // open 变为 false 时触发离场
     useEffect(() => {

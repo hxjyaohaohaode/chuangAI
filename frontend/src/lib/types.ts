@@ -2871,6 +2871,8 @@ export interface BloomDistributionResponse {
 export interface HeatmapStudent {
     id: string
     anonymousName: string
+    /** 已认证教师界面显示的名册姓名 */
+    displayName?: string
 }
 
 /** 热力图诗列 */
@@ -2918,6 +2920,7 @@ export interface LearningPathNode {
 export interface StudentProfileResponse {
     studentId: string
     anonymousName: string
+    displayName?: string
     /** 六阶雷达（所有诗的六阶均值） */
     bloomRadar: Record<BloomLevel, number>
     /** 知识漏洞列表 */
@@ -2931,6 +2934,7 @@ export interface StudentProfileResponse {
 export interface LearningPathResponse {
     studentId: string
     anonymousName: string
+    displayName?: string
     path: LearningPathNode[]
     aiGenerated: false
 }
@@ -2951,6 +2955,7 @@ export interface DarkMatterReportResponse extends DarkMatterReport {
 export interface StudentGapsResponse {
     studentId: string
     anonymousName: string
+    displayName?: string
     gaps: StudentGap[]
     aiGenerated: false
 }
@@ -5740,6 +5745,8 @@ export interface ProfileGrowthDimension {
 export interface StudentProfile3D {
     studentId: string
     anonymousName: string
+    /** 教师响应专用；不会进入模型提示或公开报告 */
+    displayName?: string
     generatedAt: number
     aiGenerated: boolean
     dimensions: {

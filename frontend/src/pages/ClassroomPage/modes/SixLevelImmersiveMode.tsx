@@ -22,7 +22,13 @@
 import { memo, useCallback, useEffect, useMemo } from 'react'
 import { Icon, Badge } from '@/components/ui'
 import { useClassroomStore } from '@/stores/classroom'
-import { BLOOM_ORDER, type BloomLevel, type StudentResponse, type ClassroomQuestion } from '@/lib/types'
+import {
+    BLOOM_ORDER,
+    type BloomLevel,
+    type StudentResponse,
+    type ClassroomQuestion,
+    type QuestSnapshot,
+} from '@/lib/types'
 import { StudentInputPanel } from '../shared/StudentInputPanel'
 
 export interface SixLevelImmersiveModeProps {
@@ -64,29 +70,34 @@ const BLOOM_DESCRIPTIONS: Record<BloomLevel, string> = {
 }
 
 function computeTierStats(
+    quest: QuestSnapshot | null,
     responses: StudentResponse[],
     currentLevel: BloomLevel | undefined,
 ): TierStat[] {
-    const stats: TierStat[] = BLOOM_ORDER.map((level) => ({
-        level,
-        correct: 0,
-        total: 0,
-        rate: 0,
-    }))
-
-    if (currentLevel) {
-        const idx = BLOOM_ORDER.indexOf(currentLevel)
-        if (idx >= 0) {
-            const stat = stats[idx]
-            if (stat) {
-                stat.total = responses.length
-                stat.correct = responses.filter((r) => r.correct).length
-                stat.rate = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : 0
+    if (quest) {
+        return BLOOM_ORDER.map((level) => {
+            const node = quest.levels.find((item) => item.level === level)
+            const rate = node?.cleared ? 100 : node?.current ? quest.levelProgress : 0
+            return {
+                level,
+                correct: node?.cleared ? node.questionCount : 0,
+                total: node?.questionCount ?? 0,
+                rate,
             }
-        }
+        })
     }
 
-    return stats
+    return BLOOM_ORDER.map((level) => {
+        const isCurrent = level === currentLevel
+        const total = isCurrent ? responses.length : 0
+        const correct = isCurrent ? responses.filter((response) => response.correct).length : 0
+        return {
+            level,
+            total,
+            correct,
+            rate: total > 0 ? Math.round((correct / total) * 100) : 0,
+        }
+    })
 }
 
 /** 根据正确率返回颜色变量名 */
@@ -102,10 +113,11 @@ export const SixLevelImmersiveMode = memo(function SixLevelImmersiveMode({
     responses,
     tierQuestionCounts,
 }: SixLevelImmersiveModeProps) {
-    const currentLevel = question?.bloomLevel
+    const quest = useClassroomStore((s) => s.quest)
+    const currentLevel = (quest?.currentLevel as BloomLevel | undefined) ?? question?.bloomLevel
     const tierStats = useMemo(
-        () => computeTierStats(responses, currentLevel),
-        [responses, currentLevel],
+        () => computeTierStats(quest, responses, currentLevel),
+        [quest, responses, currentLevel],
     )
 
     const currentRate = currentLevel
@@ -153,7 +165,7 @@ export const SixLevelImmersiveMode = memo(function SixLevelImmersiveMode({
     const currentDescription = currentLevel ? BLOOM_DESCRIPTIONS[currentLevel] : '课堂尚未开始'
 
     /** 已完成阶数 */
-    const completedTiers = tierStats.filter((t) => t.total > 0).length
+    const completedTiers = quest?.clearedLevels.length ?? tierStats.filter((tier) => tier.rate === 100).length
 
     return (
         <div className="pr-six-level">
@@ -187,9 +199,15 @@ export const SixLevelImmersiveMode = memo(function SixLevelImmersiveMode({
                     return (
                         <div
                             key={stat.level}
-                            className={`pr-six-level-tier ${isCurrent ? 'pr-six-level-tier--current' : ''}`}
+                            className={`pr-six-level-tier ${isCurrent ? 'pr-six-level-tier--current' : ''} ${stat.rate === 100 ? 'pr-six-level-tier--cleared' : ''}`}
+                            data-state={stat.rate === 100 ? 'cleared' : isCurrent ? 'current' : stat.total > 0 ? 'locked' : 'absent'}
                         >
-                            <span className="pr-six-level-tier-name">{label}</span>
+                            <span className="pr-six-level-tier-name">
+                                <span className="pr-six-level-tier-index" aria-hidden="true">
+                                    {BLOOM_ORDER.indexOf(stat.level) + 1}
+                                </span>
+                                {label}
+                            </span>
                             <div className="pr-six-level-tier-bar">
                                 <div
                                     className="pr-six-level-tier-fill"
@@ -200,7 +218,13 @@ export const SixLevelImmersiveMode = memo(function SixLevelImmersiveMode({
                                 />
                             </div>
                             <span className="pr-six-level-tier-value">
-                                {stat.total > 0 ? `${stat.rate}%` : '—'}
+                                {stat.rate === 100
+                                    ? '已通关'
+                                    : isCurrent
+                                        ? `${stat.rate}%`
+                                        : stat.total > 0
+                                            ? '待解锁'
+                                            : '本课不涉及'}
                             </span>
                         </div>
                     )

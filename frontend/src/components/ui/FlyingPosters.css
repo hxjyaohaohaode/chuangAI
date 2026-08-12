@@ -59,13 +59,14 @@
     grid-template-columns: 48px minmax(0, 1fr) 48px;
     gap: 10px;
     align-items: stretch;
-    max-width: 720px;
+    width: min(520px, calc(100% - 28px));
+    max-width: none;
     margin-inline: auto;
-    padding: 8px;
-    border-radius: 18px;
+    padding: 6px;
+    border-radius: 15px;
     border: 1px solid color-mix(in srgb, var(--text-primary) 13%, transparent);
     background: var(--surface-primary);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--text-primary) 10%, transparent);
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--text-primary) 8%, transparent);
 }
 
 .pr-flying-posters__controls > button {
@@ -124,6 +125,7 @@
         right: 10px;
         bottom: 10px;
         left: 10px;
+        width: auto;
         grid-template-columns: 44px minmax(0, 1fr) 44px;
     }
 

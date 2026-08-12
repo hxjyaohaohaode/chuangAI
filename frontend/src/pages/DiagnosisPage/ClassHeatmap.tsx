@@ -162,7 +162,7 @@ export const ClassHeatmap = memo(function ClassHeatmap({
             if (rowProgress <= 0) continue
             ctx.globalAlpha = rowProgress
             ctx.fillStyle = rgba(cTextSecondary, 1)
-            ctx.fillText(student.anonymousName, 8, y)
+            ctx.fillText(student.displayName ?? student.anonymousName, 8, y)
             ctx.globalAlpha = 1
         }
 
@@ -351,7 +351,7 @@ export const ClassHeatmap = memo(function ClassHeatmap({
 
         return {
             studentId: student.id,
-            studentName: student.anonymousName,
+            studentName: student.displayName ?? student.anonymousName,
             poemId: poem.id,
             poemTitle: poem.title,
             bloomLevel: bloom,

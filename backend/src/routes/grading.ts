@@ -659,7 +659,7 @@ export const gradingRoutes: FastifyPluginAsync<GradingRoutesOptions> = async (
             status: 'ok',
             students: repos.students.findByClassId(query.classId).map((student) => ({
                 id: student.id,
-                name: student.anonymousName,
+                name: student.name,
             })),
         })
     })

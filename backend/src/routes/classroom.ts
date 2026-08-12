@@ -924,7 +924,7 @@ export const classroomRoutes: FastifyPluginAsync<ClassroomRoutesOptions> = async
             })
         }
         if (!runtime.students.has(studentId)) {
-            runtime.students.set(studentId, studentEntity.anonymousName)
+            runtime.students.set(studentId, studentEntity.name)
         }
         const displayName = runtime.students.get(studentId) ?? studentId
 
@@ -1103,7 +1103,8 @@ export const classroomRoutes: FastifyPluginAsync<ClassroomRoutesOptions> = async
         // 讲评是"锦上添花"，让它排在响应之后。
         void (async () => {
             try {
-                const g = await gradeAnswer(question, answer, displayName)
+                // 模型侧只接收脱敏名；教师课堂与榜单使用真实名册姓名。
+                const g = await gradeAnswer(question, answer, studentEntity.anonymousName)
                 const finalCorrect = gradedLocally ? correct : g.correct
 
                 repos.answers.update(answerId, {
@@ -2459,7 +2460,7 @@ export const classroomRoutes: FastifyPluginAsync<ClassroomRoutesOptions> = async
 
         // 注册学生到 runtime
         if (!runtime.students.has(studentId)) {
-            runtime.students.set(studentId, student.anonymousName)
+            runtime.students.set(studentId, student.name)
         }
         const displayName = runtime.students.get(studentId) ?? studentId
 
@@ -2550,7 +2551,8 @@ export const classroomRoutes: FastifyPluginAsync<ClassroomRoutesOptions> = async
         }
 
         // 数据库真实学生必须属于当前课堂班级；玩法内合成 ID 可以参与临时赋分，
-        // 但后续绝不写入 mastery。真实学生展示名只取脱敏真相源。
+        // 但后续绝不写入 mastery。真实学生展示名只取服务端名册真相源，
+        // 不接受客户端伪造；模型与外发材料仍使用 anonymousName。
         const knownStudent = repos.students.findById(body.studentId)
         const participant = resolveSmartScoreParticipant(
             runtime.classId,

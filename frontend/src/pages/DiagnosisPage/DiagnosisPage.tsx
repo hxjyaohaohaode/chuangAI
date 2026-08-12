@@ -324,7 +324,7 @@ export default function DiagnosisPage() {
                                 { value: '', label: studentList.length === 0 ? '暂无学生数据' : '请选择学生...' },
                                 ...studentList.map<ComboboxOption>((s) => ({
                                     value: s.id,
-                                    label: s.anonymousName,
+                                    label: s.displayName ?? s.anonymousName,
                                 })),
                             ]}
                         />
@@ -439,7 +439,7 @@ export default function DiagnosisPage() {
                                 {/* 组件 3：AI 教学建议（流式对话，至少 3 轮上下文记忆） */}
                                 <SuggestionPanel
                                     studentId={selectedStudentId}
-                                    studentName={studentProfile.anonymousName}
+                                    studentName={studentProfile.displayName ?? studentProfile.anonymousName}
                                     studentProfile={studentProfile}
                                     studentGaps={studentGaps}
                                     prescription={prescription}
@@ -485,7 +485,7 @@ export default function DiagnosisPage() {
                         <Card className="pr-diagnosis-section-card" padding="md">
                             <LearningPathViz
                                 path={learningPath}
-                                anonymousName={studentProfile.anonymousName}
+                                anonymousName={studentProfile.displayName ?? studentProfile.anonymousName}
                                 loading={loading.learningPath}
                                 onSwitchToStudent={handleSwitchToStudent}
                             />

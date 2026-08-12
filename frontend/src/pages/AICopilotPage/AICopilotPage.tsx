@@ -128,7 +128,18 @@ export const AICopilotPage = memo(function AICopilotPage() {
 
     // 模型参数 —— 由本页面统一管理，props 传递给 ChatInterface / InterventionBar
     const [chatModel, setChatModel] = useState<string>('deepseek-v4-pro')
-    const [chatThinkingMode, setChatThinkingMode] = useState<'low' | 'medium' | 'high' | 'max'>('medium')
+    const [chatThinkingMode, setChatThinkingMode] = useState<'low' | 'high' | 'max'>('high')
+
+    const handleModelChange = useCallback((model: string) => {
+        setChatModel(model)
+        setChatThinkingMode((current) => {
+            // MiMo ChatCompletions 只有思考开关；V4 Pro 暂不支持 low；
+            // V4 Flash 则完整支持 low / high / max，切模型时不能误删用户档位。
+            if (model.startsWith('mimo-')) return 'high'
+            if (model === 'deepseek-v4-pro' && current === 'low') return 'high'
+            return current
+        })
+    }, [])
     const [chatTemperature, setChatTemperature] = useState<number>(0.7)
     const [interactionMode, setInteractionMode] = useState<CopilotInteractionMode>('ask')
 
@@ -213,7 +224,7 @@ export const AICopilotPage = memo(function AICopilotPage() {
                 chatModel={chatModel}
                 chatThinkingMode={chatThinkingMode}
                 chatTemperature={chatTemperature}
-                onModelChange={setChatModel}
+                onModelChange={handleModelChange}
                 onThinkingModeChange={setChatThinkingMode}
                 onTemperatureChange={setChatTemperature}
             />

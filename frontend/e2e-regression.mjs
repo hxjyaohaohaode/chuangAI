@@ -3086,11 +3086,14 @@ async function checkWorkbenchRefineModalKeyboard(context) {
             fullPage: false,
         })
 
+        const reducedMotion = await page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
         await page.keyboard.press('Escape')
-        await page.waitForTimeout(80)
-        const leavingFocusRemainsInDialog = await dialog.evaluate((node) => node.contains(document.activeElement))
-        if (!leavingFocusRemainsInDialog) {
-            fail('命题精修关闭动画仍显示模态框时，焦点不应提前泄漏到背景页面')
+        if (!reducedMotion) {
+            await page.waitForTimeout(80)
+            const leavingFocusRemainsInDialog = await dialog.evaluate((node) => node.contains(document.activeElement))
+            if (!leavingFocusRemainsInDialog) {
+                fail('命题精修关闭动画仍显示模态框时，焦点不应提前泄漏到背景页面')
+            }
         }
         await dialog.waitFor({ state: 'hidden', timeout: 10_000 })
         await page.waitForFunction((trigger) => document.activeElement === document.querySelector(trigger), '.pr-wb-q-action[aria-label="微调此题"]', { timeout: 5_000 })

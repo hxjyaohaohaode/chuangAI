@@ -758,7 +758,9 @@ export const StudentProfilePanel = memo(function StudentProfilePanel({
         if (!searchQuery.trim()) return students
         const q = searchQuery.toLowerCase().trim()
         return students.filter(
-            (s) => s.anonymousName.toLowerCase().includes(q) || s.id.toLowerCase().includes(q),
+            (s) => (s.displayName ?? s.anonymousName).toLowerCase().includes(q)
+                || s.anonymousName.toLowerCase().includes(q)
+                || s.id.toLowerCase().includes(q),
         )
     }, [students, searchQuery])
 
@@ -889,6 +891,7 @@ export const StudentProfilePanel = memo(function StudentProfilePanel({
                     ) : (
                         filteredStudents.map((student, index) => {
                             const isSelected = student.id === selectedStudentId
+                            const studentDisplayName = student.displayName ?? student.anonymousName
                             // 只有当前选择项可由 Tab 进入；搜索过滤掉当前项时，第一个结果接管入口。
                             const isRovingTabStop = isSelected || (!selectedStudentVisible && index === 0)
                             return (
@@ -897,7 +900,7 @@ export const StudentProfilePanel = memo(function StudentProfilePanel({
                                         type="button"
                                         data-student-list-item={student.id}
                                         aria-pressed={isSelected}
-                                        aria-label={`选择学生：${student.anonymousName}`}
+                                        aria-label={`选择学生：${studentDisplayName}`}
                                         tabIndex={isRovingTabStop ? 0 : -1}
                                         className={`pr-student-list-item ${isSelected ? 'is-selected' : ''}`}
                                         onClick={() => {
@@ -907,7 +910,7 @@ export const StudentProfilePanel = memo(function StudentProfilePanel({
                                     >
                                         <Icon name="user" size={14} />
                                         <span className="pr-student-list-name">
-                                            {student.anonymousName}
+                                            {studentDisplayName}
                                         </span>
                                         {isSelected && <Icon name="check" size={12} active />}
                                     </button>
@@ -940,7 +943,7 @@ export const StudentProfilePanel = memo(function StudentProfilePanel({
                             <div className="pr-student-profile-name-row">
                                 <Icon name="graduation" size={20} />
                                 <h3 className="pr-student-profile-name">
-                                    {profile.anonymousName}
+                                    {profile.displayName ?? profile.anonymousName}
                                 </h3>
                             </div>
                         </Card>
@@ -948,14 +951,14 @@ export const StudentProfilePanel = memo(function StudentProfilePanel({
                         {/* 五维度立体画像（能力 1 深化） */}
                         <Profile3DSection
                             studentId={profile.studentId}
-                            anonymousName={profile.anonymousName}
+                            anonymousName={profile.displayName ?? profile.anonymousName}
                         />
 
                         {/* 六阶雷达 */}
                         <Card className="pr-student-profile-radar-card" padding="md">
                             <StudentRadar
                                 radar={profile.bloomRadar}
-                                anonymousName={profile.anonymousName}
+                                anonymousName={profile.displayName ?? profile.anonymousName}
                             />
                         </Card>
 

@@ -6,20 +6,20 @@ describe('smart-score participant boundary', () => {
         expect(resolveSmartScoreParticipant(
             'class-a',
             'student-b',
-            { classId: 'class-b', anonymousName: 'B01' },
+            { classId: 'class-b', name: '陈同学', anonymousName: 'B01' },
             undefined,
             '伪造姓名',
         )).toEqual({ accepted: false, reason: 'STUDENT_CLASS_MISMATCH' })
     })
 
-    it('uses the authoritative anonymized name for a same-class real student', () => {
+    it('uses the authoritative roster name for a same-class teacher view', () => {
         expect(resolveSmartScoreParticipant(
             'class-a',
             'student-a',
-            { classId: 'class-a', anonymousName: 'A01' },
+            { classId: 'class-a', name: '林诗涵', anonymousName: 'A01' },
             '旧名字',
-            '真实姓名不应进入广播',
-        )).toEqual({ accepted: true, displayName: 'A01', persistent: true })
+            '客户端伪造姓名',
+        )).toEqual({ accepted: true, displayName: '林诗涵', persistent: true })
     })
 
     it('keeps an explicit in-class synthetic participant non-persistent', () => {

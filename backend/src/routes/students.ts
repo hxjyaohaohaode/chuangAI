@@ -43,8 +43,8 @@ export const studentRoutes: FastifyPluginAsync = async (app) => {
      * Query: classId（可选，缺省返回全部班级）/ keyword / limit
      * 返回 `{ status, students: StudentOption[] }`
      *
-     * 注意：对外只暴露 anonymousName（如 S01-Li），不暴露 students.name 真名，
-     * 与 db/utils/anonymize 的脱敏基调保持一致——命题推荐场景不需要真名。
+     * 该路由受教师会话保护，选择器显示名册姓名，避免课堂与诊断界面退化为编号。
+     * 学生 ID 仍是唯一关联键；公开分享、模型提示和外发报告继续走各自脱敏投影。
      */
     app.get('/', async (req: FastifyRequest, reply) => {
         const query = validateQuery(listQuerySchema, req, reply)
@@ -62,11 +62,12 @@ export const studentRoutes: FastifyPluginAsync = async (app) => {
 
             if (query.keyword) {
                 const q = query.keyword.toLowerCase()
-                students = students.filter((s) => s.anonymousName.toLowerCase().includes(q))
+                students = students.filter((s) =>
+                    s.name.toLowerCase().includes(q) || s.anonymousName.toLowerCase().includes(q),
+                )
             }
 
-            // 按匿名名自然序排列（S01、S02…），保证下拉框顺序稳定可预期
-            students.sort((a, b) => a.anonymousName.localeCompare(b.anonymousName, 'zh-Hans-CN', { numeric: true }))
+            students.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hans-CN', { numeric: true }))
 
             const limited = query.limit ? students.slice(0, query.limit) : students
 
@@ -74,7 +75,7 @@ export const studentRoutes: FastifyPluginAsync = async (app) => {
                 status: 'ok',
                 students: limited.map((s) => ({
                     id: s.id,
-                    name: s.anonymousName,
+                    name: s.name,
                     classId: s.classId,
                     className: classNameById.get(s.classId),
                 })),
@@ -143,7 +144,7 @@ export const studentRoutes: FastifyPluginAsync = async (app) => {
             return reply.send({
                 status: 'ok',
                 studentId: student.id,
-                studentName: student.anonymousName,
+                studentName: student.name,
                 weakPoints,
                 /** 该生总作答记录数：前端据此区分「学得很好」与「还没数据」两种空态 */
                 masteryRecordCount: rows.length,
