@@ -6,22 +6,22 @@
 
 | 指标 | 数量 |
 |---|---:|
-| sourceFiles | 632 |
-| totalLines | 256969 |
-| totalNonBlankLines | 231516 |
-| typescriptFiles | 537 |
+| sourceFiles | 633 |
+| totalLines | 255438 |
+| totalNonBlankLines | 230144 |
+| typescriptFiles | 538 |
 | cssFiles | 94 |
 | sqlFiles | 1 |
-| functions | 10183 |
+| functions | 10084 |
 | backendEndpoints | 220 |
 | frontendRoutes | 25 |
 | frontendProductionRoutes | 23 |
 | frontendDevelopmentRoutes | 2 |
 | frontendApiReferences | 222 |
-| testDeclarations | 897 |
-| findings | 590 |
+| testDeclarations | 817 |
+| findings | 532 |
 
-生成时间：2026-08-11T08:39:57.966Z
+生成时间：2026-08-12T01:35:14.031Z
 
 ## 后端端点（完整）
 
@@ -37,10 +37,10 @@
 | GET | `/api/orchestrator/sessions/:id/trace` | `backend/src/orchestrator/routes.ts` | 411 |
 | GET | `/api/orchestrator/sessions` | `backend/src/orchestrator/routes.ts` | 432 |
 | GET | `/ws/orchestrator` | `backend/src/orchestrator/websocket/handlers.ts` | 63 |
-| POST | `/api/ai/image-generate` | `backend/src/routes/ai.ts` | 277 |
-| POST | `/api/ai/tts` | `backend/src/routes/ai.ts` | 393 |
-| POST | `/api/ai/asr` | `backend/src/routes/ai.ts` | 434 |
-| POST | `/api/ai/chat` | `backend/src/routes/ai.ts` | 601 |
+| POST | `/api/ai/image-generate` | `backend/src/routes/ai.ts` | 276 |
+| POST | `/api/ai/tts` | `backend/src/routes/ai.ts` | 358 |
+| POST | `/api/ai/asr` | `backend/src/routes/ai.ts` | 399 |
+| POST | `/api/ai/chat` | `backend/src/routes/ai.ts` | 566 |
 | GET | `/api/appreciation/:poemId` | `backend/src/routes/appreciation.ts` | 251 |
 | GET | `/api/classroom/classes` | `backend/src/routes/classroom.ts` | 625 |
 | GET | `/api/classroom/readiness` | `backend/src/routes/classroom.ts` | 634 |
@@ -105,12 +105,12 @@
 | POST | `/api/creation/works/:id/recreate` | `backend/src/routes/creation.ts` | 1031 |
 | GET | `/api/culture/poems/:poemId/background` | `backend/src/routes/culture.ts` | 256 |
 | GET | `/api/culture/poems/:poemId/images` | `backend/src/routes/culture.ts` | 295 |
-| GET | `/api/culture/images/:imageId` | `backend/src/routes/culture.ts` | 341 |
-| GET | `/api/culture/imagery/:imageName` | `backend/src/routes/culture.ts` | 363 |
-| POST | `/api/culture/imagery/:imageName/refresh` | `backend/src/routes/culture.ts` | 391 |
-| POST | `/api/culture/immersive/start` | `backend/src/routes/culture.ts` | 445 |
-| GET | `/api/culture/immersive/:poemId/status` | `backend/src/routes/culture.ts` | 473 |
-| POST | `/api/culture/immersive/stop` | `backend/src/routes/culture.ts` | 497 |
+| GET | `/api/culture/images/:imageId` | `backend/src/routes/culture.ts` | 339 |
+| GET | `/api/culture/imagery/:imageName` | `backend/src/routes/culture.ts` | 361 |
+| POST | `/api/culture/imagery/:imageName/refresh` | `backend/src/routes/culture.ts` | 389 |
+| POST | `/api/culture/immersive/start` | `backend/src/routes/culture.ts` | 443 |
+| GET | `/api/culture/immersive/:poemId/status` | `backend/src/routes/culture.ts` | 471 |
+| POST | `/api/culture/immersive/stop` | `backend/src/routes/culture.ts` | 495 |
 | GET | `/api/dashboard/stats` | `backend/src/routes/dashboard.ts` | 349 |
 | GET | `/api/dashboard/bloom-radar` | `backend/src/routes/dashboard.ts` | 388 |
 | GET | `/api/dashboard/alerts` | `backend/src/routes/dashboard.ts` | 422 |
@@ -226,9 +226,9 @@
 | POST | `/api/report/home-school/:reportId/publish` | `backend/src/routes/report.ts` | 1322 |
 | POST | `/api/report/home-school/:reportId/feedback/read` | `backend/src/routes/report.ts` | 1345 |
 | POST | `/api/report/home-school/:reportId/activity/:activityId/complete` | `backend/src/routes/report.ts` | 1368 |
-| GET | `/api/settings/credentials` | `backend/src/routes/settings.ts` | 237 |
-| PUT | `/api/settings/credentials/:id` | `backend/src/routes/settings.ts` | 250 |
-| POST | `/api/settings/credentials/:id/test` | `backend/src/routes/settings.ts` | 291 |
+| GET | `/api/settings/credentials` | `backend/src/routes/settings.ts` | 246 |
+| PUT | `/api/settings/credentials/:id` | `backend/src/routes/settings.ts` | 259 |
+| POST | `/api/settings/credentials/:id/test` | `backend/src/routes/settings.ts` | 300 |
 | GET | `/api/students` | `backend/src/routes/students.ts` | 49 |
 | GET | `/api/students/:id/weak-points` | `backend/src/routes/students.ts` | 97 |
 | GET | `/api/agents/poems` | `backend/src/routes/workbench.ts` | 352 |
@@ -254,39 +254,39 @@
 
 | 路由 | 范围 | 文件 | 行 |
 |---|---|---|---:|
-| `/login` | 生产 | `frontend/src/App.tsx` | 386 |
-| `*` | 生产 | `frontend/src/App.tsx` | 387 |
-| `/` | 生产 | `frontend/src/App.tsx` | 425 |
-| `/dashboard` | 生产 | `frontend/src/App.tsx` | 427 |
-| `/starmap` | 生产 | `frontend/src/App.tsx` | 429 |
-| `/diagnosis-report` | 生产 | `frontend/src/App.tsx` | 431 |
-| `/diagnosis` | 生产 | `frontend/src/App.tsx` | 432 |
-| `/lesson-plan` | 生产 | `frontend/src/App.tsx` | 434 |
-| `/workbench` | 生产 | `frontend/src/App.tsx` | 435 |
-| `/classroom` | 生产 | `frontend/src/App.tsx` | 436 |
-| `/classroom/:lessonId` | 生产 | `frontend/src/App.tsx` | 437 |
-| `/grading` | 生产 | `frontend/src/App.tsx` | 438 |
-| `/creation-studio` | 生产 | `frontend/src/App.tsx` | 439 |
-| `/ai-copilot` | 生产 | `frontend/src/App.tsx` | 441 |
-| `/evolution-eye` | 生产 | `frontend/src/App.tsx` | 443 |
-| `/thinking-palace` | 生产 | `frontend/src/App.tsx` | 444 |
-| `/culture` | 生产 | `frontend/src/App.tsx` | 446 |
-| `/report` | 生产 | `frontend/src/App.tsx` | 448 |
-| `/privacy` | 生产 | `frontend/src/App.tsx` | 450 |
-| `/forbidden` | 生产 | `frontend/src/App.tsx` | 452 |
-| `/dev/visual` | 仅开发 | `frontend/src/App.tsx` | 455 |
-| `/dev/scripts` | 仅开发 | `frontend/src/App.tsx` | 459 |
-| `*` | 生产 | `frontend/src/App.tsx` | 462 |
-| `/shared/report/:token` | 生产 | `frontend/src/App.tsx` | 499 |
-| `*` | 生产 | `frontend/src/App.tsx` | 508 |
+| `/login` | 生产 | `frontend/src/App.tsx` | 384 |
+| `*` | 生产 | `frontend/src/App.tsx` | 385 |
+| `/` | 生产 | `frontend/src/App.tsx` | 423 |
+| `/dashboard` | 生产 | `frontend/src/App.tsx` | 425 |
+| `/starmap` | 生产 | `frontend/src/App.tsx` | 427 |
+| `/diagnosis-report` | 生产 | `frontend/src/App.tsx` | 429 |
+| `/diagnosis` | 生产 | `frontend/src/App.tsx` | 430 |
+| `/lesson-plan` | 生产 | `frontend/src/App.tsx` | 432 |
+| `/workbench` | 生产 | `frontend/src/App.tsx` | 433 |
+| `/classroom` | 生产 | `frontend/src/App.tsx` | 434 |
+| `/classroom/:lessonId` | 生产 | `frontend/src/App.tsx` | 435 |
+| `/grading` | 生产 | `frontend/src/App.tsx` | 436 |
+| `/creation-studio` | 生产 | `frontend/src/App.tsx` | 437 |
+| `/ai-copilot` | 生产 | `frontend/src/App.tsx` | 439 |
+| `/evolution-eye` | 生产 | `frontend/src/App.tsx` | 441 |
+| `/thinking-palace` | 生产 | `frontend/src/App.tsx` | 442 |
+| `/culture` | 生产 | `frontend/src/App.tsx` | 444 |
+| `/report` | 生产 | `frontend/src/App.tsx` | 446 |
+| `/privacy` | 生产 | `frontend/src/App.tsx` | 448 |
+| `/forbidden` | 生产 | `frontend/src/App.tsx` | 450 |
+| `/dev/visual` | 仅开发 | `frontend/src/App.tsx` | 453 |
+| `/dev/scripts` | 仅开发 | `frontend/src/App.tsx` | 457 |
+| `*` | 生产 | `frontend/src/App.tsx` | 460 |
+| `/shared/report/:token` | 生产 | `frontend/src/App.tsx` | 497 |
+| `*` | 生产 | `frontend/src/App.tsx` | 506 |
 
 ## 最大文件
 
 | 行数 | 函数 | 端点 | 文件 |
 |---:|---:|---:|---|
-| 6364 | 8 | 0 | `frontend/src/lib/types.ts` |
-| 5621 | 0 | 0 | `frontend/src/pages/StarMapPage/StarMapPage.css` |
-| 4954 | 325 | 0 | `frontend/src/lib/api.ts` |
+| 6363 | 8 | 0 | `frontend/src/lib/types.ts` |
+| 5618 | 0 | 0 | `frontend/src/pages/StarMapPage/StarMapPage.css` |
+| 4915 | 325 | 0 | `frontend/src/lib/api.ts` |
 | 3965 | 0 | 0 | `frontend/src/pages/LessonPlanPage/LessonPlanPage.css` |
 | 3830 | 129 | 37 | `backend/src/routes/classroom.ts` |
 | 3756 | 0 | 0 | `frontend/src/pages/ThinkingPalacePage/ThinkingPalacePage.css` |
@@ -300,7 +300,7 @@
 | 2305 | 0 | 0 | `frontend/src/pages/CultureContextPage/CultureContextPage.css` |
 | 2298 | 0 | 0 | `frontend/src/pages/EvolutionEyePage/EvolutionEyePage.css` |
 | 2262 | 69 | 16 | `backend/src/routes/diagnosis.ts` |
-| 2245 | 0 | 0 | `frontend/src/components/layout/AppShell.css` |
+| 2208 | 0 | 0 | `frontend/src/components/layout/AppShell.css` |
 | 1919 | 0 | 0 | `frontend/src/pages/ReportPage/ReportPage.css` |
 | 1833 | 57 | 13 | `backend/src/routes/lesson-plan.ts` |
 | 1795 | 68 | 12 | `backend/src/routes/dashboard.ts` |
@@ -308,7 +308,7 @@
 | 1754 | 81 | 0 | `frontend/src/pages/ReportPage/ReportCharts.tsx` |
 | 1727 | 63 | 15 | `backend/src/routes/grading.ts` |
 | 1573 | 78 | 0 | `backend/src/services/knowledge-graph/knowledge-graph-service.ts` |
-| 1504 | 96 | 0 | `frontend/src/pages/LessonPlanPage/LessonPlanPage.tsx` |
+| 1501 | 96 | 0 | `frontend/src/pages/LessonPlanPage/LessonPlanPage.tsx` |
 | 1337 | 0 | 0 | `frontend/src/pages/DiagnosisPage/SuggestionPanel.css` |
 | 1334 | 0 | 0 | `frontend/src/pages/ClassroomPage/ModesEnhanced.css` |
 | 1326 | 0 | 0 | `frontend/src/styles/tokens.css` |
@@ -327,7 +327,7 @@
 | 125 | 929 | `ClassroomPage` | `frontend/src/pages/ClassroomPage/ClassroomPage.tsx:105` |
 | 124 | 767 | `workbenchRoutes` | `backend/src/routes/workbench.ts:344` |
 | 118 | 865 | `RefineModal` | `frontend/src/pages/WorkbenchPage/RefineModal.tsx:217` |
-| 117 | 775 | `recitationRoutes` | `backend/src/routes/recitation.ts:356` |
+| 116 | 775 | `recitationRoutes` | `backend/src/routes/recitation.ts:356` |
 | 104 | 909 | `<callback>` | `frontend/src/stores/classroom.ts:322` |
 | 100 | 708 | `creationRoutes` | `backend/src/routes/creation.ts:424` |
 | 99 | 390 | `VoiceInputImpl` | `frontend/src/pages/ThinkingPalacePage/VoiceInput.tsx:82` |
@@ -349,16 +349,17 @@
 | 71 | 280 | `VoiceCaptureButton` | `frontend/src/components/ui/QuickVoiceAssist.tsx:65` |
 | 71 | 88 | `parseGradingBatch` | `frontend/src/stores/grading.ts:157` |
 | 69 | 547 | `lessonPlanRoutes` | `backend/src/routes/lesson-plan.ts:430` |
-| 69 | 447 | `GradingPage` | `frontend/src/pages/GradingPage/GradingPage.tsx:65` |
+| 69 | 445 | `GradingPage` | `frontend/src/pages/GradingPage/GradingPage.tsx:65` |
 | 66 | 529 | `PoemRecitationPlayer` | `frontend/src/pages/ThinkingPalacePage/PoemRecitationPlayer.tsx:163` |
-| 66 | 453 | `aiRoutes` | `backend/src/routes/ai.ts:275` |
-| 63 | 348 | `StarMapDome` | `frontend/src/pages/StarMapPage/StarMapDome.tsx:55` |
+| 66 | 419 | `aiRoutes` | `backend/src/routes/ai.ts:274` |
+| 64 | 344 | `StarMapDome` | `frontend/src/pages/StarMapPage/StarMapDome.tsx:55` |
 | 62 | 423 | `ScriptPlayer` | `frontend/src/components/dev/ScriptPlayer.tsx:70` |
 | 62 | 375 | `RadarCanvas` | `frontend/src/pages/DashboardPage/BloomRadarChart.tsx:161` |
 | 61 | 539 | `LearningPathViz` | `frontend/src/pages/DiagnosisPage/LearningPathViz.tsx:144` |
 | 61 | 478 | `QuestionCardList` | `frontend/src/pages/WorkbenchPage/QuestionCardList.tsx:165` |
-| 61 | 391 | `PoemImageGenerator` | `frontend/src/pages/ThinkingPalacePage/PoemImageGenerator.tsx:399` |
-| 59 | 435 | `StarMapPage` | `frontend/src/pages/StarMapPage/StarMapPage.tsx:122` |
+| 59 | 437 | `StarMapPage` | `frontend/src/pages/StarMapPage/StarMapPage.tsx:122` |
+| 59 | 387 | `FlyingPosters` | `frontend/src/components/ui/FlyingPosters.tsx:113` |
+| 59 | 382 | `PoemImageGenerator` | `frontend/src/pages/ThinkingPalacePage/PoemImageGenerator.tsx:399` |
 | 59 | 365 | `evolutionRoutes` | `backend/src/routes/evolution.ts:176` |
 | 59 | 301 | `StudentInputPanel` | `frontend/src/pages/ClassroomPage/shared/StudentInputPanel.tsx:85` |
 | 58 | 434 | `CreationStudioPage` | `frontend/src/pages/CreationStudioPage/CreationStudioPage.tsx:49` |
@@ -367,18 +368,17 @@
 | 56 | 405 | `PoemRelayMode` | `frontend/src/pages/ClassroomPage/modes/PoemRelayMode.tsx:84` |
 | 55 | 184 | `AnimatedList` | `frontend/src/components/ui/AnimatedList.tsx:57` |
 | 53 | 396 | `CommandPalette` | `frontend/src/components/ui/CommandPalette.tsx:191` |
+| 53 | 312 | `<callback>` | `frontend/src/components/ui/FlyingPosters.tsx:138` |
 | 52 | 381 | `AIAssistant` | `frontend/src/pages/ClassroomPage/AIAssistant.tsx:105` |
 | 52 | 188 | `CardSwap` | `frontend/src/components/ui/CardSwap.tsx:112` |
-| 51 | 313 | `MemoryGovernancePanel` | `frontend/src/components/layout/MemoryGovernancePanel.tsx:16` |
-| 51 | 133 | `grade` | `frontend/src/stores/grading.ts:530` |
 
 ## 静态风险标记汇总
 
 | 类型 | 命中 |
 |---|---:|
-| non-null-assertion | 260 |
-| css-important | 210 |
-| console | 71 |
+| css-important | 213 |
+| non-null-assertion | 198 |
+| console | 72 |
 | hardcoded-localhost | 29 |
 | possible-secret | 9 |
 | todo | 9 |

@@ -252,6 +252,18 @@ export function SettingsPanel() {
 
                     <MemoryGovernancePanel />
 
+                    <button
+                        type="button"
+                        className="pr-settings-logout pr-settings-legal"
+                        onClick={() => {
+                            setOpen(false)
+                            navigate('/privacy')
+                        }}
+                    >
+                        <Icon name="shield-check" size={14} />
+                        <span>隐私政策与用户协议</span>
+                    </button>
+
                     {/* 退出登录 */}
                     <button
                         type="button"

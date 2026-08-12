@@ -87,51 +87,50 @@ function parseTab(value: string | null): DashboardTab {
  *   诊断 → 命题 → 备课 → 授课 → 批改 → 复盘 →（复盘结论回流到下一轮诊断）
  * 每张卡都带 href，指向一条**已在路由表中注册**的地址。
  *
- * `sceneId` 对应后端 `/api/illustration/scene/:sceneId` 的受控场景，
- * 配图由 wan2.7-image 生成后落盘缓存，九个场景共用一套风格约束，
- * 因此六张放在一起是一套画，而不是六张各说各话的图。
+ * 六张配图均为针对当前环节单独生成、人工核对后随前端发布的 WebP。
+ * 不在首屏发起生图请求，也不使用 SVG 或 CSS 假图兜底。
  */
 const TEACHING_LOOP_CARDS: TeachingLoopCard[] = [
     {
         label: '课前 · 诊断',
         title: '学情诊断',
         description: '六阶认知模型定位学习起点，挖掘班级共性薄弱点',
-        sceneId: 'diagnose',
+        imageUrl: '/images/teaching-loop/diagnose.webp',
         href: '/dashboard?tab=diagnosis',
     },
     {
         label: '课前 · 命题',
         title: '智能命题',
         description: '按诊断结果分配六阶权重，多智能体生成并交叉校验题卡',
-        sceneId: 'workbench',
+        imageUrl: '/images/teaching-loop/workbench.webp',
         href: '/workbench',
     },
     {
         label: '备课',
         title: '教案工坊',
         description: '十二类教案模板 + 教学环节骨架，一键生成可编辑教案',
-        sceneId: 'lessonplan',
+        imageUrl: '/images/teaching-loop/lesson-plan.webp',
         href: '/lesson-plan',
     },
     {
         label: '课中 · 授课',
         title: '课堂导播',
         description: '飞花令 / 接龙 / 虚拟对手，实时互动与节奏把控',
-        sceneId: 'classroom',
+        imageUrl: '/images/teaching-loop/classroom.webp',
         href: '/classroom',
     },
     {
         label: '课后 · 批改',
         title: '智能批改',
         description: 'OCR 识别 + 认知归因 + 教师审核三阶段流程闭环',
-        sceneId: 'grading',
+        imageUrl: '/images/teaching-loop/grading.webp',
         href: '/grading',
     },
     {
         label: '复盘',
         title: '教研报告',
         description: '汇总本轮学情与作答证据，产出结论并回流到下一轮诊断',
-        sceneId: 'report',
+        imageUrl: '/images/teaching-loop/report.webp',
         href: '/report',
     },
 ]

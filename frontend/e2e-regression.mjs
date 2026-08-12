@@ -81,7 +81,7 @@ let reducedMotionComplianceChecked = false
 let mobileBrandHierarchyChecked = false
 let dashboardTabKeyboardChecked = false
 let dashboardMagicBentoContractChecked = false
-let anchorMiniMapContractChecked = false
+let chapterNavigationRemovedChecked = false
 let dashboardAsyncContentVisibilityChecked = false
 let dashboardAlertActionSemanticsChecked = false
 let reportHistoryActionSemanticsChecked = false
@@ -1784,9 +1784,9 @@ async function checkElectricBorderDecoration(page) {
 }
 
 /**
- * 教学闭环是驾驶舱六个真实业务入口，不是装饰卡片样例。本检查使用生产构建、
- * 受控插画响应和一个故意中止的装饰图请求，验证原生链接、图片失败、媒体查询
- * 以及桌面/触控布局；它不评价插画生成质量、教学质量或比赛结果。
+ * 教学闭环是驾驶舱六个真实业务入口，不是装饰卡片样例。本检查使用生产构建，
+ * 验证六张随包 WebP 与业务入口一一对应、不会再请求运行时插画 API，同时覆盖
+ * 原生链接、媒体查询以及桌面/触控布局；它不评价教学质量或比赛结果。
  */
 async function checkDashboardMagicBentoContract(context) {
     activeRoute = 'dashboard-magic-bento-contract'
@@ -1801,33 +1801,16 @@ async function checkDashboardMagicBentoContract(context) {
         '/report',
     ]
     const expectedTitles = ['学情诊断', '智能命题', '教案工坊', '课堂导播', '智能批改', '教研报告']
-    const brokenImageUrl = `${BASE_URL}/e2e-fixtures/magic-bento-failed-image.png`
-    let failedImageRequests = 0
-    let releaseFailedImage = () => { }
-    const failedImageGate = new Promise((resolve) => {
-        releaseFailedImage = resolve
-    })
+    const expectedImagePaths = [
+        '/images/teaching-loop/diagnose.webp',
+        '/images/teaching-loop/workbench.webp',
+        '/images/teaching-loop/lesson-plan.webp',
+        '/images/teaching-loop/classroom.webp',
+        '/images/teaching-loop/grading.webp',
+        '/images/teaching-loop/report.webp',
+    ]
 
     page.on('pageerror', (error) => runtimeErrors.push(error.message))
-    await page.route('**/api/illustration/scene/*', (route) => {
-        const sceneId = new URL(route.request().url()).pathname.split('/').pop() ?? 'unknown'
-        return route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify({
-                status: 'ok',
-                sceneId,
-                url: sceneId === 'diagnose' ? brokenImageUrl : null,
-                cached: false,
-                alt: `E2E ${sceneId} 受控装饰图`,
-            }),
-        })
-    })
-    await page.route('**/e2e-fixtures/magic-bento-failed-image.png', async (route) => {
-        failedImageRequests += 1
-        await failedImageGate
-        await route.abort('failed')
-    })
 
     try {
         await page.setViewportSize({ width: 1440, height: 900 })
@@ -1841,68 +1824,13 @@ async function checkDashboardMagicBentoContract(context) {
         await section.scrollIntoViewIfNeeded()
         await grid.waitFor({ state: 'visible', timeout: 10_000 })
 
-        const firstMedia = grid.locator('[data-card-index="0"] .pr-magic-bento-card__media')
-        const firstImage = firstMedia.locator('.pr-magic-bento-card__image')
-        await firstImage.waitFor({ state: 'attached', timeout: 10_000 })
-        const loadingImageContract = await firstImage.evaluate((image) => ({
-            alt: image.getAttribute('alt'),
-            mediaState: image.closest('[data-image-state]')?.getAttribute('data-image-state') ?? null,
-        }))
-        if (loadingImageContract.alt !== '' || loadingImageContract.mediaState !== 'loading') {
-            fail(`受控装饰图加载阶段未保持空 alt 与显式 loading 状态：${JSON.stringify(loadingImageContract)}`)
-        }
-        const beforeFailureRect = await firstMedia.evaluate((media) => {
-            const card = media.closest('.pr-magic-bento-card')
-            const mediaRect = media.getBoundingClientRect()
-            const cardRect = card?.getBoundingClientRect()
-            return {
-                mediaWidth: mediaRect.width,
-                mediaHeight: mediaRect.height,
-                cardWidth: cardRect?.width ?? 0,
-                cardHeight: cardRect?.height ?? 0,
-            }
-        })
-        releaseFailedImage()
-        await firstMedia.locator('.pr-magic-bento-card__image').waitFor({ state: 'detached', timeout: 10_000 })
-        await page.waitForFunction(() => (
-            document.querySelector('[data-card-index="0"] .pr-magic-bento-card__media')
-                ?.getAttribute('data-image-state') === 'failed'
-        ), undefined, { timeout: 5_000 })
-        const afterFailureRect = await firstMedia.evaluate((media) => {
-            const card = media.closest('.pr-magic-bento-card')
-            const mediaRect = media.getBoundingClientRect()
-            const cardRect = card?.getBoundingClientRect()
-            const fallback = media.querySelector('.pr-magic-bento-card__media-landscape')
-            return {
-                mediaWidth: mediaRect.width,
-                mediaHeight: mediaRect.height,
-                cardWidth: cardRect?.width ?? 0,
-                cardHeight: cardRect?.height ?? 0,
-                state: media.getAttribute('data-image-state'),
-                imageCount: media.querySelectorAll('img').length,
-                fallbackCount: fallback ? 1 : 0,
-                fallbackDisplay: fallback ? window.getComputedStyle(fallback).display : 'none',
-                backgroundImage: window.getComputedStyle(media).backgroundImage,
-            }
-        })
-        const failureRectDelta = Math.max(
-            Math.abs(beforeFailureRect.mediaWidth - afterFailureRect.mediaWidth),
-            Math.abs(beforeFailureRect.mediaHeight - afterFailureRect.mediaHeight),
-            Math.abs(beforeFailureRect.cardWidth - afterFailureRect.cardWidth),
-            Math.abs(beforeFailureRect.cardHeight - afterFailureRect.cardHeight),
-        )
-        if (failedImageRequests !== 1
-            || afterFailureRect.state !== 'failed'
-            || afterFailureRect.imageCount !== 0
-            || afterFailureRect.fallbackCount !== 1
-            || afterFailureRect.fallbackDisplay === 'none'
-            || afterFailureRect.backgroundImage === 'none'
-            || afterFailureRect.mediaHeight < 100
-            || failureRectDelta > 1) {
-            fail(`装饰图失败后未保持无跳变 CSS 山水兜底：requests=${failedImageRequests} delta=${failureRectDelta} before=${JSON.stringify(beforeFailureRect)} after=${JSON.stringify(afterFailureRect)}`)
-        }
+        await page.waitForFunction(() => Array.from(document.querySelectorAll(
+            '.pr-dashboard-magic-bento .pr-magic-bento-card__image',
+        )).length === 6 && Array.from(document.querySelectorAll(
+            '.pr-dashboard-magic-bento .pr-magic-bento-card__image',
+        )).every((image) => image instanceof HTMLImageElement && image.complete && image.naturalWidth > 0), undefined, { timeout: 10_000 })
 
-        const desktopContract = await grid.evaluate((root, { expectedHrefs: hrefs, expectedTitles: titles }) => {
+        const desktopContract = await grid.evaluate((root, { expectedHrefs: hrefs, expectedTitles: titles, expectedImagePaths: imagePaths }) => {
             const cells = Array.from(root.querySelectorAll(':scope > .pr-magic-bento-cell'))
             const cards = cells.map((cell) => cell.querySelector('.pr-magic-bento-card'))
             const cardRects = cards.map((card) => card?.getBoundingClientRect())
@@ -1940,6 +1868,23 @@ async function checkDashboardMagicBentoContract(context) {
                 descriptionsPresent: cards.every((card) => Boolean(card?.querySelector('.pr-magic-bento-card__description')?.textContent?.trim())),
                 focusableCounts: cells.map((cell) => cell.querySelectorAll(focusableSelector).length),
                 mediaAriaHidden: cards.map((card) => card?.querySelector('.pr-magic-bento-card__media')?.getAttribute('aria-hidden') ?? null),
+                imageContracts: cards.map((card) => {
+                    const image = card?.querySelector('.pr-magic-bento-card__image')
+                    if (!(image instanceof HTMLImageElement)) return null
+                    return {
+                        src: new URL(image.currentSrc || image.src, window.location.href).pathname,
+                        alt: image.getAttribute('alt'),
+                        complete: image.complete,
+                        naturalWidth: image.naturalWidth,
+                        naturalHeight: image.naturalHeight,
+                        state: image.closest('[data-image-state]')?.getAttribute('data-image-state') ?? null,
+                    }
+                }),
+                imagesMatch: cards.every((card, index) => {
+                    const image = card?.querySelector('.pr-magic-bento-card__image')
+                    return image instanceof HTMLImageElement
+                        && new URL(image.currentSrc || image.src, window.location.href).pathname === imagePaths[index]
+                }),
                 canvasCount: root.querySelectorAll('canvas').length,
                 svgCount: root.querySelectorAll('svg').length,
                 oldEffectCount: document.querySelectorAll('.pr-magic-bento-particle, .pr-magic-bento-ripple, body > .pr-magic-bento-global-spotlight').length,
@@ -1974,8 +1919,9 @@ async function checkDashboardMagicBentoContract(context) {
                 }),
                 longAnimationCount: longAnimations.length,
                 gsapResources: resourceNames.filter((name) => name.includes('gsap-vendor')).length,
+                illustrationApiResources: resourceNames.filter((name) => name.includes('/api/illustration/scene/')).length,
             }
-        }, { expectedHrefs, expectedTitles })
+        }, { expectedHrefs, expectedTitles, expectedImagePaths })
         if (desktopContract.sectionCount !== 1
             || desktopContract.renderer !== 'css'
             || desktopContract.declaredCount !== 6
@@ -1993,6 +1939,14 @@ async function checkDashboardMagicBentoContract(context) {
             || !desktopContract.descriptionsPresent
             || desktopContract.focusableCounts.some((count) => count !== 1)
             || desktopContract.mediaAriaHidden.some((value) => value !== 'true')
+            || !desktopContract.imagesMatch
+            || desktopContract.imageContracts.some((image) => !image
+                || image.alt !== ''
+                || !image.complete
+                || image.naturalWidth !== 1280
+                || image.naturalHeight !== 720
+                || image.state !== 'loaded')
+            || desktopContract.illustrationApiResources !== 0
             || desktopContract.canvasCount !== 0
             || desktopContract.svgCount !== 0
             || desktopContract.oldEffectCount !== 0
@@ -2119,6 +2073,32 @@ async function checkDashboardMagicBentoContract(context) {
         await page.waitForURL((url) => url.pathname === '/dashboard' && !url.searchParams.has('tab'), { timeout: 8_000 })
         await grid.waitFor({ state: 'visible', timeout: 8_000 })
 
+        // 历史返回会重新挂载 Dashboard。即使命中浏览器内存缓存，React 的
+        // onLoad 状态也要在后续任务中提交；立即截图会把 loading 纸色骨架
+        // 误当成真实空图。证据必须等待六张随包 WebP 全部完成解码。
+        await page.waitForFunction(() => {
+            const images = Array.from(document.querySelectorAll(
+                '.pr-dashboard-magic-bento .pr-magic-bento-card__image',
+            ))
+            return images.length === 6 && images.every((image) => (
+                image instanceof HTMLImageElement
+                && image.complete
+                && image.naturalWidth === 1280
+                && image.naturalHeight === 720
+                && image.closest('[data-image-state]')?.getAttribute('data-image-state') === 'loaded'
+                && Number.parseFloat(window.getComputedStyle(image).opacity) >= 0.9
+            ))
+        }, undefined, { timeout: 10_000 })
+
+        // decode() + 双 rAF 把断言从“DOM 状态已提交”推进到“像素可绘制”。
+        await page.evaluate(async () => {
+            const images = Array.from(document.querySelectorAll(
+                '.pr-dashboard-magic-bento .pr-magic-bento-card__image',
+            )).filter((image) => image instanceof HTMLImageElement)
+            await Promise.all(images.map((image) => image.decode()))
+            await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+        })
+
         await section.screenshot({ path: path.join(OUTPUT_DIR, 'desktop-dashboard-magic-bento.png') })
 
         await page.emulateMedia({ media: 'screen', reducedMotion: 'reduce', forcedColors: 'active' })
@@ -2143,7 +2123,6 @@ async function checkDashboardMagicBentoContract(context) {
                     && window.getComputedStyle(card.querySelector('.pr-magic-bento-card__wash')).display === 'none'
                     && window.getComputedStyle(card.querySelector('.pr-magic-bento-card__media'), '::before').display === 'none'
                     && window.getComputedStyle(card.querySelector('.pr-magic-bento-card__media'), '::after').display === 'none'
-                    && window.getComputedStyle(card.querySelector('.pr-magic-bento-card__media-landscape')).display === 'none'
                 )),
                 imageHidden: cards.every((card) => {
                     const image = card.querySelector('.pr-magic-bento-card__image')
@@ -2203,14 +2182,6 @@ async function checkDashboardMagicBentoContract(context) {
             isMobile: true,
         })
         try {
-            await touchContext.route('**/api/illustration/scene/*', (route) => {
-                const sceneId = new URL(route.request().url()).pathname.split('/').pop() ?? 'unknown'
-                return route.fulfill({
-                    status: 200,
-                    contentType: 'application/json',
-                    body: JSON.stringify({ status: 'ok', sceneId, url: null, cached: false, alt: '' }),
-                })
-            })
             const touchPage = await touchContext.newPage()
             await touchPage.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' })
             await waitForSettledPage(touchPage)
@@ -2234,6 +2205,13 @@ async function checkDashboardMagicBentoContract(context) {
                         const stars = card.querySelector('.pr-magic-bento-card__stars')
                         return stars ? window.getComputedStyle(stars).display === 'none' : true
                     }),
+                    imagesLoaded: cards.every((card) => {
+                        const image = card.querySelector('.pr-magic-bento-card__image')
+                        return image instanceof HTMLImageElement
+                            && image.complete
+                            && image.naturalWidth === 1280
+                            && image.naturalHeight === 720
+                    }),
                     pageHasHorizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
                 }
             })
@@ -2245,6 +2223,7 @@ async function checkDashboardMagicBentoContract(context) {
                 || touchContract.minCardHeight < 250
                 || !touchContract.transformsStatic
                 || !touchContract.starLayersHidden
+                || !touchContract.imagesLoaded
                 || touchContract.pageHasHorizontalOverflow) {
                 fail(`教学闭环真实触控/粗指针布局不合格：${JSON.stringify(touchContract)}`)
             }
@@ -2278,16 +2257,14 @@ async function checkDashboardMagicBentoContract(context) {
         await page.evaluate(() => window.__e2eMagicBentoObserver?.disconnect())
         dashboardMagicBentoContractChecked = true
     } finally {
-        releaseFailedImage()
         await page.close()
     }
 }
 
 /**
- * 锚点导航与异步列表都是跨页面基础设施。本门禁先故意扣住告警响应，证明
- * query pending 时 ref 尚未挂载；释放后再验证列表不透明、PRM 无位移。
- * 随后对真实 Dashboard 锚点执行稳定身份、重复业务 id 精确目标、44px、
- * 持久化、高对比、打印和移动端契约。注入章节仅用于前端行为验证。
+ * 异步列表是跨页面基础设施。本门禁先故意扣住告警响应，证明 query pending
+ * 时 ref 尚未挂载；释放后再验证列表不透明、PRM 无位移。随后硬断言旧的右侧
+ * 章节导航及其持久化状态均已删除，并复验页面吸顶标题与无横向溢出。
  */
 async function checkDashboardNavigationPrimitives(context) {
     activeRoute = 'dashboard-navigation-primitives'
@@ -2356,131 +2333,22 @@ async function checkDashboardNavigationPrimitives(context) {
         }
         dashboardAsyncContentVisibilityChecked = true
 
-        const anchor = page.locator('[data-anchor-map="navigation"]')
-        await anchor.waitFor({ state: 'visible', timeout: 10_000 })
-        await page.mouse.move(0, 0)
-        const collapsedContract = await anchor.evaluate((root) => {
-            const rootRect = root.getBoundingClientRect()
-            const toggle = root.querySelector('.pr-anchor-map-toggle')
-            const toggleRect = toggle?.getBoundingClientRect()
-            const items = Array.from(root.querySelectorAll('.pr-anchor-item'))
-            return {
-                count: document.querySelectorAll('[data-anchor-map="navigation"]').length,
-                tag: root.tagName,
-                ariaLabel: root.getAttribute('aria-label'),
-                width: rootRect.width,
-                toggleTag: toggle?.tagName ?? null,
-                toggleWidth: toggleRect?.width ?? 0,
-                toggleHeight: toggleRect?.height ?? 0,
-                expanded: toggle?.getAttribute('aria-expanded') ?? null,
-                itemCount: items.length,
-                itemMinHeights: items.map((item) => getComputedStyle(item).minHeight),
-                pageHasHorizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-            }
-        })
-        if (collapsedContract.count !== 1
-            || collapsedContract.tag !== 'NAV'
-            || collapsedContract.ariaLabel !== '页面章节导航'
-            || collapsedContract.width < 43
-            || collapsedContract.width > 46
-            || collapsedContract.toggleTag !== 'BUTTON'
-            || collapsedContract.toggleWidth < 43
-            || collapsedContract.toggleHeight < 43
-            || collapsedContract.expanded !== 'false'
-            || collapsedContract.itemCount < 3
-            || collapsedContract.itemMinHeights.some((height) => Number.parseFloat(height) < 44)
-            || collapsedContract.pageHasHorizontalOverflow) {
-            fail(`锚点导航收起态、语义或触控几何不合格：${JSON.stringify(collapsedContract)}`)
-        }
-
-        const toggle = anchor.getByRole('button', { name: '章节导航', exact: true })
-        await toggle.press('Space')
-        await page.waitForFunction(() => {
-            const root = document.querySelector('[data-anchor-map="navigation"]')
-            return root?.classList.contains('is-expanded') && root.getBoundingClientRect().width >= 190
-        })
-        if (await toggle.getAttribute('aria-expanded') !== 'true') {
-            fail('锚点导航原生 Space 激活后未同步 aria-expanded')
-        }
-        await page.reload({ waitUntil: 'domcontentloaded' })
-        await waitForSettledPage(page)
-        const persistedAnchor = page.locator('[data-anchor-map="navigation"]')
-        await persistedAnchor.waitFor({ state: 'visible', timeout: 10_000 })
-        const persistedContract = await persistedAnchor.evaluate((root) => ({
-            expanded: root.querySelector('.pr-anchor-map-toggle')?.getAttribute('aria-expanded') ?? null,
-            width: root.getBoundingClientRect().width,
-            stored: localStorage.getItem('poetic-realm.anchormap-expanded'),
+        const removedNavigationContract = await page.evaluate(() => ({
+            navigationCount: document.querySelectorAll('[data-anchor-map="navigation"], .pr-anchor-map').length,
+            chapterButtonCount: Array.from(document.querySelectorAll('button')).filter((button) => (
+                button.textContent?.trim() === '章节导航'
+                || button.getAttribute('aria-label') === '章节导航'
+            )).length,
+            persistedState: localStorage.getItem('poetic-realm.anchormap-expanded'),
+            pageHasHorizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
         }))
-        if (persistedContract.expanded !== 'true'
-            || persistedContract.width < 190
-            || persistedContract.stored !== '1') {
-            fail(`锚点导航展开状态未跨刷新持久化：${JSON.stringify(persistedContract)}`)
+        if (removedNavigationContract.navigationCount !== 0
+            || removedNavigationContract.chapterButtonCount !== 0
+            || removedNavigationContract.persistedState !== null
+            || removedNavigationContract.pageHasHorizontalOverflow) {
+            fail(`右侧章节导航或其持久化残留仍存在：${JSON.stringify(removedNavigationContract)}`)
         }
 
-        await page.evaluate(() => {
-            // AnchorMiniMap 的默认契约是优先观察语义 <main>，不存在时才回退 .pr-main。
-            // 组合选择器会按 DOM 顺序先命中外层 .pr-main，把夹具插到真实观察区的兄弟节点。
-            const host = document.querySelector('main') ?? document.querySelector('.pr-main')
-            if (!host) throw new Error('缺少锚点测试宿主')
-            const makeAnchor = (label, marker, hidden = false, id = '') => {
-                const element = document.createElement('section')
-                element.dataset.anchor = ''
-                element.dataset.anchorLabel = label
-                element.dataset.e2eAnchor = marker
-                element.hidden = hidden
-                element.style.minHeight = '2px'
-                if (id) element.id = id
-                element.scrollIntoView = function scrollIntoView(options) {
-                    window.__e2eAnchorScrollTarget = this.dataset.e2eAnchor ?? null
-                    window.__e2eAnchorScrollBehavior = options?.behavior ?? null
-                }
-                return element
-            }
-            const fragment = document.createDocumentFragment()
-            fragment.append(
-                makeAnchor('E2E 动态锚点甲', 'generated-a'),
-                makeAnchor('E2E 动态锚点乙', 'generated-b', true),
-                makeAnchor('E2E 重复业务锚点甲', 'duplicate-a', false, 'e2e-duplicate-anchor-id'),
-                makeAnchor('E2E 重复业务锚点乙', 'duplicate-b', false, 'e2e-duplicate-anchor-id'),
-            )
-            host.appendChild(fragment)
-        })
-        await persistedAnchor.getByRole('button', { name: 'E2E 动态锚点甲', exact: true })
-            .waitFor({ state: 'visible', timeout: 5_000 })
-        const generatedAId = await page.locator('[data-e2e-anchor="generated-a"]').getAttribute('id')
-        await page.evaluate(() => {
-            document.querySelector('[data-e2e-anchor="generated-a"]')?.setAttribute('hidden', '')
-            document.querySelector('[data-e2e-anchor="generated-b"]')?.removeAttribute('hidden')
-        })
-        await persistedAnchor.getByRole('button', { name: 'E2E 动态锚点乙', exact: true })
-            .waitFor({ state: 'visible', timeout: 5_000 })
-        const generatedBId = await page.locator('[data-e2e-anchor="generated-b"]').getAttribute('id')
-        if (!generatedAId || !generatedBId || generatedAId === generatedBId) {
-            fail(`动态无 id 锚点未获得稳定且唯一的 DOM id：${JSON.stringify({ generatedAId, generatedBId })}`)
-        }
-        await persistedAnchor.getByRole('button', { name: 'E2E 重复业务锚点乙', exact: true }).click()
-        const exactTarget = await page.evaluate(() => ({
-            target: window.__e2eAnchorScrollTarget ?? null,
-            behavior: window.__e2eAnchorScrollBehavior ?? null,
-            duplicateIds: document.querySelectorAll('#e2e-duplicate-anchor-id').length,
-        }))
-        if (exactTarget.target !== 'duplicate-b'
-            || exactTarget.behavior !== 'auto'
-            || exactTarget.duplicateIds !== 2) {
-            fail(`重复业务 id 下未以内部 Element 身份精确滚动，或 PRM 未使用 auto：${JSON.stringify(exactTarget)}`)
-        }
-        await page.evaluate(() => {
-            document.querySelectorAll('[data-e2e-anchor]').forEach((element) => element.remove())
-        })
-        await persistedAnchor.getByRole('button', { name: 'E2E 重复业务锚点乙', exact: true })
-            .waitFor({ state: 'detached', timeout: 5_000 })
-
-        await persistedAnchor.screenshot({
-            path: path.join(OUTPUT_DIR, 'desktop-dashboard-anchor-mini-map.png'),
-        })
-
-        // Header 的滚动态曾被后置样式从 sticky 覆盖为 relative。这里必须在真实滚动
-        // 阈值后检查计算样式与几何，避免只验证 class 而遗漏吸顶失效和页面跳变。
         await page.evaluate(() => window.scrollTo({ top: 640, behavior: 'instant' }))
         await page.waitForFunction(() => window.scrollY > 48
             && document.querySelector('.pr-header')?.classList.contains('is-scrolled'))
@@ -2488,65 +2356,19 @@ async function checkDashboardNavigationPrimitives(context) {
             const style = getComputedStyle(header)
             const rect = header.getBoundingClientRect()
             return {
-                scrollY: window.scrollY,
-                isScrolled: header.classList.contains('is-scrolled'),
                 position: style.position,
                 top: style.top,
                 rectTop: rect.top,
                 height: rect.height,
             }
         })
-        if (stickyHeaderContract.scrollY <= 48
-            || !stickyHeaderContract.isScrolled
-            || stickyHeaderContract.position !== 'sticky'
+        if (stickyHeaderContract.position !== 'sticky'
             || Number.parseFloat(stickyHeaderContract.top) !== 0
             || Math.abs(stickyHeaderContract.rectTop) > 1
             || stickyHeaderContract.height < 44) {
-            fail(`滚动态页头未保持真实吸顶与稳定触控高度：${JSON.stringify(stickyHeaderContract)}`)
+            fail(`删除章节导航后页头未保持吸顶：${JSON.stringify(stickyHeaderContract)}`)
         }
-        await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
-        await page.waitForFunction(() => window.scrollY === 0
-            && !document.querySelector('.pr-header')?.classList.contains('is-scrolled'))
-
-        await persistedAnchor.locator('.pr-anchor-item').first().click()
-        await page.emulateMedia({ media: 'screen', reducedMotion: 'reduce', forcedColors: 'active' })
-        const firstAnchorItem = persistedAnchor.locator('.pr-anchor-item').first()
-        await persistedAnchor.locator('.pr-anchor-map-toggle').focus()
-        await page.keyboard.press('Tab')
-        if (!await firstAnchorItem.evaluate((item) => item === document.activeElement)) {
-            fail('锚点导航从展开按钮 Tab 后未进入首个章节按钮')
-        }
-        const forcedContract = await firstAnchorItem.evaluate((item) => {
-            const style = getComputedStyle(item)
-            return {
-                color: style.color,
-                backgroundColor: style.backgroundColor,
-                outlineStyle: style.outlineStyle,
-                outlineWidth: style.outlineWidth,
-                animationName: style.animationName,
-                transitionDuration: style.transitionDuration,
-            }
-        })
-        if (forcedContract.color === forcedContract.backgroundColor
-            || forcedContract.backgroundColor === 'rgba(0, 0, 0, 0)'
-            || forcedContract.outlineStyle === 'none'
-            || Number.parseFloat(forcedContract.outlineWidth) < 3
-            || forcedContract.animationName !== 'none'
-            || forcedContract.transitionDuration !== '0s') {
-            fail(`锚点导航强制色彩/焦点/PRM 契约不合格：${JSON.stringify(forcedContract)}`)
-        }
-        await page.emulateMedia({ media: 'print', reducedMotion: 'reduce', forcedColors: 'none' })
-        if (await persistedAnchor.evaluate((root) => getComputedStyle(root).display) !== 'none') {
-            fail('锚点导航在打印介质中未隐藏')
-        }
-        await page.emulateMedia({ media: 'screen', reducedMotion: 'reduce', forcedColors: 'none' })
-        await page.setViewportSize({ width: 390, height: 844 })
-        await page.waitForFunction(() => document.querySelectorAll('[data-anchor-map="navigation"]').length === 0)
-        if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)) {
-            fail('锚点导航移动端卸载后页面仍有横向溢出')
-        }
-        await page.evaluate(() => localStorage.removeItem('poetic-realm.anchormap-expanded'))
-        anchorMiniMapContractChecked = true
+        chapterNavigationRemovedChecked = true
     } finally {
         releaseAlerts()
         if (!page.isClosed()) {
@@ -5963,8 +5785,8 @@ async function checkPoemImageCardAccessibility(context) {
 
 /**
  * 星图在受限环境中优先保留完整、可访问的目录模式；教师主动进入诗境穹顶后，
- * 也必须继续使用原生 DOM/CSS 画廊，不能因为“沉浸”二字重新下载 Three.js 或创建
- * Canvas。该检查同时覆盖导航抽屉与主动切换资源边界。
+ * 必须使用 33 号参考对应的受控 OGL 旋转画廊，但不能下载 Three.js、创建多个
+ * Canvas 或在未主动进入时提前启动。该检查同时覆盖导航抽屉与主动切换资源边界。
  */
 async function checkStarMapLightweightView(context) {
     activeRoute = 'starmap-lightweight-view'
@@ -6045,55 +5867,40 @@ async function checkStarMapLightweightView(context) {
 
         const note = page.getByTestId('starmap-lightweight-view-note')
         await note.waitFor({ state: 'visible', timeout: 10_000 })
-        // 轻量目录默认不打开放在覆盖层中的“观星舱”；先以教师真实入口展开，
-        // 再验证侧栏内部 Tab，避免对 aria-hidden 的非活动抽屉制造伪阳性。
+        // 观星舱在桌面和移动端都采用按需抽屉，避免覆盖 33 号画廊。关闭态必须
+        // aria-hidden + inert，打开后才可见可聚焦，关闭后焦点回到原触发按钮。
         const openSidebar = page.getByRole('button', { name: '打开观星舱', exact: true })
         const sidebarNode = page.locator('#pr-sm-sidebar')
-        const closedSidebarIsolation = await sidebarNode.evaluate((sidebar) => ({
+        const closedSidebarContract = await sidebarNode.evaluate((sidebar) => ({
             ariaHidden: sidebar.getAttribute('aria-hidden'),
             inert: sidebar.hasAttribute('inert'),
-            focusables: sidebar.querySelectorAll('button, input, a[href], [tabindex]:not([tabindex="-1"])').length,
+            visibility: getComputedStyle(sidebar).visibility,
         }))
-        if (closedSidebarIsolation.ariaHidden !== 'true'
-            || !closedSidebarIsolation.inert
-            || closedSidebarIsolation.focusables === 0) {
-            fail(`观星舱关闭态未以 inert 隔离真实可聚焦后代：${JSON.stringify(closedSidebarIsolation)}`)
+        if (closedSidebarContract.ariaHidden !== 'true'
+            || !closedSidebarContract.inert
+            || closedSidebarContract.visibility !== 'hidden') {
+            fail(`观星舱关闭态没有完整隔离：${JSON.stringify(closedSidebarContract)}`)
         }
-        await openSidebar.focus()
         await openSidebar.click()
         await page.waitForFunction(() => {
             const sidebar = document.querySelector('#pr-sm-sidebar')
-            return sidebar?.getAttribute('aria-hidden') === 'false' && !sidebar.hasAttribute('inert')
+            return sidebar?.getAttribute('aria-hidden') === 'false'
+                && !sidebar.hasAttribute('inert')
+                && getComputedStyle(sidebar).visibility === 'visible'
         }, undefined, { timeout: 5_000 })
-        await page.waitForTimeout(100)
-        const openedSidebarFocus = await page.evaluate(() => {
-            const sidebar = document.querySelector('#pr-sm-sidebar')
-            const input = sidebar?.querySelector('.pr-sm-sidebar-search-input')
-            const inputRect = input?.getBoundingClientRect()
-            return {
-                activeTag: document.activeElement?.tagName ?? null,
-                activeClass: document.activeElement?.getAttribute('class') ?? null,
-                activeLabel: document.activeElement?.getAttribute('aria-label') ?? null,
-                sidebarClass: sidebar?.getAttribute('class') ?? null,
-                sidebarVisibility: sidebar ? getComputedStyle(sidebar).visibility : null,
-                sidebarInert: sidebar?.hasAttribute('inert') ?? null,
-                inputConnected: input?.isConnected ?? false,
-                inputDisabled: input?.hasAttribute('disabled') ?? null,
-                inputVisibility: input ? getComputedStyle(input).visibility : null,
-                inputWidth: inputRect?.width ?? 0,
-                inputHeight: inputRect?.height ?? 0,
-                triggerExpanded: document.querySelector('[aria-controls="pr-sm-sidebar"]')?.getAttribute('aria-expanded') ?? null,
-            }
-        })
-        if (openedSidebarFocus.activeClass?.split(/\s+/u).includes('pr-sm-sidebar-search-input') !== true) {
-            fail(`观星舱打开后焦点未进入搜索框：${JSON.stringify(openedSidebarFocus)}`)
-        }
-        const openSidebarIsolation = await sidebarNode.evaluate((sidebar) => ({
+        const desktopSidebarContract = await sidebarNode.evaluate((sidebar) => ({
             ariaHidden: sidebar.getAttribute('aria-hidden'),
             inert: sidebar.hasAttribute('inert'),
+            focusables: sidebar.querySelectorAll('button, input, a[href], [tabindex]:not([tabindex="-1"])').length,
+            visibility: getComputedStyle(sidebar).visibility,
+            width: sidebar.getBoundingClientRect().width,
         }))
-        if (openSidebarIsolation.ariaHidden !== 'false' || openSidebarIsolation.inert) {
-            fail(`观星舱打开后仍处于无障碍隔离态：${JSON.stringify(openSidebarIsolation)}`)
+        if (desktopSidebarContract.ariaHidden !== 'false'
+            || desktopSidebarContract.inert
+            || desktopSidebarContract.focusables === 0
+            || desktopSidebarContract.visibility !== 'visible'
+            || desktopSidebarContract.width < 240) {
+            fail(`桌面观星舱被错误隐藏或隔离：${JSON.stringify(desktopSidebarContract)}`)
         }
         await verifyRovingTablist(page, {
             tablistName: '节点分类浏览',
@@ -6105,10 +5912,10 @@ async function checkStarMapLightweightView(context) {
             .getByRole('complementary', { name: '星图导航侧边栏', exact: true })
             .getByRole('button', { name: '关闭观星舱', exact: true })
         await closeSidebar.click()
-        await openSidebar.waitFor({ state: 'visible', timeout: 5_000 })
         await page.waitForFunction(() => (
-            document.activeElement?.getAttribute('aria-label') === '打开观星舱'
+            document.querySelector('#pr-sm-sidebar')?.getAttribute('aria-hidden') === 'true'
             && document.querySelector('#pr-sm-sidebar')?.hasAttribute('inert')
+            && document.activeElement?.getAttribute('aria-label') === '打开观星舱'
         ), undefined, { timeout: 5_000 })
         if (await page.locator('.scene3d-container').count() !== 0) {
             fail('减少动态效果时星图仍渲染沉浸式画布')
@@ -6130,18 +5937,22 @@ async function checkStarMapLightweightView(context) {
         })
         await enableImmersive.click()
         await note.waitFor({ state: 'hidden', timeout: 10_000 })
-        const lightweightGallery = page.locator(
-            '.pr-sm-dome .pr-sm-dome-gallery[data-sphere-gallery="lightweight"]',
+        const flyingPosters = page.locator(
+            '.pr-sm-dome .pr-flying-posters[data-flying-posters="ogl"]',
         )
-        await lightweightGallery.waitFor({ state: 'visible', timeout: 10_000 })
+        await flyingPosters.waitFor({ state: 'visible', timeout: 10_000 })
         await page.waitForTimeout(300)
         const immersiveResourceBoundary = await page.evaluate(() => ({
             loadedThree: performance
                 .getEntriesByType('resource')
                 .some((entry) => entry.name.includes('three-vendor-')),
             canvasCount: document.querySelectorAll('.pr-sm-dome canvas').length,
+            renderer: document.querySelector('.pr-sm-dome .pr-flying-posters')
+                ?.getAttribute('data-renderer-state') ?? null,
         }))
-        if (immersiveResourceBoundary.loadedThree || immersiveResourceBoundary.canvasCount !== 0) {
+        if (immersiveResourceBoundary.loadedThree
+            || immersiveResourceBoundary.canvasCount !== 1
+            || !['ready', 'fallback'].includes(immersiveResourceBoundary.renderer)) {
             fail(`星图主动进入诗境穹顶后重新引入重图形运行时：${JSON.stringify(immersiveResourceBoundary)}`)
         }
         starMapLightweightViewChecked = true
@@ -8154,6 +7965,9 @@ async function checkLessonPlanImageGalleryContract(context) {
             fail(`教案模板画廊真实触控横滑或页面边界不合格：${JSON.stringify({ before, after })}`)
         }
         await gallery.screenshot({ path: path.join(OUTPUT_DIR, 'mobile-lesson-plan-image-gallery-touch.png') })
+        // SphereGallery 现在只服务教案模板；诗脉星图已按 33 号参考迁移为
+        // 有边界的 OGL 旋转画廊，不能再把两种不同组件混成同一资源契约。
+        sphereGalleryLightweightResourceBoundaryChecked = true
     } finally {
         touchFixture.releaseBroken()
         await touchContext.close()
@@ -8172,7 +7986,6 @@ async function installStarMapGalleryFixture(page) {
             { source: 'E2E-STARMAP-02-CHUNXIAO', target: 'E2E-STARMAP-03-DENGGUANQUELOU', type: 'SHARES_THEME', weight: 0.6, evidence: ['E2E 受控前端关系样本'], confidence: 'EXTRACTED' },
         ],
     }
-    let brokenImageRequests = 0
     let successfulImageRequests = 0
     await page.addInitScript(() => localStorage.removeItem('pr-demo-mode'))
     await page.route('**/api/knowledge-graph/full', (route) => route.fulfill({
@@ -8185,32 +7998,31 @@ async function installStarMapGalleryFixture(page) {
         contentType: 'application/json',
         body: JSON.stringify(graph),
     }))
-    // 发布边界已将人工核验通过的星图 WebP 固化到 public；专项应拦截当前
-    // 随包路径并让成功项由真实生产静态服务解码，不能继续测试已废弃的 runtime URL。
+    // 发布边界已经把同诗 WebP 固化到 public；这里让三张受控诗图全部走真实
+    // 静态服务与浏览器解码。发布截图不得再故意制造缺图或用 SVG 冒充恢复态。
     await page.route('**/images/generated/starmap/**', async (route) => {
-        const url = route.request().url()
-        if (url.includes('tongbian-002.webp')) {
-            brokenImageRequests += 1
-            await route.abort('failed')
-            return
-        }
         successfulImageRequests += 1
         await route.continue()
     })
     return {
         graph,
-        brokenImageRequests: () => brokenImageRequests,
         successfulImageRequests: () => successfulImageRequests,
     }
 }
 
-async function checkStarMapPoetryGalleryContract(context) {
-    activeRoute = 'starmap-poetry-gallery-contract'
+/**
+ * 诗脉星图的目标形态来自 33 号“3D 旋转展示图像”参考：默认保留可访问目录，
+ * 教师主动开启后使用一个有边界的 OGL 画布承载同诗位图。这里明确拒绝旧版
+ * SphereGallery 契约、Three.js、SVG 占位、边缘模糊和无休止的自动轮播。
+ */
+async function checkStarMapFlyingPostersContract(context) {
+    activeRoute = 'starmap-flying-posters-contract'
     const browser = context.browser()
     if (!browser) {
-        fail('诗脉画廊专项无法取得浏览器实例')
+        fail('诗脉 3D 旋转画廊专项无法取得浏览器实例')
         return
     }
+
     const desktopContext = await browser.newContext({
         storageState: await context.storageState(),
         viewport: { width: 1440, height: 900 },
@@ -8222,157 +8034,132 @@ async function checkStarMapPoetryGalleryContract(context) {
     try {
         await page.goto(`${BASE_URL}/starmap`, { waitUntil: 'domcontentloaded' })
         await waitForSettledPage(page)
-        const gallery = page.locator('.pr-sm-dome .pr-sm-dome-gallery[data-sphere-gallery="lightweight"]')
+        const enableImmersive = page.getByTestId('starmap-toggle-immersive-view')
+        const desktopViewAction = await enableImmersive.getAttribute('aria-label')
+        if (desktopViewAction === '开启沉浸星图' || desktopViewAction === '返回诗境穹顶') {
+            await enableImmersive.click()
+        }
+
+        const gallery = page.locator('.pr-sm-dome .pr-flying-posters[data-flying-posters="ogl"]')
         await gallery.waitFor({ state: 'visible', timeout: 10_000 })
-        const cards = gallery.locator('.pr-sphere-gallery-card[data-gallery-index]')
-        await page.waitForFunction(() => (
-            document.querySelectorAll('.pr-sm-dome .pr-sphere-gallery-card[data-gallery-index]').length === 3
-        ), undefined, { timeout: 10_000 })
-        await cards.nth(1).scrollIntoViewIfNeeded()
-        await page.waitForFunction(() => (
-            document.querySelector('.pr-sm-dome .pr-sphere-gallery-card[data-gallery-index="1"]')
-                ?.getAttribute('data-image-state') === 'failed'
-        ), undefined, { timeout: 10_000 })
+        await page.waitForFunction(() => {
+            const root = document.querySelector('.pr-sm-dome .pr-flying-posters[data-flying-posters="ogl"]')
+            const state = root?.getAttribute('data-renderer-state')
+            return state === 'ready' || state === 'fallback'
+        }, undefined, { timeout: 10_000 })
+        await page.waitForTimeout(500)
 
-        const initialContract = await gallery.evaluate((root, expectedIds) => {
-            const cardsInRoot = Array.from(root.querySelectorAll('.pr-sphere-gallery-card[data-gallery-index]'))
+        const initial = await gallery.evaluate((root) => {
+            const canvas = root.querySelector('.pr-flying-posters__canvas')
+            const controls = root.querySelector('.pr-flying-posters__controls')
+            const current = root.querySelector('.pr-flying-posters__current')
             const resources = performance.getEntriesByType('resource').map((entry) => entry.name.toLowerCase())
+            const rootStyle = getComputedStyle(root)
+            const canvasStyle = canvas instanceof HTMLElement ? getComputedStyle(canvas) : null
+            const rect = root.getBoundingClientRect()
             return {
-                count: root.getAttribute('data-gallery-count'),
-                activation: root.getAttribute('data-gallery-activation'),
-                motion: root.getAttribute('data-gallery-motion'),
-                buttonCount: cardsInRoot.length,
-                ids: cardsInRoot.map((card) => card.getAttribute('data-gallery-id')),
-                labels: cardsInRoot.map((card) => card.getAttribute('aria-label')),
-                nativeButtons: cardsInRoot.every((card) => card.tagName === 'BUTTON' && card.getAttribute('role') === null),
-                failedSecond: cardsInRoot[1]?.getAttribute('data-image-state') === 'failed',
-                failedEnabled: cardsInRoot[1] instanceof HTMLButtonElement && !cardsInRoot[1].disabled,
-                failedImageCount: cardsInRoot[1]?.querySelectorAll('img').length ?? -1,
+                renderer: root.getAttribute('data-renderer-state'),
                 canvasCount: root.querySelectorAll('canvas').length,
-                genericDialogCount: document.querySelectorAll('body > .pr-sphere-gallery-dialog-backdrop').length,
-                threeResourceCount: resources.filter((name) => name.includes('three-vendor')).length,
-                infiniteAnimationCount: root.getAnimations({ subtree: true }).filter((animation) => {
-                    const timing = animation.effect?.getComputedTiming()
-                    return animation.playState === 'running' && timing?.iterations === Infinity
-                }).length,
+                canvasRole: canvas?.getAttribute('role'),
+                canvasTabIndex: canvas instanceof HTMLElement ? canvas.tabIndex : null,
+                controlsRole: controls?.getAttribute('role'),
+                controlButtons: controls?.querySelectorAll(':scope > button').length ?? 0,
+                currentText: current?.textContent?.replace(/\s+/gu, ' ').trim() ?? '',
+                width: rect.width,
+                height: rect.height,
+                rootFilter: rootStyle.filter,
+                rootBackdrop: rootStyle.backdropFilter,
+                canvasFilter: canvasStyle?.filter ?? null,
+                canvasBackdrop: canvasStyle?.backdropFilter ?? null,
+                threeResources: resources.filter((name) => name.includes('three-vendor')).length,
+                svgImageResources: resources.filter((name) => /\/images\/.*\.svg(?:\?|$)/u.test(name)).length,
+                pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
             }
-        }, fixture.graph.nodes.map((node) => node.id))
-        if (initialContract.count !== '3'
-            || initialContract.activation !== 'select'
-            || initialContract.motion !== 'manual-only'
-            || initialContract.buttonCount !== 3
-            || JSON.stringify(initialContract.ids) !== JSON.stringify(fixture.graph.nodes.map((node) => node.id))
-            || !['静夜思', '春晓', '登鹳雀楼'].every((title, index) => initialContract.labels[index]?.includes(title))
-            || !initialContract.nativeButtons
-            || !initialContract.failedSecond
-            || !initialContract.failedEnabled
-            || initialContract.failedImageCount !== 0
-            || initialContract.canvasCount !== 0
-            || initialContract.genericDialogCount !== 0
-            || initialContract.threeResourceCount !== 0
-            || initialContract.infiniteAnimationCount !== 0
-            || fixture.brokenImageRequests() < 1
-            || fixture.successfulImageRequests() < 1) {
-            fail(`诗脉轻量画廊初始映射或资源边界不合格：${JSON.stringify({ initialContract, broken: fixture.brokenImageRequests(), successful: fixture.successfulImageRequests() })}`)
+        })
+        if (!['ready', 'fallback'].includes(initial.renderer)
+            || initial.canvasCount !== 1
+            || initial.canvasRole !== 'img'
+            || initial.canvasTabIndex !== 0
+            || initial.controlsRole !== 'group'
+            || initial.controlButtons !== 3
+            || !initial.currentText.includes('静夜思')
+            || !initial.currentText.includes('1 / 3')
+            || initial.width < 480
+            || initial.height < 300
+            || initial.rootFilter !== 'none'
+            || initial.rootBackdrop !== 'none'
+            || initial.canvasFilter !== 'none'
+            || initial.canvasBackdrop !== 'none'
+            || initial.threeResources !== 0
+            || initial.svgImageResources !== 0
+            || initial.pageOverflow
+            || fixture.successfulImageRequests() < 3) {
+            fail(`33号诗脉旋转画廊初始契约不合格：${JSON.stringify({ initial, successfulImages: fixture.successfulImageRequests() })}`)
         }
 
-        await page.screenshot({ path: path.join(OUTPUT_DIR, 'desktop-starmap-poetry-gallery.png'), fullPage: false })
-        // 夹具使用语义合法的 Poem↔Poem 同主题关系；必须经真实关系透镜交互
-        // 切到“诗篇共鸣”，避免用类型错误的边绕过生产归一化与透镜过滤。
-        const resonanceLens = page.getByRole('button', { name: /诗篇共鸣/ })
-        await resonanceLens.click()
+        const canvas = gallery.locator('.pr-flying-posters__canvas')
+        await canvas.focus()
+        await canvas.press('ArrowRight')
         await page.waitForFunction(() => (
-            document.querySelector('.pr-sm-dome')?.getAttribute('data-relation-lens') === 'resonance'
+            document.querySelector('.pr-sm-dome .pr-flying-posters__current strong')
+                ?.textContent?.includes('春晓') === true
         ), undefined, { timeout: 5_000 })
-        await cards.nth(0).focus()
-        await cards.nth(0).press('ArrowRight')
-        await page.waitForFunction(() => (
-            document.querySelector('.pr-sm-dome-foreground h2')?.textContent?.trim() === '春晓'
-            && document.querySelector('.pr-sm-floating-panel')?.getAttribute('aria-hidden') === 'true'
-        ), undefined, { timeout: 5_000 })
-        if (await page.locator('body > .pr-sphere-gallery-dialog-backdrop').count() !== 0) {
-            fail('诗脉画廊方向键漫游错误打开了通用图片预览')
-        }
-        await cards.nth(1).press('Enter')
+        await canvas.press('Enter')
         const detailPanel = page.locator('.pr-sm-floating-panel')
         await page.waitForFunction(() => (
             document.querySelector('.pr-sm-floating-panel')?.getAttribute('aria-hidden') === 'false'
             && document.querySelector('.pr-sm-floating-panel .pr-sm-panel-title')?.textContent?.trim() === '春晓'
         ), undefined, { timeout: 10_000 })
-        const selectedContract = await gallery.evaluate((root) => {
-            const selected = root.querySelector('.pr-sphere-gallery-card[data-gallery-index="1"]')
-            return {
-                selectedIndex: root.getAttribute('data-gallery-selected-index'),
-                pressed: selected?.getAttribute('aria-pressed'),
-                failed: selected?.getAttribute('data-image-state'),
-                genericDialogCount: document.querySelectorAll('body > .pr-sphere-gallery-dialog-backdrop').length,
-                relationLens: document.querySelector('.pr-sm-dome')?.getAttribute('data-relation-lens'),
-                poemRelationText: document.querySelector('.pr-sm-dome-poem-relations')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
-            }
-        })
-        if (selectedContract.selectedIndex !== '1'
-            || selectedContract.pressed !== 'true'
-            || selectedContract.failed !== 'failed'
-            || selectedContract.genericDialogCount !== 0
-            || selectedContract.relationLens !== 'resonance'
-            || !selectedContract.poemRelationText.includes('同主题')
-            || !selectedContract.poemRelationText.includes('静夜思')
-            || !selectedContract.poemRelationText.includes('登鹳雀楼')) {
-            fail(`失败诗篇图片没有保留准确选择、详情或关系能力：${JSON.stringify(selectedContract)}`)
+
+        const resonanceLens = page.getByRole('button', { name: /诗篇共鸣/ })
+        await resonanceLens.click()
+        await page.waitForFunction(() => (
+            document.querySelector('.pr-sm-dome')?.getAttribute('data-relation-lens') === 'resonance'
+        ), undefined, { timeout: 5_000 })
+        const relationText = await page.locator('.pr-sm-dome-poem-relations').textContent()
+        if (!relationText?.includes('静夜思') || !relationText.includes('登鹳雀楼')) {
+            fail(`3D 前景节点与真实关系证据未同步：${JSON.stringify({ relationText })}`)
         }
-        await page.screenshot({ path: path.join(OUTPUT_DIR, 'desktop-starmap-poetry-gallery-selected.png'), fullPage: false })
 
-        const closeDetail = detailPanel.getByRole('button', { name: '关闭详情面板', exact: true })
-        await closeDetail.press('Enter')
+        await page.screenshot({ path: path.join(OUTPUT_DIR, 'desktop-starmap-33-flying-posters.png'), fullPage: false })
+        await detailPanel.getByRole('button', { name: '关闭详情面板', exact: true }).press('Enter')
         await page.waitForFunction(() => (
             document.querySelector('.pr-sm-floating-panel')?.getAttribute('aria-hidden') === 'true'
-            && document.activeElement?.getAttribute('data-gallery-index') === '1'
-        ), undefined, { timeout: 5_000 })
-        await cards.nth(1).press('Enter')
-        await page.waitForFunction(() => document.querySelector('.pr-sm-floating-panel')?.getAttribute('aria-hidden') === 'false')
-        await page.keyboard.press('Escape')
-        await page.waitForFunction(() => (
-            document.querySelector('.pr-sm-floating-panel')?.getAttribute('aria-hidden') === 'true'
-            && document.activeElement?.getAttribute('data-gallery-index') === '1'
+            && document.activeElement?.classList.contains('pr-flying-posters__canvas') === true
         ), undefined, { timeout: 5_000 })
 
-        const stableIndex = await gallery.getAttribute('data-gallery-active-index')
-        await page.waitForTimeout(500)
-        if (await gallery.getAttribute('data-gallery-active-index') !== stableIndex) {
-            fail('诗脉轻量画廊空闲时仍自动推进')
+        const stableLabel = await gallery.locator('.pr-flying-posters__current').textContent()
+        await page.waitForTimeout(700)
+        if (await gallery.locator('.pr-flying-posters__current').textContent() !== stableLabel) {
+            fail('33号诗脉旋转画廊空闲时仍自动换图')
         }
 
         const sourceFiles = [
-            'src/components/ui/SphereGallery.tsx',
+            'src/components/ui/FlyingPosters.tsx',
             'src/pages/StarMapPage/StarMapDome.tsx',
         ]
         const sourceContents = await Promise.all(sourceFiles.map((file) => fs.readFile(path.resolve(file), 'utf8')))
-        const forbiddenSourcePatterns = [
-            /from\s+['"]three['"]/,
-            /@react-three\//,
-            /WebGLRenderer\s*\(/,
-            /requestAnimationFrame\s*\(/,
-            /cancelAnimationFrame\s*\(/,
-            /createElement\s*\(\s*['"]canvas['"]/,
-            /<canvas\b/i,
-            /getContext\s*\(\s*['"](?:webgl|webgl2|experimental-webgl|2d)['"]/,
-            /setTimeout\s*\(/,
-            /setInterval\s*\(/,
-            /Math\.random\s*\(/,
-            /window\.addEventListener\s*\(\s*['"]pointer(?:move|up|cancel)['"]/,
-        ]
-        const sourceViolations = sourceFiles.flatMap((file, fileIndex) => forbiddenSourcePatterns
-            .filter((pattern) => pattern.test(sourceContents[fileIndex]))
-            .map((pattern) => `${file}:${pattern}`))
-        const cssSource = await fs.readFile(path.resolve('src/components/ui/SphereGallery.css'), 'utf8')
-        if (/animation(?:-name)?\s*:[^;{}]*\binfinite\b/i.test(cssSource)
-            || /touch-action\s*:\s*none\b/i.test(cssSource)) {
-            sourceViolations.push('SphereGallery.css:infinite-animation-or-touch-action-none')
+        const sourceViolations = sourceFiles.flatMap((file, index) => [
+            /from\s+['"]three['"]/u,
+            /@react-three\//u,
+            /\.svg(?:['"`?])/u,
+            /setInterval\s*\(/u,
+        ].filter((pattern) => pattern.test(sourceContents[index])).map((pattern) => `${file}:${pattern}`))
+        const cssContents = await Promise.all([
+            fs.readFile(path.resolve('src/components/ui/FlyingPosters.css'), 'utf8'),
+            fs.readFile(path.resolve('src/pages/StarMapPage/StarMapDome.css'), 'utf8'),
+        ])
+        const hasNonNoneBackdrop = cssContents.some((source) => (
+            [...source.matchAll(/(?:-webkit-)?backdrop-filter\s*:\s*([^;{}]+)/giu)]
+                .some((match) => match[1]?.replace(/!important/giu, '').trim() !== 'none')
+        ))
+        if (cssContents.some((source) => /(?:^|[;{]\s*)filter\s*:\s*blur\s*\(/imu.test(source))
+            || hasNonNoneBackdrop) {
+            sourceViolations.push('FlyingPosters/StarMapDome.css:blur-or-backdrop-filter')
         }
         if (sourceViolations.length > 0) {
-            fail(`轻量画廊源码重新引入重图形或持续副作用：${sourceViolations.join(', ')}`)
+            fail(`33号诗脉旋转画廊源码边界回退：${sourceViolations.join(', ')}`)
         }
-        sphereGalleryLightweightResourceBoundaryChecked = true
         starMapPoetryGalleryContractChecked = true
     } finally {
         await desktopContext.close()
@@ -8382,133 +8169,59 @@ async function checkStarMapPoetryGalleryContract(context) {
         storageState: await context.storageState(),
         viewport: { width: 390, height: 844 },
         locale: 'zh-CN',
-        reducedMotion: 'no-preference',
+        reducedMotion: 'reduce',
         hasTouch: true,
         isMobile: true,
     })
     const touchPage = await touchContext.newPage()
-    const touchFixture = await installStarMapGalleryFixture(touchPage)
+    await installStarMapGalleryFixture(touchPage)
     try {
         await touchPage.goto(`${BASE_URL}/starmap`, { waitUntil: 'domcontentloaded' })
         await waitForSettledPage(touchPage)
         const enableImmersive = touchPage.getByTestId('starmap-toggle-immersive-view')
-        await enableImmersive.waitFor({ state: 'visible', timeout: 10_000 })
-        await enableImmersive.click()
-        const gallery = touchPage.locator('.pr-sm-dome .pr-sm-dome-gallery[data-sphere-gallery="lightweight"]')
-        await gallery.waitFor({ state: 'visible', timeout: 10_000 })
-        const track = gallery.locator('[data-gallery-track="true"]')
-        const before = await track.evaluate((node) => ({
-            scrollLeft: node.scrollLeft,
-            scrollWidth: node.scrollWidth,
-            clientWidth: node.clientWidth,
-            touchAction: window.getComputedStyle(node).touchAction,
-            coarse: window.matchMedia('(pointer: coarse)').matches,
-            noHover: window.matchMedia('(hover: none)').matches,
-        }))
-        await dispatchHorizontalTouchSwipe(touchContext, touchPage, track)
-        const afterSwipe = await gallery.evaluate((root) => ({
-            activeIndex: root.getAttribute('data-gallery-active-index'),
-            scrollLeft: root.querySelector('[data-gallery-track="true"]')?.scrollLeft ?? 0,
-            detailHidden: document.querySelector('.pr-sm-floating-panel')?.getAttribute('aria-hidden'),
-            hiddenPanel: (() => {
-                const panel = document.querySelector('.pr-sm-floating-panel')
-                if (!(panel instanceof HTMLElement)) return null
-                const style = getComputedStyle(panel)
-                const rect = panel.getBoundingClientRect()
-                return {
-                    visibility: style.visibility,
-                    pointerEvents: style.pointerEvents,
-                    left: rect.left,
-                    viewportWidth: innerWidth,
-                }
-            })(),
-            genericDialogCount: document.querySelectorAll('body > .pr-sphere-gallery-dialog-backdrop').length,
-            canvasCount: document.querySelectorAll('.pr-sm-dome canvas').length,
-            threeResourceCount: performance.getEntriesByType('resource').filter((entry) => entry.name.includes('three-vendor')).length,
-            pageHasHorizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-        }))
-        const nativePanEnabled = before.touchAction === 'manipulation'
-            || (before.touchAction.includes('pan-x') && before.touchAction.includes('pan-y'))
-        if (before.scrollWidth <= before.clientWidth
-            || before.touchAction === 'none'
-            || !nativePanEnabled
-            || (!before.coarse && !before.noHover)
-            || afterSwipe.scrollLeft <= before.scrollLeft + 5
-            || Number(afterSwipe.activeIndex) <= 0
-            || afterSwipe.detailHidden !== 'true'
-            || afterSwipe.hiddenPanel?.visibility !== 'hidden'
-            || afterSwipe.hiddenPanel?.pointerEvents !== 'none'
-            || (afterSwipe.hiddenPanel?.left ?? 0) < (afterSwipe.hiddenPanel?.viewportWidth ?? 1) - 1
-            || afterSwipe.genericDialogCount !== 0
-            || afterSwipe.canvasCount !== 0
-            || afterSwipe.threeResourceCount !== 0
-            || afterSwipe.pageHasHorizontalOverflow) {
-            fail(`诗脉画廊移动触控或轻量资源边界不合格：${JSON.stringify({ before, afterSwipe })}`)
+        const mobileViewAction = await enableImmersive.getAttribute('aria-label')
+        if (mobileViewAction === '开启沉浸星图' || mobileViewAction === '返回诗境穹顶') {
+            await enableImmersive.click()
         }
-        const failedCard = gallery.locator('.pr-sphere-gallery-card[data-gallery-index="1"]')
-        await failedCard.scrollIntoViewIfNeeded()
-        await failedCard.tap()
-        await touchPage.waitForFunction(() => (
-            (() => {
-                const panel = document.querySelector('.pr-sm-floating-panel')
-                if (!(panel instanceof HTMLElement)) return false
-                const style = getComputedStyle(panel)
-                const rect = panel.getBoundingClientRect()
-                return panel.getAttribute('aria-hidden') === 'false'
-                    && panel.querySelector('.pr-sm-panel-title')?.textContent?.trim() === '春晓'
-                    && style.visibility === 'visible'
-                    && Number(style.opacity) >= 0.99
-                    && style.pointerEvents !== 'none'
-                    && rect.left >= 0
-                    && rect.right <= innerWidth + 1
-                    && Math.abs(rect.right - (innerWidth - 8)) <= 2
-            })()
-        ), undefined, { timeout: 10_000 })
-        const openPanelVisual = await touchPage.locator('.pr-sm-floating-panel').evaluate((panel) => {
-            const rect = panel.getBoundingClientRect()
-            const centerTarget = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
-            const outsideTarget = document.elementFromPoint(
-                Math.max(1, rect.left / 2),
-                rect.top + rect.height / 2,
-            )
-            const overlay = document.querySelector('.pr-sm-floating-panel-overlay')
+        const gallery = touchPage.locator('.pr-sm-dome .pr-flying-posters[data-flying-posters="ogl"]')
+        await gallery.waitFor({ state: 'visible', timeout: 10_000 })
+        const next = gallery.getByRole('button', { name: '下一幅诗境图', exact: true })
+        const current = gallery.locator('.pr-flying-posters__current')
+        const mobile = await gallery.evaluate((root) => {
+            const rect = root.getBoundingClientRect()
+            const controls = Array.from(root.querySelectorAll('.pr-flying-posters__controls > button'))
             return {
+                canvasCount: root.querySelectorAll('canvas').length,
                 width: rect.width,
                 viewportWidth: innerWidth,
-                backgroundImage: getComputedStyle(panel).backgroundImage,
-                centerOwnedByPanel: Boolean(centerTarget?.closest('.pr-sm-floating-panel')),
-                overlayVisible: overlay instanceof HTMLElement && getComputedStyle(overlay).display !== 'none',
-                overlayCapturesOutsideSliver: Boolean(outsideTarget?.closest('.pr-sm-floating-panel-overlay')),
-            }
-        })
-        if (touchFixture.brokenImageRequests() < 1
-            || await touchPage.locator('body > .pr-sphere-gallery-dialog-backdrop').count() !== 0) {
-            fail('诗脉失败图片在移动触控下未保留节点选择或错误打开通用预览')
-        }
-        if (openPanelVisual.width < openPanelVisual.viewportWidth - 20
-            || openPanelVisual.backgroundImage === 'none'
-            || !openPanelVisual.centerOwnedByPanel
-            || !openPanelVisual.overlayVisible
-            || !openPanelVisual.overlayCapturesOutsideSliver) {
-            fail(`诗脉移动详情没有形成稳定、非混叠的视口内阅读层：${JSON.stringify(openPanelVisual)}`)
-        }
-        await touchPage.screenshot({ path: path.join(OUTPUT_DIR, 'mobile-starmap-poetry-gallery-touch.png'), fullPage: false })
-        await touchPage.emulateMedia({ reducedMotion: 'reduce' })
-        await touchPage.waitForFunction(() => matchMedia('(prefers-reduced-motion: reduce)').matches)
-        const reducedMotionPanel = await touchPage.locator('.pr-sm-floating-panel').evaluate((panel) => {
-            const style = getComputedStyle(panel)
-            return {
-                transitionDuration: style.transitionDuration,
-                animationName: style.animationName,
-                activeAnimationCount: panel.getAnimations({ subtree: false })
+                minControlWidth: Math.min(...controls.map((item) => item.getBoundingClientRect().width)),
+                minControlHeight: Math.min(...controls.map((item) => item.getBoundingClientRect().height)),
+                reduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
+                pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+                activeAnimations: root.getAnimations({ subtree: true })
                     .filter((animation) => animation.playState === 'running').length,
             }
         })
-        if (reducedMotionPanel.transitionDuration.split(',').some((value) => Number.parseFloat(value) !== 0)
-            || reducedMotionPanel.animationName !== 'none'
-            || reducedMotionPanel.activeAnimationCount !== 0) {
-            fail(`诗脉移动详情没有服从系统减少动态效果：${JSON.stringify(reducedMotionPanel)}`)
+        if (mobile.canvasCount !== 1
+            || mobile.width > mobile.viewportWidth + 1
+            || mobile.minControlWidth < 44
+            || mobile.minControlHeight < 44
+            || !mobile.reduced
+            || mobile.pageOverflow
+            || mobile.activeAnimations !== 0) {
+            fail(`33号诗脉旋转画廊移动端或减少动态契约不合格：${JSON.stringify(mobile)}`)
         }
+        await next.click()
+        await touchPage.waitForFunction(() => (
+            document.querySelector('.pr-sm-dome .pr-flying-posters__current strong')
+                ?.textContent?.includes('春晓') === true
+        ), undefined, { timeout: 5_000 })
+        await current.click()
+        await touchPage.waitForFunction(() => (
+            document.querySelector('.pr-sm-floating-panel')?.getAttribute('aria-hidden') === 'false'
+            && document.querySelector('.pr-sm-floating-panel .pr-sm-panel-title')?.textContent?.trim() === '春晓'
+        ), undefined, { timeout: 10_000 })
+        await touchPage.screenshot({ path: path.join(OUTPUT_DIR, 'mobile-starmap-33-flying-posters.png'), fullPage: false })
     } finally {
         await touchContext.close()
     }
@@ -9494,7 +9207,7 @@ async function run() {
         await checkEvolutionEmptyEvidence(context)
         await checkEvolutionPatternLinkedNavigation(context)
         await checkLessonPlanImageGalleryContract(context)
-        await checkStarMapPoetryGalleryContract(context)
+        await checkStarMapFlyingPostersContract(context)
 
         activeRoute = 'refresh-session'
         await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'domcontentloaded' })
@@ -9537,7 +9250,7 @@ async function run() {
                 reducedMotionComplianceChecked,
                 mobileBrandHierarchyChecked,
                 dashboardMagicBentoContractChecked,
-                anchorMiniMapContractChecked,
+                chapterNavigationRemovedChecked,
                 dashboardAsyncContentVisibilityChecked,
                 dashboardTabKeyboardChecked,
                 dashboardAlertActionSemanticsChecked,

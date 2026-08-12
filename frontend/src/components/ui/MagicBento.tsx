@@ -24,7 +24,7 @@ export interface MagicBentoCardData {
     title: string
     /** 卡片功能说明。 */
     description: string
-    /** 可选装饰图；加载失败时自动保留 CSS 山水兜底。 */
+    /** 可选装饰图；生产卡片应传入已核验的随包位图。 */
     imageUrl?: string
     /** 可选目标地址；有值时使用原生链接。 */
     href?: string
@@ -164,13 +164,12 @@ function CardMedia({ imageUrl }: { imageUrl?: string }) {
             data-image-state={status}
             aria-hidden="true"
         >
-            <span className="pr-magic-bento-card__media-landscape" />
             {imageUrl && status !== 'failed' ? (
                 <img
                     className="pr-magic-bento-card__image"
                     src={imageUrl}
                     alt=""
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
                     draggable={false}
                     onLoad={() => setStatus('loaded')}
@@ -281,7 +280,7 @@ function MagicBentoCard({
 }
 
 function imageUrlKey(imageUrl: string | undefined): string {
-    return imageUrl?.trim() || 'css-fallback'
+    return imageUrl?.trim() || 'no-image'
 }
 
 export function MagicBento({

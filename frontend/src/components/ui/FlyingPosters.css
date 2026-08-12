@@ -47,7 +47,6 @@
 
 .pr-flying-posters__fallback {
     object-fit: cover;
-    filter: saturate(0.86) contrast(1.03);
 }
 
 .pr-flying-posters__controls {
@@ -64,9 +63,9 @@
     margin-inline: auto;
     padding: 8px;
     border-radius: 18px;
-    background: color-mix(in srgb, var(--surface-primary) 76%, transparent);
-    box-shadow: 0 18px 48px color-mix(in srgb, var(--text-primary) 13%, transparent);
-    backdrop-filter: blur(18px) saturate(1.12);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 13%, transparent);
+    background: var(--surface-primary);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--text-primary) 10%, transparent);
 }
 
 .pr-flying-posters__controls > button {
@@ -75,7 +74,7 @@
     border: 0;
     border-radius: 12px;
     color: var(--text-primary);
-    background: color-mix(in srgb, var(--surface-secondary) 84%, transparent);
+    background: var(--surface-secondary);
     font: inherit;
     cursor: pointer;
 }

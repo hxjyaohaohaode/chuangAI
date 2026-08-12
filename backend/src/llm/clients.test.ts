@@ -100,6 +100,7 @@ describe('DeepSeekClient SDK contract', () => {
         expect(body).toMatchObject({
             model: 'deepseek-v4-pro',
             reasoning_effort: 'max',
+            thinking: { type: 'enabled' },
             temperature: 0.2,
             max_tokens: 9000,
             response_format: { type: 'json_object' },
@@ -203,12 +204,23 @@ describe('MiMoClient SDK contract', () => {
             content: '识别结果', reasoning: '逐区域核验',
             usage: { promptTokens: 20, completionTokens: 10 }, model: 'mimo-v2.5',
         })
-        const body = sdk.chatCreate.mock.calls[0]?.[0] as { messages: Array<{ content: unknown }>; tools: unknown[] }
+        const body = sdk.chatCreate.mock.calls[0]?.[0] as {
+            messages: Array<{ content: unknown }>
+            tools: unknown[]
+            max_completion_tokens: number
+            thinking: { type: string }
+            temperature?: number
+        }
         expect(body.messages[0]?.content).toEqual([
             { type: 'text', text: '识别图片' },
             { type: 'image_url', image_url: { url: pngDataUrl, detail: 'high' } },
         ])
         expect(body.tools).toHaveLength(1)
+        expect(body.max_completion_tokens).toBe(2048)
+        expect(body.thinking).toEqual({ type: 'enabled' })
+        expect(body).not.toHaveProperty('max_tokens')
+        expect(body).not.toHaveProperty('reasoning_effort')
+        expect(body).not.toHaveProperty('temperature')
 
         await expect(client.chat({
             model: 'mimo-v2.5',

@@ -7,7 +7,8 @@
  * - mimo-v2.5-tts:   语音合成模型，8K 上下文，8K 输出，限时免费
  * - mimo-v2.5-asr:   语音识别模型，8K 上下文，2K 输出，0.5 元/小时
  *
- * 文本模型支持 low/medium/high 思考模式（不支持 max）
+ * 文本模型支持开关思考模式；当前官方 ChatCompletions 不支持自定义思考强度，
+ * 因此上层 low/medium/high 均按“启用思考”发送，不能伪装成供应商已执行分档。
  */
 
 import OpenAI from 'openai'
@@ -35,15 +36,18 @@ import { inspectAudioBytes, type InspectedAudio } from '../security/audio-upload
 // ─────────────────────────────────────────────────────────────
 
 /**
- * MiMo 扩展 ChatCompletion 请求参数
- * OpenAI SDK 4.67 不含 reasoning_effort 字段，需类型扩展
+ * MiMo 扩展 ChatCompletion 请求参数。
+ * 官方 ChatCompletions 使用 max_completion_tokens 与 thinking.type；
+ * 不能复用 Responses API 的 reasoning.effort，也不能沿用旧 max_tokens 字段。
  */
 type MimoCompletionParams = ChatCompletionCreateParamsNonStreaming & {
-    reasoning_effort?: TextThinkingMode
+    max_completion_tokens?: number
+    thinking?: { type: 'enabled' | 'disabled' }
 }
 
 type MimoStreamingParams = ChatCompletionCreateParamsStreaming & {
-    reasoning_effort?: TextThinkingMode
+    max_completion_tokens?: number
+    thinking?: { type: 'enabled' | 'disabled' }
 }
 
 /**
@@ -73,7 +77,7 @@ export interface MimoTextParams {
     messages: ChatMessage[]
     /** 多模态图片输入（仅 mimo-v2.5 支持） */
     images?: Array<{ url: string; detail?: 'auto' | 'low' | 'high' }>
-    /** 思考模式 low/medium/high（不支持 max） */
+    /** 上层任务强度提示；MiMo 官方 ChatCompletions 当前统一映射为 enabled */
     thinking?: TextThinkingMode
     /** 采样温度 0-2 */
     temperature?: number
@@ -425,15 +429,14 @@ export class MiMoClient {
         const base: Record<string, unknown> = {
             model: params.model,
             messages,
-            max_tokens: params.maxTokens ?? 4096,
+            max_completion_tokens: params.maxTokens ?? 4096,
+            thinking: { type: 'enabled' },
         }
 
-        if (params.temperature !== undefined) {
-            base.temperature = params.temperature
-        }
-
-        // 思考模式（MiMo 不支持 max，仅 low/medium/high）
-        base.reasoning_effort = thinking
+        // 官方说明：思考开启时 temperature/top_p 会被强制覆盖为推荐值。
+        // 不发送虚假的“可调采样参数”，避免界面设置与真实模型行为不一致。
+        void params.temperature
+        void thinking
 
         // 工具定义
         if (params.tools && params.tools.length > 0) {

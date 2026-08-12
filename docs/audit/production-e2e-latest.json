@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-11T08:39:41.825Z",
+  "generatedAt": "2026-08-12T01:34:20.576Z",
   "hosting": "fastify-production-same-origin",
   "nodeEnv": "production",
   "authMode": "demo",
@@ -55,9 +55,9 @@
   "cultureDemoGalleryFallback": {
     "checked": true,
     "poemBound": true,
-    "localIllustrationOnly": true,
-    "aiGeneratedFalse": true,
-    "fourUniqueSvgScenes": true,
+    "packagedWanWebpOnly": true,
+    "aiGeneratedTrue": true,
+    "noSvgFallback": true,
     "detailIndexReadable": true
   },
   "ttsBinaryContract": {
@@ -121,7 +121,7 @@
     "externalTrackerUrlRejectedBeforePersistence": true,
     "generatedWebpPathAllowlisted": true
   },
-  "baseUrl": "http://127.0.0.1:57517",
+  "baseUrl": "http://127.0.0.1:57519",
   "routeViewportCombinations": 32,
   "warnings": 0,
   "failures": 0,
@@ -327,10 +327,10 @@
   "dashboardMagicBentoContract": {
     "checked": true,
     "viewport": "1440x900; 390x844 touch; forced-colors active; print",
-    "testDataBoundary": "production dashboard with controlled illustration API and one intentionally aborted decorative image; verifies frontend semantics, resource recovery and media fallbacks only, not generated-image quality, teaching quality or competition outcome",
+    "testDataBoundary": "production dashboard with six packaged route-specific WebP assets; verifies exact local resource mapping, semantics and media fallbacks only, not teaching quality or competition outcome",
     "verifies": [
       "six-native-links-preserve-keyboard-spa-and-modifier-or-middle-click-browser-behavior",
-      "aborted-decorative-image-keeps-css-landscape-without-card-layout-shift",
+      "six-route-specific-1280x720-webp-images-load-without-svg-or-runtime-illustration-api",
       "css-renderer-creates-no-legacy-particle-ripple-global-spotlight-or-runtime-style",
       "reduced-motion-and-real-coarse-pointer-context-remain-static-and-operable",
       "desktop-three-column-and-mobile-single-column-layouts-have-no-horizontal-overflow",
@@ -338,19 +338,15 @@
       "source-gate-excludes-gsap-raf-timers-global-listeners-randomness-canvas-and-webgl"
     ]
   },
-  "anchorMiniMapContract": {
+  "chapterNavigationRemoved": {
     "checked": true,
-    "viewport": "1440x900;390x844; prefers-reduced-motion: reduce; forced-colors active; print",
-    "testDataBoundary": "authenticated production Dashboard plus temporary DOM-only synthetic anchors; verifies navigation identity, geometry and media fallbacks only, not teaching content, information architecture quality or every physical assistive device",
+    "viewport": "1440x900; prefers-reduced-motion: reduce",
+    "testDataBoundary": "authenticated production Dashboard; verifies obsolete right-side chapter navigation removal and header geometry only",
     "verifies": [
-      "collapsed-native-toggle-and-every-section-target-preserve-at-least-44px-css-hit-size",
-      "space-key-expands-and-aria-expanded-plus-local-storage-persist-across-reload",
-      "late-visible-generated-anchors-receive-distinct-stable-dom-identities",
-      "duplicate-business-ids-still-scroll-the-exact-internal-element-with-auto-behavior-under-reduced-motion",
-      "equivalent-live-page-mutations-do-not-change-the-exposed-navigation-contract",
-      "header-remains-computed-sticky-at-top-after-the-real-scroll-state-threshold",
-      "forced-colors-preserves-system-color-pair-and-visible-keyboard-focus",
-      "print-hides-auxiliary-navigation-and-mobile-breakpoint-unmounts-it-without-overflow"
+      "right-side-chapter-navigation-root-and-trigger-are-absent",
+      "obsolete-navigation-local-storage-state-is-absent",
+      "page-retains-no-horizontal-overflow-after-removal",
+      "header-remains-computed-sticky-at-top-after-real-scroll"
     ]
   },
   "dashboardAsyncContentVisibility": {
@@ -652,13 +648,13 @@
   },
   "starMapLightweightView": {
     "checked": true,
-    "testDataBoundary": "authenticated production route, navigation-drawer DOM and browser resource timing; verifies directory and opted-in poetry-gallery rendering boundaries only, not graph truth, image provenance or learning outcomes",
+    "testDataBoundary": "authenticated production route, navigation-drawer DOM and browser resource timing; verifies directory and opted-in reference-33 OGL rendering boundaries only, not graph truth, image provenance or learning outcomes",
     "verifies": [
       "reduced-motion-defaults-to-accessible-starmap-directory",
       "closed-observatory-drawer-is-aria-hidden-and-inert-open-focuses-search-and-close-restores-trigger",
       "directory-category-tablist-controls-panel-and-supports-arrow-home-end-navigation",
       "three-vendor-is-not-downloaded-before-or-after-starmap-teacher-opt-in",
-      "teacher-opt-in-renders-a-lightweight-native-poetry-gallery-with-zero-canvas"
+      "teacher-opt-in-renders-the-reference-33-bounded-ogl-gallery-with-exactly-one-canvas"
     ]
   },
   "evolutionEmptyEvidence": {
@@ -709,26 +705,24 @@
   "starMapPoetryGallery": {
     "checked": true,
     "viewport": "1440x900;390x844 touch",
-    "testDataBoundary": "isolated controlled three-poem graph with explicitly synthetic E2E relation edges and controlled local image responses, including one intentionally aborted poem image; verifies frontend node-index mapping, selection, focus transfer, responsive interaction and failure isolation only, not knowledge-graph truth, image provenance, student mastery or learning outcomes",
+    "testDataBoundary": "isolated controlled three-poem graph with explicitly synthetic E2E relation edges and three same-poem packaged WebP responses; verifies reference-33 OGL node-index mapping, selection, focus transfer and responsive interaction only, not knowledge-graph truth, image provenance, student mastery or learning outcomes",
     "verifies": [
-      "gallery-renders-one-native-card-per-controlled-poem-without-duplicate-sphere-tiles",
-      "arrow-navigation-updates-the-foreground-poem-without-selecting-a-node",
-      "enter-selects-the-exact-poem-node-and-opens-the-matching-detail-title",
-      "failed-poem-image-preserves-the-poem-selection-business-action",
-      "closing-detail-with-button-or-escape-restores-the-originating-poem-card-focus",
-      "select-mode-never-opens-the-generic-image-preview-dialog",
-      "touch-scrolling-changes-the-active-poem-without-accidental-selection-or-page-overflow",
-      "mobile-detail-sheet-is-opaque-settled-topmost-touch-blocking-and-reduced-motion-safe"
+      "gallery-uses-one-bounded-ogl-canvas-and-three-native-controls-for-three-same-poem-webp-items",
+      "arrow-navigation-updates-the-foreground-poem-and-enter-opens-the-exact-detail",
+      "closing-detail-restores-the-single-canvas-focus",
+      "no-three-vendor-svg-placeholder-edge-blur-backdrop-blur-or-idle-auto-advance",
+      "mobile-controls-remain-at-least-44px-without-horizontal-overflow",
+      "reduced-motion-keeps-the-gallery-static-without-running-css-animation"
     ]
   },
   "sphereGalleryLightweightResourceBoundary": {
     "checked": true,
     "viewport": "1440x900;390x844",
-    "testDataBoundary": "production-build source and browser resource-timing boundary for the two tested gallery consumers; verifies those routes do not use Three.js, WebGL, Canvas, RAF, automatic timers or infinite gallery animations, not GPU behavior on untested browsers or long-duration device memory characteristics",
+    "testDataBoundary": "production-build source and browser resource-timing boundary for the lesson-plan gallery consumer; verifies that route does not use Three.js, WebGL, Canvas, RAF, automatic timers or infinite gallery animations, not GPU behavior on untested browsers or long-duration device memory characteristics",
     "verifies": [
-      "gallery-and-starmap-dome-source-contain-no-three-webgl-canvas-or-raf-path",
-      "lesson-plan-and-opted-in-starmap-gallery-load-no-three-vendor-resource",
-      "both-consumers-render-zero-canvas-elements",
+      "lesson-plan-gallery-source-contains-no-three-webgl-canvas-or-raf-path",
+      "lesson-plan-gallery-loads-no-three-vendor-resource",
+      "lesson-plan-gallery-renders-zero-canvas-elements",
       "gallery-is-manual-only-and-runs-no-infinite-web-animation",
       "gallery-registers-no-window-level-pointer-drag-listeners"
     ]

@@ -82,10 +82,11 @@ async function validateGates() {
         || imageAssets?.gate !== 'PASS'
         || imageAssets?.summary?.blockers !== 0
         || imageAssets?.summary?.curatedReleaseWebp !== 22
+        || imageAssets?.summary?.releasedStarmapWebp !== 148
         || imageAssets?.summary?.productionRuntimeStarmapReferences !== 0
         || imageAssets?.summary?.productionSvgReferences !== 0
         || imageAssets?.summary?.releaseContamination !== 0
-        || imageAssets?.releaseMapping?.entries?.length !== 22
+        || imageAssets?.releaseMapping?.entries?.length !== 148
         || imageAssets?.distParity?.status !== 'passed') {
         throw new Error('图像资产、引用或 dist 发布真实性审计未通过，拒绝打包')
     }

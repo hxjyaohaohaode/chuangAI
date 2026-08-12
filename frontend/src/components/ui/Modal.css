@@ -7,8 +7,9 @@
     position: fixed;
     inset: 0;
     background: var(--overlay-modal);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    /* 遮罩只负责压低背景，不再模糊正文；演示时仍能辨认上下文。 */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     z-index: var(--z-modal);
     display: flex;
     align-items: center;
@@ -33,10 +34,10 @@
 
 .pr-modal-panel {
     position: relative;
-    background: var(--surface-glass-heavy);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: none;
+    background: rgb(var(--c-surface-elevated));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid rgb(var(--c-border-primary) / 0.42);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-modal);
     width: 100%;
@@ -57,15 +58,15 @@
 }
 
 .pr-modal-panel--sm {
-    max-width: 400px;
+    max-width: 520px;
 }
 
 .pr-modal-panel--md {
-    max-width: 560px;
+    max-width: 760px;
 }
 
 .pr-modal-panel--lg {
-    max-width: 720px;
+    max-width: 1040px;
 }
 
 .pr-modal-panel--full {
@@ -79,7 +80,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-md);
-    padding: var(--space-lg) var(--space-lg) var(--space-md);
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
 }
 
 .pr-modal-title {
@@ -93,7 +94,7 @@
 }
 
 .pr-modal-body {
-    padding: 0 var(--space-lg) var(--space-lg);
+    padding: 0 var(--space-xl) var(--space-xl);
     font-size: var(--text-base);
     line-height: var(--leading-base);
     color: rgb(var(--c-text-primary));
@@ -106,7 +107,7 @@
     justify-content: flex-end;
     gap: var(--space-sm);
     flex-wrap: wrap;
-    padding: 0 var(--space-lg) var(--space-lg);
+    padding: 0 var(--space-xl) var(--space-xl);
 }
 
 @media (max-width: 767px) {
@@ -118,6 +119,8 @@
     .pr-modal-panel {
         margin: auto 0;
         max-width: none;
+        max-height: calc(100dvh - 24px);
+        border-radius: var(--radius-lg);
     }
 
     .pr-modal-header,
@@ -132,8 +135,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
     background: transparent;
     border: none;
@@ -189,8 +192,8 @@
         radial-gradient(ellipse at top, rgb(var(--c-bg-ultra-glow) / 0.55) 0%, transparent 60%),
         var(--noise-texture);
     background-size: 100% 100%, 160px 160px;
-    backdrop-filter: blur(24px) saturate(120%);
-    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow: var(--shadow-glass-ambient), var(--shadow-modal);
 }
 
@@ -277,8 +280,8 @@
  *   应用极淡的强调色背景 + 微妙边框 */
 .pr-modal-panel--v51-ai {
     background-color: var(--ai-panel-bg);
-    backdrop-filter: blur(24px) saturate(140%);
-    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow:
         0 0 0 1px var(--ai-panel-border),
         var(--shadow-glass-ambient),

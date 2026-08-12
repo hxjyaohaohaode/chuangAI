@@ -42,10 +42,12 @@ import type {
  */
 type DeepSeekCompletionParams = ChatCompletionCreateParamsNonStreaming & {
     reasoning_effort?: ThinkingMode
+    thinking?: { type: 'enabled' | 'disabled' }
 }
 
 type DeepSeekStreamingParams = ChatCompletionCreateParamsStreaming & {
     reasoning_effort?: ThinkingMode
+    thinking?: { type: 'enabled' | 'disabled' }
 }
 
 /**
@@ -318,6 +320,9 @@ export class DeepSeekClient {
             model: params.model,
             messages,
             max_tokens: params.maxTokens ?? 4096,
+            // DeepSeek 官方 OpenAI ChatCompletions 契约要求用 thinking 显式开关
+            // 思考模式，再用 reasoning_effort 控制强度；只传后者会依赖供应商默认值。
+            thinking: { type: 'enabled' },
         }
 
         if (params.temperature !== undefined) {

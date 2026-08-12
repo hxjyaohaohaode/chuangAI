@@ -366,9 +366,9 @@ async function verifyGeneratedMediaBoundary(baseUrl, session, runtimeRoot) {
 }
 
 /**
- * DEMO 的文化图库必须是可离线复现的当前诗篇本地场景，而非首次读取时再赌外部
- * 文生图或借用其他诗篇的缓存。这里使用与浏览器回归相同的临时生产服务器和认证
- * 会话，验证图库响应、来源标记与单图详情索引三者的一致性。
+ * DEMO 的文化图库必须是可离线复现的当前诗篇专属 WebP，而非首次读取时再赌外部
+ * 文生图、借用其他诗篇缓存或回退 SVG。这里使用与浏览器回归相同的临时生产服务
+ * 和认证会话，验证图库响应、来源标记与单图详情索引三者的一致性。
  */
 async function verifyCultureDemoGalleryFallback(baseUrl, session) {
     const headers = { cookie: session.cookie }
@@ -383,19 +383,19 @@ async function verifyCultureDemoGalleryFallback(baseUrl, session) {
     const invalidImage = images.find((image) => (
         !image
         || image.poemId !== 'tongbian-001'
-        || image.source !== 'local-illustration'
-        || image.aiGenerated !== false
+        || image.source !== 'wan2.7-packaged'
+        || image.aiGenerated !== true
         || typeof image.imageUrl !== 'string'
-        || !image.imageUrl.startsWith('data:image/svg+xml;base64,')
+        || !/^\/images\/generated\/starmap\/tongbian-001\.webp$/u.test(image.imageUrl)
     ))
     if (body?.status !== 'ok'
         || body?.poemId !== 'tongbian-001'
-        || body?.aiGenerated !== false
-        || body?.source !== 'local-demo'
-        || images.length !== 4
-        || ids.size !== 4
+        || body?.aiGenerated !== true
+        || body?.source !== 'packaged-demo'
+        || images.length !== 1
+        || ids.size !== 1
         || invalidImage) {
-        throw new Error(`DEMO 文化图库未收敛为当前诗篇本地插画：${JSON.stringify({
+        throw new Error(`DEMO 文化图库未收敛为当前诗篇专属 WebP：${JSON.stringify({
             status: body?.status,
             poemId: body?.poemId,
             source: body?.source,
@@ -415,16 +415,16 @@ async function verifyCultureDemoGalleryFallback(baseUrl, session) {
     if (detailBody?.status !== 'ok'
         || detailBody?.image?.id !== first.id
         || detailBody?.image?.poemId !== 'tongbian-001'
-        || detailBody?.image?.source !== 'local-illustration'
-        || detailBody?.image?.aiGenerated !== false) {
+        || detailBody?.image?.source !== 'wan2.7-packaged'
+        || detailBody?.image?.aiGenerated !== true) {
         throw new Error('DEMO 文化图库卡片与详情索引来源不一致')
     }
     return {
         checked: true,
         poemBound: true,
-        localIllustrationOnly: true,
-        aiGeneratedFalse: true,
-        fourUniqueSvgScenes: true,
+        packagedWanWebpOnly: true,
+        aiGeneratedTrue: true,
+        noSvgFallback: true,
         detailIndexReadable: true,
     }
 }
@@ -716,6 +716,9 @@ async function main() {
             APP_DATA_DIR: temporaryRoot,
             SQLITE_PATH: path.join(temporaryRoot, 'production-e2e.db'),
             DEMO_MODE: 'true',
+            // 比赛演示部署必须带有可追溯、可清理的合成学情；浏览器回归也在同一
+            // 数据条件下运行，避免空库页面通过测试而真实演示什么都没有。
+            SEED_LEARNING_DEMO: 'true',
             // 隔离回归只验证受控 UI/API 契约，绝不继承开发机的真实供应商密钥。
             // 显式空值会覆盖 dotenv 的本地 .env，避免测试产生付费调用、外部数据
             // 漂移或把真实 provider 可用性误记为可重复的比赛证据。
@@ -840,10 +843,10 @@ async function main() {
             throw new Error('移动端顶栏未完成完整中文主品牌、完整辅助技术名称与无裁切回归')
         }
         if (results.dashboardMagicBentoContractChecked !== true) {
-            throw new Error('教学闭环入口未完成原生链接、装饰图失败、减弱动态、触控、高对比与打印回归')
+            throw new Error('教学闭环入口未完成六张随包 WebP、原生链接、减弱动态、触控、高对比与打印回归')
         }
-        if (results.anchorMiniMapContractChecked !== true) {
-            throw new Error('章节锚点导航未完成稳定 Element 身份、44px、原生键盘、持久化、吸顶页头、PRM、高对比、打印与移动端回归')
+        if (results.chapterNavigationRemovedChecked !== true) {
+            throw new Error('右侧章节导航未完成全量卸载、持久化残留清理、无横向溢出与吸顶页头回归')
         }
         if (results.dashboardAsyncContentVisibilityChecked !== true) {
             throw new Error('教学驾驶舱异步列表未完成 pending 后挂载可见性与减少动态回归')
@@ -921,7 +924,7 @@ async function main() {
             throw new Error('思考宫殿未完成诗境图片控件、资源恢复、大图 Portal 全视口、焦点陷阱与滚动恢复回归')
         }
         if (results.starMapLightweightViewChecked !== true) {
-            throw new Error('诗脉星图未完成减少动态下的目录优先、教师主动开启轻量诗境画廊与零 Three/Canvas 资源回归')
+            throw new Error('诗脉星图未完成目录优先、教师主动开启33号受控OGL画廊、单Canvas与零Three资源回归')
         }
         if (results.evolutionEmptyEvidenceChecked !== true) {
             throw new Error('进化之眼未完成空谱系真实边界、证据刷新、模式说明与无意义 Three.js 延迟加载回归')
@@ -933,10 +936,10 @@ async function main() {
             throw new Error('教案模板图片画廊未完成唯一图片映射、原生键盘漫游、预览焦点、图片失败、触控、减弱动态、强制配色与打印回归')
         }
         if (results.starMapPoetryGalleryContractChecked !== true) {
-            throw new Error('诗脉图片画廊未完成诗篇索引映射、失败图片业务保留、键盘选择、详情关闭回焦与移动触控回归')
+            throw new Error('诗脉33号旋转画廊未完成同诗位图映射、键盘/触控选择、详情关闭回焦、无SVG与无虚化回归')
         }
         if (results.sphereGalleryLightweightResourceBoundaryChecked !== true) {
-            throw new Error('轻量图片画廊未完成零 Three.js、零 WebGL、零 Canvas、零 RAF 与无持续后台动画资源门禁')
+            throw new Error('教案轻量图片画廊未完成零 Three.js、零 WebGL、零 Canvas、零 RAF 与无持续后台动画资源门禁')
         }
         if (results.starfieldBackgroundFallbackChecked !== true) {
             throw new Error('403/404 星空背景未完成无 Canvas/OGL、非交互、减弱动态静止与桌面/移动覆盖回归')
@@ -1217,10 +1220,10 @@ async function main() {
             dashboardMagicBentoContract: {
                 checked: true,
                 viewport: '1440x900; 390x844 touch; forced-colors active; print',
-                testDataBoundary: 'production dashboard with controlled illustration API and one intentionally aborted decorative image; verifies frontend semantics, resource recovery and media fallbacks only, not generated-image quality, teaching quality or competition outcome',
+                testDataBoundary: 'production dashboard with six packaged route-specific WebP assets; verifies exact local resource mapping, semantics and media fallbacks only, not teaching quality or competition outcome',
                 verifies: [
                     'six-native-links-preserve-keyboard-spa-and-modifier-or-middle-click-browser-behavior',
-                    'aborted-decorative-image-keeps-css-landscape-without-card-layout-shift',
+                    'six-route-specific-1280x720-webp-images-load-without-svg-or-runtime-illustration-api',
                     'css-renderer-creates-no-legacy-particle-ripple-global-spotlight-or-runtime-style',
                     'reduced-motion-and-real-coarse-pointer-context-remain-static-and-operable',
                     'desktop-three-column-and-mobile-single-column-layouts-have-no-horizontal-overflow',
@@ -1228,19 +1231,15 @@ async function main() {
                     'source-gate-excludes-gsap-raf-timers-global-listeners-randomness-canvas-and-webgl',
                 ],
             },
-            anchorMiniMapContract: {
+            chapterNavigationRemoved: {
                 checked: true,
-                viewport: '1440x900;390x844; prefers-reduced-motion: reduce; forced-colors active; print',
-                testDataBoundary: 'authenticated production Dashboard plus temporary DOM-only synthetic anchors; verifies navigation identity, geometry and media fallbacks only, not teaching content, information architecture quality or every physical assistive device',
+                viewport: '1440x900; prefers-reduced-motion: reduce',
+                testDataBoundary: 'authenticated production Dashboard; verifies obsolete right-side chapter navigation removal and header geometry only',
                 verifies: [
-                    'collapsed-native-toggle-and-every-section-target-preserve-at-least-44px-css-hit-size',
-                    'space-key-expands-and-aria-expanded-plus-local-storage-persist-across-reload',
-                    'late-visible-generated-anchors-receive-distinct-stable-dom-identities',
-                    'duplicate-business-ids-still-scroll-the-exact-internal-element-with-auto-behavior-under-reduced-motion',
-                    'equivalent-live-page-mutations-do-not-change-the-exposed-navigation-contract',
-                    'header-remains-computed-sticky-at-top-after-the-real-scroll-state-threshold',
-                    'forced-colors-preserves-system-color-pair-and-visible-keyboard-focus',
-                    'print-hides-auxiliary-navigation-and-mobile-breakpoint-unmounts-it-without-overflow',
+                    'right-side-chapter-navigation-root-and-trigger-are-absent',
+                    'obsolete-navigation-local-storage-state-is-absent',
+                    'page-retains-no-horizontal-overflow-after-removal',
+                    'header-remains-computed-sticky-at-top-after-real-scroll',
                 ],
             },
             dashboardAsyncContentVisibility: {
@@ -1530,13 +1529,13 @@ async function main() {
             },
             starMapLightweightView: {
                 checked: true,
-                testDataBoundary: 'authenticated production route, navigation-drawer DOM and browser resource timing; verifies directory and opted-in poetry-gallery rendering boundaries only, not graph truth, image provenance or learning outcomes',
+                testDataBoundary: 'authenticated production route, navigation-drawer DOM and browser resource timing; verifies directory and opted-in reference-33 OGL rendering boundaries only, not graph truth, image provenance or learning outcomes',
                 verifies: [
                     'reduced-motion-defaults-to-accessible-starmap-directory',
                     'closed-observatory-drawer-is-aria-hidden-and-inert-open-focuses-search-and-close-restores-trigger',
                     'directory-category-tablist-controls-panel-and-supports-arrow-home-end-navigation',
                     'three-vendor-is-not-downloaded-before-or-after-starmap-teacher-opt-in',
-                    'teacher-opt-in-renders-a-lightweight-native-poetry-gallery-with-zero-canvas',
+                    'teacher-opt-in-renders-the-reference-33-bounded-ogl-gallery-with-exactly-one-canvas',
                 ],
             },
             evolutionEmptyEvidence: {
@@ -1587,26 +1586,24 @@ async function main() {
             starMapPoetryGallery: {
                 checked: true,
                 viewport: '1440x900;390x844 touch',
-                testDataBoundary: 'isolated controlled three-poem graph with explicitly synthetic E2E relation edges and controlled local image responses, including one intentionally aborted poem image; verifies frontend node-index mapping, selection, focus transfer, responsive interaction and failure isolation only, not knowledge-graph truth, image provenance, student mastery or learning outcomes',
+                testDataBoundary: 'isolated controlled three-poem graph with explicitly synthetic E2E relation edges and three same-poem packaged WebP responses; verifies reference-33 OGL node-index mapping, selection, focus transfer and responsive interaction only, not knowledge-graph truth, image provenance, student mastery or learning outcomes',
                 verifies: [
-                    'gallery-renders-one-native-card-per-controlled-poem-without-duplicate-sphere-tiles',
-                    'arrow-navigation-updates-the-foreground-poem-without-selecting-a-node',
-                    'enter-selects-the-exact-poem-node-and-opens-the-matching-detail-title',
-                    'failed-poem-image-preserves-the-poem-selection-business-action',
-                    'closing-detail-with-button-or-escape-restores-the-originating-poem-card-focus',
-                    'select-mode-never-opens-the-generic-image-preview-dialog',
-                    'touch-scrolling-changes-the-active-poem-without-accidental-selection-or-page-overflow',
-                    'mobile-detail-sheet-is-opaque-settled-topmost-touch-blocking-and-reduced-motion-safe',
+                    'gallery-uses-one-bounded-ogl-canvas-and-three-native-controls-for-three-same-poem-webp-items',
+                    'arrow-navigation-updates-the-foreground-poem-and-enter-opens-the-exact-detail',
+                    'closing-detail-restores-the-single-canvas-focus',
+                    'no-three-vendor-svg-placeholder-edge-blur-backdrop-blur-or-idle-auto-advance',
+                    'mobile-controls-remain-at-least-44px-without-horizontal-overflow',
+                    'reduced-motion-keeps-the-gallery-static-without-running-css-animation',
                 ],
             },
             sphereGalleryLightweightResourceBoundary: {
                 checked: true,
                 viewport: '1440x900;390x844',
-                testDataBoundary: 'production-build source and browser resource-timing boundary for the two tested gallery consumers; verifies those routes do not use Three.js, WebGL, Canvas, RAF, automatic timers or infinite gallery animations, not GPU behavior on untested browsers or long-duration device memory characteristics',
+                testDataBoundary: 'production-build source and browser resource-timing boundary for the lesson-plan gallery consumer; verifies that route does not use Three.js, WebGL, Canvas, RAF, automatic timers or infinite gallery animations, not GPU behavior on untested browsers or long-duration device memory characteristics',
                 verifies: [
-                    'gallery-and-starmap-dome-source-contain-no-three-webgl-canvas-or-raf-path',
-                    'lesson-plan-and-opted-in-starmap-gallery-load-no-three-vendor-resource',
-                    'both-consumers-render-zero-canvas-elements',
+                    'lesson-plan-gallery-source-contains-no-three-webgl-canvas-or-raf-path',
+                    'lesson-plan-gallery-loads-no-three-vendor-resource',
+                    'lesson-plan-gallery-renders-zero-canvas-elements',
                     'gallery-is-manual-only-and-runs-no-infinite-web-animation',
                     'gallery-registers-no-window-level-pointer-drag-listeners',
                 ],

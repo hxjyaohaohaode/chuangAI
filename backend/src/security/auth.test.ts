@@ -154,7 +154,7 @@ describe('server authentication boundary', () => {
         const accepted = await login(app)
         expect(accepted.response.statusCode).toBe(200)
         expect(accepted.body.user).toEqual({
-            id: 'teacher-001', name: '演示教师', role: 'teacher', accountType: 'demo',
+            id: 'teacher-001', name: '曹老师', role: 'teacher', accountType: 'demo',
         })
         expect(accepted.cookie).toContain('pr_session=')
         expect(accepted.cookie).toContain('pr_csrf=')

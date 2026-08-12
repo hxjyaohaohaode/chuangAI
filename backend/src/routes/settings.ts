@@ -83,6 +83,7 @@ async function testOpenAICompatible(
     baseUrl: string,
     apiKey: string,
     model: string,
+    provider: 'deepseek' | 'mimo',
 ): Promise<TestResult> {
     const started = Date.now()
     try {
@@ -95,7 +96,15 @@ async function testOpenAICompatible(
             body: JSON.stringify({
                 model,
                 messages: [{ role: 'user', content: 'ping' }],
-                max_tokens: 1,
+                ...(provider === 'mimo'
+                    ? {
+                        max_completion_tokens: 1,
+                        thinking: { type: 'disabled' },
+                    }
+                    : {
+                        max_tokens: 1,
+                        thinking: { type: 'disabled' },
+                    }),
             }),
         }, async (res) => {
             const text = res.ok ? '' : await readBoundedProviderErrorText(res, '模型连通性检测')
@@ -199,10 +208,10 @@ async function runTest(provider: CredentialProvider): Promise<TestResult> {
         return { ok: false, message: '尚未配置密钥', latencyMs: 0 }
     }
     if (provider === 'deepseek') {
-        return testOpenAICompatible(config.deepseek.baseUrl, key, 'deepseek-v4-flash')
+        return testOpenAICompatible(config.deepseek.baseUrl, key, 'deepseek-v4-flash', 'deepseek')
     }
     if (provider === 'mimo') {
-        return testOpenAICompatible(config.mimo.baseUrl, key, 'mimo-v2.5')
+        return testOpenAICompatible(config.mimo.baseUrl, key, 'mimo-v2.5', 'mimo')
     }
     return testDashscope(key)
 }

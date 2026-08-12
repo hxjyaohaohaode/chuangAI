@@ -416,27 +416,6 @@ export function AppShell({
                         {showExitMask && <div className="pr-route-exit-mask" aria-hidden />}
                     </main>
 
-                    <footer className="pr-footer">
-                        <div className="pr-footer-inner">
-                            <span className="pr-footer-copyright">
-                                诗脉·启明 PoeticRealm AI v5.0 · 异构多智能体古诗词复习系统
-                            </span>
-                            <nav className="pr-footer-nav" aria-label="页脚导航">
-                                <a
-                                    href="/privacy"
-                                    className="pr-footer-link"
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        captureFlipRects(contentRef.current)
-                                        navigate('/privacy')
-                                    }}
-                                >
-                                    <Icon name="shield-check" size={13} />
-                                    <span>隐私政策与用户协议</span>
-                                </a>
-                            </nav>
-                        </div>
-                    </footer>
                 </div>
                 {import.meta.env.DEV && <PerformanceMonitor defaultExpanded={false} />}
             </div>

@@ -254,9 +254,9 @@ export function StarMapDome({
                     className="pr-sm-dome-gallery"
                     ariaLabel="3D 旋转诗境画廊"
                     activeIndex={safeActiveIndex}
-                    distortion={3}
-                    planeWidth={560}
-                    planeHeight={315}
+                    distortion={0}
+                    planeWidth={440}
+                    planeHeight={248}
                     onActivate={handleSelectIndex}
                     onActiveIndexChange={handleActiveIndex}
                 />
@@ -266,7 +266,7 @@ export function StarMapDome({
                 <p className="pr-sm-dome-empty" role="status">当前数据中暂无可展示的诗篇</p>
             )}
 
-            {relationRoot && (
+            {selectedNode && relationRoot && (
                 <section
                     key={`${relationLens}:${focusNodeId ?? 'archive'}`}
                     className="pr-sm-dome-relation-status"
@@ -331,7 +331,7 @@ export function StarMapDome({
                 </>
             )}
 
-            {relationRoot && poemRelationTracks.length > 0 && (
+            {selectedNode && relationRoot && poemRelationTracks.length > 0 && (
                 <section className="pr-sm-dome-poem-relations" aria-labelledby="pr-sm-dome-poem-relations-heading">
                     <h3 id="pr-sm-dome-poem-relations-heading">
                         与「{relationRoot.label}」相关的诗篇

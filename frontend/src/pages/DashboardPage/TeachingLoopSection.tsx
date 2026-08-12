@@ -2,29 +2,16 @@
  * 教学闭环六大环节区块
  *
  * ── 职责 ──
- * 1. 拉取六张卡的场景插画（后端 wan2.7-image 生成 + 落盘缓存）
+ * 1. 使用随发布包交付并逐张核验的六张 WebP，不再等待运行时生图
  * 2. 把 MagicBento 的卡片接成真实可导航的入口
- *
- * ── 为什么每个场景各发一条请求，而不是一个批量接口 ──
- * 六个场景相互独立，分开请求可以**逐张就位**：先缓存命中的（约 0.4 秒）
- * 立刻显示，需要现生成的（约 6 秒）稍后补上，页面全程不阻塞。
- * 换成批量接口就得等最慢的那张，首次进页面会空 30 秒以上。
- *
- * 图片地址与 prompt 一一对应且服务端固定，因此 `staleTime: Infinity`——
- * 同一会话内不会重复请求，也不会因为窗口聚焦而重新生成。
  */
 
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQueries } from '@tanstack/react-query'
 import type { MagicBentoCardData } from '@/components/ui/MagicBento'
 import { MagicBento } from '@/components/ui/MagicBento'
-import { api } from '@/lib/api'
 
-export interface TeachingLoopCard extends MagicBentoCardData {
-    /** 后端受控插画场景 id */
-    sceneId: string
-}
+export type TeachingLoopCard = MagicBentoCardData
 
 export interface TeachingLoopSectionProps {
     cards: TeachingLoopCard[]
@@ -32,30 +19,6 @@ export interface TeachingLoopSectionProps {
 
 export function TeachingLoopSection({ cards }: TeachingLoopSectionProps) {
     const navigate = useNavigate()
-
-    const illustrations = useQueries({
-        queries: cards.map((card) => ({
-            queryKey: ['illustration', 'scene', card.sceneId],
-            queryFn: () => api.illustration.scene(card.sceneId),
-            staleTime: Infinity,
-            gcTime: Infinity,
-            // 生图失败时后端返回 url: null 而非 5xx，所以这里几乎不会进 error 分支；
-            // 真的失败了也只重试一次——没有配图不值得反复烧生图额度。
-            retry: 1,
-        })),
-    })
-
-    /**
-     * 把插画地址并回卡片数据
-     *
-     * 没取到地址（还在生成 / 生成失败 / 密钥未配置）时不传 imageUrl。
-     * MagicBento 会保留同尺寸的 CSS 山水底图；真实图片就位后只做图层替换，
-     * 因此接口慢、404 或离线都不会留下空白，也不会引发布局跳变。
-     */
-    const cardsWithMedia: MagicBentoCardData[] = cards.map((card, i) => {
-        const url = illustrations[i]?.data?.url
-        return url ? { ...card, imageUrl: url } : card
-    })
 
     /**
      * 卡片激活 —— 走 SPA 路由而不是让 `<a href>` 整页刷新
@@ -86,7 +49,7 @@ export function TeachingLoopSection({ cards }: TeachingLoopSectionProps) {
                 </p>
             </header>
             <MagicBento
-                cards={cardsWithMedia}
+                cards={cards}
                 enableStars={true}
                 enableSpotlight={true}
                 enableBorderGlow={true}

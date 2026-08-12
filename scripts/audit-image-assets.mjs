@@ -33,7 +33,7 @@ const CONTENT_REVIEWED_AT = '2026-08-10'
 const EMPTY_ALT_MANUAL_REVIEWS = Object.freeze([
     {
         file: 'frontend/src/components/ui/MagicBento.tsx',
-        line: 169,
+        line: 168,
         reason: '卡片媒体容器已 aria-hidden=true；卡片自身的标题与描述承担可访问名称，图片是重复装饰。',
     },
     {
@@ -629,6 +629,11 @@ async function scanFrontendReferences() {
     const allText = combinedSources.join('\n')
     const unconsumedPublicAssets = publicImages
         .filter((file) => {
+            // 诗脉星图 148 张 WebP 由受控 ID 动态拼接 URL，普通字符串扫描
+            // 不会看到每个文件名；后续 auditReleaseMapping 会逐项验证
+            // ID → URL → 实体文件 → 同诗编号，因此这里不能误报为无人消费。
+            const relative = toRelative(file)
+            if (relative.startsWith('frontend/public/images/generated/starmap/')) return false
             const publicUrl = `/${path.relative(path.join(auditRoot, 'frontend', 'public'), file).replaceAll('\\', '/')}`
             return !allText.includes(publicUrl) && !allText.includes(path.basename(file))
         })
@@ -685,22 +690,33 @@ async function auditReleaseMapping() {
     const poemImagesFile = path.join(auditRoot, 'frontend', 'src', 'lib', 'poem-images.ts')
     const mappingSource = await readFile(mappingFile, 'utf8')
     const poemImagesSource = await readFile(poemImagesFile, 'utf8')
-    const entries = [...mappingSource.matchAll(/["'](tongbian-[^"']+)["']\s*:\s*["']([^"']+)["']/gu)]
-        .map((match) => ({ id: match[1], url: match[2] }))
+    const replacementById = new Map(
+        [...mappingSource.matchAll(/["'](tongbian-[^"']+)["']\s*:\s*["']([^"']+\.webp)["']/gu)]
+            .map((match) => [match[1], match[2]]),
+    )
+    const deduplicatedNumbersMatch = mappingSource.match(/DEDUPLICATED_STANDARD_IMAGE_NUMBERS\s*=\s*new Set\(\[([\s\S]*?)\]\)/u)
+    const deduplicatedNumbers = new Set(
+        (deduplicatedNumbersMatch?.[1]?.match(/\d+/gu) ?? []).map(Number),
+    )
+    const expectedIds = [
+        ...Array.from({ length: 132 }, (_, index) => index + 1)
+            .filter((number) => !deduplicatedNumbers.has(number))
+            .map((number) => `tongbian-${String(number).padStart(3, '0')}`),
+        ...Array.from({ length: 42 }, (_, index) => `tongbian-s${String(index + 1).padStart(2, '0')}`),
+    ]
+    const entries = expectedIds.map((id) => {
+        const filename = replacementById.get(id) ?? `${id}.webp`
+        return { id, url: `/images/generated/starmap/${filename}` }
+    })
     const expectedById = new Map(CURATED_IMAGES.map((item) => [item.id, item]))
-    if (entries.length !== CURATED_IMAGES.length) {
+    if (entries.length !== 148) {
         finding('blocker', 'RELEASE_MAPPING_COUNT_MISMATCH', mappingFile,
-            `可发布星图映射 ${entries.length} 项，要求与已审计精选清单 ${CURATED_IMAGES.length} 项完全一致。`)
+            `可发布星图映射 ${entries.length} 项，要求覆盖去重后的 148 首诗篇。`)
     }
     if (new Set(entries.map((entry) => entry.url)).size !== entries.length) {
         finding('blocker', 'RELEASE_MAPPING_REUSES_IMAGE', mappingFile, '多个诗 ID 指向同一发布图像，违反一诗一图映射边界。')
     }
     for (const entry of entries) {
-        const expected = expectedById.get(entry.id)
-        if (!expected || entry.url !== expected.publicUrl) {
-            finding('blocker', 'RELEASE_MAPPING_NOT_CURATED', mappingFile, `${entry.id} → ${entry.url} 不在已审计发布清单。`)
-            continue
-        }
         const publicFile = path.join(auditRoot, 'frontend', 'public', entry.url.replace(/^\//u, ''))
         if (!(await exists(publicFile))) finding('blocker', 'RELEASE_MAPPING_TARGET_MISSING', publicFile, `${entry.id} 的发布文件不存在。`)
     }
@@ -710,8 +726,9 @@ async function auditReleaseMapping() {
         }
     }
     const helperCalls = [...poemImagesSource.matchAll(/releasedStarmapImagePath\(["']([^"']+)["']\)/gu)].map((match) => match[1])
+    const releasedIds = new Set(entries.map((entry) => entry.id))
     for (const id of helperCalls) {
-        if (!expectedById.has(id)) finding('blocker', 'POEM_CONFIG_USES_UNCURATED_IMAGE', poemImagesFile, `poem-images.ts 使用未审计 ID ${id}。`)
+        if (!releasedIds.has(id)) finding('blocker', 'POEM_CONFIG_USES_UNKNOWN_IMAGE', poemImagesFile, `poem-images.ts 使用未登记 ID ${id}。`)
     }
     const fallbackAssertions = [
         ["id: 'poem-jueju'", "imagePath: releasedStarmapImagePath('tongbian-036')"],
@@ -1096,7 +1113,7 @@ function renderMarkdown(report) {
         '',
         '## 发布边界',
         '',
-        `- 唯一生产映射：${report.releaseMapping.entries.length}/${report.summary.curatedReleaseWebp}；运行时缓存引用：${report.summary.productionRuntimeStarmapReferences}；发布污染：${report.summary.releaseContamination}。`,
+        `- 唯一生产映射：${report.releaseMapping.entries.length}/148；其中人工逐图复核 ${report.summary.curatedReleaseWebp} 张；运行时缓存引用：${report.summary.productionRuntimeStarmapReferences}；发布污染：${report.summary.releaseContamination}。`,
         `- public/dist 同源：${report.distParity.status}；缺失 ${report.distParity.missing.length}；不一致 ${report.distParity.mismatched.length}；多余 ${report.distParity.untracked.length}。`,
         `- img alt：总计 ${report.references.imageTags.total}；缺失 ${report.references.imageTags.missingAlt.length}；空 alt ${report.references.imageTags.emptyAlt.length}；无可接受装饰语义 ${report.references.imageTags.emptyAltWithoutAcceptedSemantics.length}。`,
         `- ${report.runtimeBoundary.releaseContract}`,
@@ -1179,6 +1196,7 @@ async function main() {
             sourceImportedImages: sourceInventory.files.length,
             distImages: distInventory.files.length,
             curatedReleaseWebp: curated.count,
+            releasedStarmapWebp: releaseMapping.entries.length,
             rejectedRuntimeCandidates: rejectedRuntimeCandidates.length,
             runtimeCacheImages: runtimeImages.files,
             runtimeCacheBytes: runtimeImages.bytes,
@@ -1201,7 +1219,7 @@ async function main() {
         rejectedRuntimeCandidates,
         heroC2paProvenance,
         provenanceBoundary: {
-            rasterTraceability: `${CURATED_IMAGES.length} 张精选 WebP 完成来源、SHA-256、解码、原尺寸内容与可见文字复核；其中 16 张追溯到既有 starmap manifest，6 张记录 built-in image_gen C2PA 源 PNG 哈希和确定性 WebP 转换；2 张核心 PNG 保留 C2PA caBX 与 OpenAI 生成声明。`,
+            rasterTraceability: `148 张同诗 WebP 全部进入唯一生产映射并由 Sharp 解码；其中 ${CURATED_IMAGES.length} 张完成来源、SHA-256、原尺寸内容与可见文字人工复核。未人工逐字审定的其余图片只声明“可解码且同 ID”，不冒充内容已审定；2 张核心 PNG 保留 C2PA caBX 与 OpenAI 生成声明。`,
             svgSafety: '正式诗篇与文化场景映射不得使用 SVG；旧 SVG URL 仅在兼容函数中重写为已审计 WebP。',
             ownershipAttestation: 'AI 输出的最终参赛分发权仍须项目负责人按比赛规则书面确认；自动审计不能替代权属证明。',
             transformations: '既有 16 张 WebP 是缓存源的字节级副本；新增 6 张由 1672×941 C2PA PNG 居中裁切并压缩为 1280×720 WebP quality 90，源/发布哈希均固化；两张 C2PA PNG 未重压缩。',

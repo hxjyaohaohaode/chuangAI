@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-08-11T05:50:07.028Z",
+  "generatedAt": "2026-08-12T01:35:16.324Z",
   "status": "passed_with_review",
   "summary": {
-    "uniquePackages": 403,
-    "directPackages": 30,
+    "uniquePackages": 404,
+    "directPackages": 31,
     "forbiddenCopyleft": 0,
     "reviewRequired": 1,
     "sourceReviewRequired": 0,
     "packageReviewRequired": 1,
     "packageRootLicenseFilesPresent": 375,
-    "packageRootLicenseFilesAbsent": 28,
+    "packageRootLicenseFilesAbsent": 29,
     "packagesWithoutDeclaredLicense": 0
   },
   "forbidden": [],
@@ -55,7 +55,7 @@
   "controlledFrontendEvidence": {
     "evidenceRecord": "docs/audit/production-e2e-latest.json",
     "available": true,
-    "generatedAt": "2026-08-11T05:49:05.465Z",
+    "generatedAt": "2026-08-12T01:34:20.576Z",
     "routeViewportCombinations": 32,
     "warnings": 0,
     "failures": 0,
@@ -200,6 +200,11 @@
       "name": "micromark-util-types",
       "version": "2.0.0",
       "license": "MIT"
+    },
+    {
+      "name": "ogl",
+      "version": "1.0.11",
+      "license": "Unlicense"
     },
     {
       "name": "stats-gl",
@@ -5460,6 +5465,19 @@
           "content": "The MIT License (MIT)\n\nCopyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE."
         }
       ]
+    },
+    {
+      "name": "ogl",
+      "version": "1.0.11",
+      "license": "Unlicense",
+      "author": "Nathan Gordon",
+      "homepage": "https://github.com/oframe/ogl#readme",
+      "description": "WebGL Library",
+      "areas": [
+        "frontend"
+      ],
+      "direct": true,
+      "licenseFiles": []
     },
     {
       "name": "on-exit-leak-free",

@@ -202,56 +202,6 @@
         var(--surface-secondary, #f6efe3);
 }
 
-.pr-magic-bento-card__media::before,
-.pr-magic-bento-card__media::after,
-.pr-magic-bento-card__media-landscape::before,
-.pr-magic-bento-card__media-landscape::after {
-    content: '';
-    position: absolute;
-    pointer-events: none;
-}
-
-.pr-magic-bento-card__media::before {
-    width: 70px;
-    height: 70px;
-    top: 16%;
-    right: 10%;
-    border-radius: 50%;
-    background: rgb(var(--magic-bento-glow) / 0.105);
-}
-
-.pr-magic-bento-card__media::after {
-    inset: auto -5% -34% 28%;
-    height: 92%;
-    border-radius: 50% 46% 0 0;
-    background: rgb(var(--magic-bento-glow) / 0.1);
-    transform: rotate(-7deg);
-}
-
-.pr-magic-bento-card__media-landscape {
-    position: absolute;
-    inset: 0;
-}
-
-.pr-magic-bento-card__media-landscape::before {
-    inset: auto 35% -42% -14%;
-    height: 110%;
-    border-radius: 48% 52% 0 0;
-    background: rgb(var(--c-text-primary, 63 46 35) / 0.055);
-    transform: rotate(11deg);
-}
-
-.pr-magic-bento-card__media-landscape::after {
-    left: 8%;
-    right: 8%;
-    bottom: 18%;
-    height: 1px;
-    background: linear-gradient(90deg,
-            transparent,
-            rgb(var(--magic-bento-glow) / 0.22),
-            transparent);
-}
-
 .pr-magic-bento-card__image {
     position: absolute;
     z-index: 2;
@@ -259,15 +209,15 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0;
+    /* 六张入口图都是随包静态 WebP，不需要用 React 状态驱动淡入。
+     * 直接显示可避免历史返回/快速滚动时 DOM 已 loaded 但合成帧仍透明的空块。 */
+    opacity: 0.96;
     transform: scale(1.015);
-    transition:
-        opacity var(--dur-small, 200ms) var(--ease-out, ease-out),
-        transform var(--dur-large, 420ms) var(--ease-out, ease-out);
+    transition: transform var(--dur-large, 420ms) var(--ease-out, ease-out);
 }
 
 .pr-magic-bento-card__media[data-image-state='loaded'] .pr-magic-bento-card__image {
-    opacity: 0.94;
+    opacity: 0.96;
 }
 
 .pr-magic-bento-card__content {
@@ -448,11 +398,10 @@
 
     .pr-magic-bento-card::before,
     .pr-magic-bento-card::after,
-    .pr-magic-bento-card__wash,
-    .pr-magic-bento-card__stars,
     .pr-magic-bento-card__media::before,
     .pr-magic-bento-card__media::after,
-    .pr-magic-bento-card__media-landscape,
+    .pr-magic-bento-card__wash,
+    .pr-magic-bento-card__stars,
     .pr-magic-bento-card__image {
         display: none;
     }

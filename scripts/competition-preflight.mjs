@@ -215,16 +215,16 @@ try {
         readFile(path.join(rootDir, 'backend', 'src', 'security', 'bounded-response.ts'), 'utf8'),
         readFile(path.join(rootDir, 'backend', 'src', 'llm', 'mimo-client.ts'), 'utf8'),
     ])
-    const ttsResponseOk = audioBoundary.includes('mp3: 24 * 1024 * 1024')
-        && audioBoundary.includes('wav: 64 * 1024 * 1024')
-        && audioBoundary.includes('opus: 24 * 1024 * 1024')
+    const ttsResponseOk = /mp3:\s*24\s*\*\s*1024\s*\*\s*1024/u.test(audioBoundary)
+        && /wav:\s*64\s*\*\s*1024\s*\*\s*1024/u.test(audioBoundary)
+        && /opus:\s*24\s*\*\s*1024\s*\*\s*1024/u.test(audioBoundary)
         && audioBoundary.includes("new Set(['audio/mpeg', 'audio/mp3'])")
         && audioBoundary.includes("bytes.subarray(0, 4).toString('ascii') === 'RIFF'")
         && audioBoundary.includes("Buffer.from('OpusHead')")
         && boundedResponse.includes("response.headers.get('content-length')")
         && boundedResponse.includes('totalBytes > maxBytes')
         && boundedResponse.includes('await reader.cancel')
-        && mimoClient.includes('readBoundedTtsAudioResponse(response, format)')
+        && mimoClient.includes('decodeBoundedTtsAudioData(audioData, format)')
         && !mimoClient.includes('response.arrayBuffer()')
     record('security.tts-response', ttsResponseOk ? 'PASS' : 'FAIL', ttsResponseOk
         ? 'TTS 响应按 MP3/WAV/Opus 限制 MIME、魔数、声明/流式字节并取消超限读取'
@@ -689,15 +689,18 @@ const productionE2EOk = productionE2E?.hosting === 'fastify-production-same-orig
     ].every((verification) => productionE2E.lessonPlanImageGallery.verifies.includes(verification))
     && Array.isArray(productionE2E?.starMapPoetryGallery?.verifies)
     && [
-        'failed-poem-image-preserves-the-poem-selection-business-action',
-        'closing-detail-with-button-or-escape-restores-the-originating-poem-card-focus',
-        'mobile-detail-sheet-is-opaque-settled-topmost-touch-blocking-and-reduced-motion-safe',
+        'gallery-uses-one-bounded-ogl-canvas-and-three-native-controls-for-three-same-poem-webp-items',
+        'arrow-navigation-updates-the-foreground-poem-and-enter-opens-the-exact-detail',
+        'closing-detail-restores-the-single-canvas-focus',
+        'no-three-vendor-svg-placeholder-edge-blur-backdrop-blur-or-idle-auto-advance',
+        'mobile-controls-remain-at-least-44px-without-horizontal-overflow',
+        'reduced-motion-keeps-the-gallery-static-without-running-css-animation',
     ].every((verification) => productionE2E.starMapPoetryGallery.verifies.includes(verification))
     && Array.isArray(productionE2E?.sphereGalleryLightweightResourceBoundary?.verifies)
     && [
-        'gallery-and-starmap-dome-source-contain-no-three-webgl-canvas-or-raf-path',
-        'lesson-plan-and-opted-in-starmap-gallery-load-no-three-vendor-resource',
-        'both-consumers-render-zero-canvas-elements',
+        'lesson-plan-gallery-source-contains-no-three-webgl-canvas-or-raf-path',
+        'lesson-plan-gallery-loads-no-three-vendor-resource',
+        'lesson-plan-gallery-renders-zero-canvas-elements',
     ].every((verification) => productionE2E.sphereGalleryLightweightResourceBoundary.verifies.includes(verification))
     && productionE2E?.securityHeaders?.shell?.contentSecurityPolicy?.includes("default-src 'self'")
     && productionE2E?.securityHeaders?.shell?.contentSecurityPolicy?.includes("media-src 'self' blob: data:")
@@ -720,9 +723,9 @@ const productionE2EOk = productionE2E?.hosting === 'fastify-production-same-orig
     && productionE2E?.generatedMediaBoundary?.cacheControl?.includes('no-store')
     && productionE2E?.cultureDemoGalleryFallback?.checked === true
     && productionE2E?.cultureDemoGalleryFallback?.poemBound === true
-    && productionE2E?.cultureDemoGalleryFallback?.localIllustrationOnly === true
-    && productionE2E?.cultureDemoGalleryFallback?.aiGeneratedFalse === true
-    && productionE2E?.cultureDemoGalleryFallback?.fourUniqueSvgScenes === true
+    && productionE2E?.cultureDemoGalleryFallback?.packagedWanWebpOnly === true
+    && productionE2E?.cultureDemoGalleryFallback?.aiGeneratedTrue === true
+    && productionE2E?.cultureDemoGalleryFallback?.noSvgFallback === true
     && productionE2E?.cultureDemoGalleryFallback?.detailIndexReadable === true
     && productionE2E?.ttsBinaryContract?.checked === true
     && productionE2E?.ttsBinaryContract?.unauthenticatedRejected === true
@@ -917,12 +920,12 @@ const productionE2EOk = productionE2E?.hosting === 'fastify-production-same-orig
     && [
         'reduced-motion-defaults-to-accessible-starmap-directory',
         'three-vendor-is-not-downloaded-before-or-after-starmap-teacher-opt-in',
-        'teacher-opt-in-renders-a-lightweight-native-poetry-gallery-with-zero-canvas',
+        'teacher-opt-in-renders-the-reference-33-bounded-ogl-gallery-with-exactly-one-canvas',
     ].every((verification) => productionE2E.starMapLightweightView.verifies.includes(verification))
     && productionAuthE2EOk
-record('evidence.production-e2e', productionE2EOk ? 'PASS' : 'FAIL', productionE2E
+record('evidence.production-e2e', productionE2EOk ? 'PASS' : 'FAIL', (productionE2E
     ? `生产同源 E2E ${productionE2E.routeViewportCombinations} 组，${productionE2E.warnings} 警告，${productionE2E.failures} 失败；认证=${productionE2E.authMode ?? '缺失'}，认证故障失败关闭、告警单操作入口、报告历史原生表格/具名查看删除/键盘查看、答题图片堆原生按钮/大图焦点闭环/资源失败非空终态、沉浸导航关闭态语义/遮罩回焦、空通知对话框焦点兜底/窄屏视口几何、命令面板 Ctrl/Cmd+K/组合框 roving/窄屏几何/卸载回焦、命题精修模态框可见标题命名/动态视口/独立滚动/决策区、诊断学生 roving 焦点、批改进度 Space/Enter 状态切换、命题富 Markdown 题干语义隔离/详情入口/焦点归还、进化模式真实关联版本定位/陈旧边失败关闭/焦点交接、文化语境原文验收默认披露/原生详情键盘开合/窄屏几何、生成媒体会话边界、DEMO 文化图库同诗 SVG 来源与详情索引、TTS/跟读录音收尾、迟到授权取消、组件卸载设备回收与 OCR/生图/AI 对话图片引用边界、内容真实性、未认证 API、断网披露、创造任务认证发布/看板回执、命题/课堂/副驾的诗库局部降级披露、演示隔离、创新模式契约与恢复、受限环境中的二维/目录优先与 Three.js 主动加载边界、生产安全头 ${productionE2EOk ? '通过' : '缺失'}`
-    : '缺少生产同源 E2E 证据')
+    : '缺少生产同源 E2E 证据').replace('同诗 SVG 来源', '同诗 WebP 来源'))
 
 const dependencySecurity = await readJson('docs/audit/dependency-security-latest.json')
 const dependencyAuditAgeMs = dependencySecurity?.generatedAt
@@ -995,13 +998,14 @@ const imageAssetsOk = imageAuditFresh
     && imageAssets?.gate === 'PASS'
     && imageAssets?.summary?.blockers === 0
     && imageAssets?.summary?.curatedReleaseWebp === 22
+    && imageAssets?.summary?.releasedStarmapWebp === 148
     && imageAssets?.summary?.productionRuntimeStarmapReferences === 0
     && imageAssets?.summary?.productionSvgReferences === 0
     && imageAssets?.summary?.releaseContamination === 0
-    && imageAssets?.releaseMapping?.entries?.length === 22
+    && imageAssets?.releaseMapping?.entries?.length === 148
     && imageAssets?.distParity?.status === 'passed'
 record('evidence.image-assets', imageAssetsOk ? 'PASS' : 'FAIL', imageAssets
-    ? `图像门 ${imageAssets.gate}；随包精选 WebP ${imageAssets.summary?.curatedReleaseWebp ?? '未知'}/22；正式内容 SVG 引用 0；运行时缓存生产映射 ${imageAssets.summary?.productionRuntimeStarmapReferences ?? '未知'}；发布污染 ${imageAssets.summary?.releaseContamination ?? '未知'}；dist 同源 ${imageAssets.distParity?.status ?? '未知'}；输入哈希${imageTrackedInputsCurrent ? '当前' : '已变化'}；${imageAuditFresh ? '7 天内' : '已过期'}`
+    ? `图像门 ${imageAssets.gate}；随包同诗 WebP ${imageAssets.summary?.releasedStarmapWebp ?? '未知'}/148，其中逐图人工复核 ${imageAssets.summary?.curatedReleaseWebp ?? '未知'}/22；正式内容 SVG 引用 0；运行时缓存生产映射 ${imageAssets.summary?.productionRuntimeStarmapReferences ?? '未知'}；发布污染 ${imageAssets.summary?.releaseContamination ?? '未知'}；dist 同源 ${imageAssets.distParity?.status ?? '未知'}；输入哈希${imageTrackedInputsCurrent ? '当前' : '已变化'}；${imageAuditFresh ? '7 天内' : '已过期'}`
     : '缺少逐图解码、来源、引用与发布包边界审计证据')
 
 const provenance = await readJson('docs/audit/poem-provenance-latest.json')

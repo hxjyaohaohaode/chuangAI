@@ -3027,12 +3027,9 @@
     gap: var(--space-sm);
     padding: var(--space-md);
     border-radius: var(--radius-lg);
-    background-color: var(--surface-glass, rgb(var(--c-surface-primary) / 0.78));
-    background-image: var(--noise-texture);
-    background-size: 160px 160px;
-    background-blend-mode: overlay;
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    background: rgb(var(--c-surface-primary));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow: 0 16px 40px rgb(var(--c-text-primary) / 0.08);
     overflow: hidden;
     position: relative;
@@ -5082,27 +5079,15 @@
     --sm-ink: 43 39 33;
     --sm-muted: 110 103 93;
     --sm-bronze: 151 103 47;
-    background:
-        radial-gradient(circle at 52% 46%, rgb(255 255 255) 0 9%, transparent 48%),
-        linear-gradient(135deg, rgb(251 250 247), rgb(var(--sm-paper)) 52%, rgb(var(--sm-paper-deep)));
+    background: rgb(var(--sm-paper));
 }
 
 .pr-sm-universe-atmosphere {
-    opacity: .48;
-    background-image:
-        linear-gradient(rgb(var(--sm-ink) / .022) 1px, transparent 1px),
-        linear-gradient(90deg, rgb(var(--sm-ink) / .022) 1px, transparent 1px);
-    background-size: 96px 96px;
-    mask-image: linear-gradient(to bottom, black, transparent 78%);
+    display: none;
 }
 
 .pr-sm-universe .pr-sm-graph-wrap::before {
-    z-index: 4;
-    opacity: 1;
-    background:
-        linear-gradient(90deg, rgb(var(--sm-paper) / .8), transparent 17%, transparent 83%, rgb(var(--sm-paper) / .8)),
-        linear-gradient(180deg, rgb(var(--sm-paper) / .62), transparent 17%, transparent 82%, rgb(var(--sm-paper) / .76));
-    pointer-events: none;
+    display: none;
 }
 
 .pr-sm-universe-header {
@@ -5498,6 +5483,18 @@
     box-shadow: 0 24px 80px rgb(var(--sm-ink) / .1);
 }
 
+/* 发布版阅读优先：这些控件与面板必须使用实色纸面，禁止把底层图像模糊后
+ * 混进文字区域。除去 GPU backdrop pass 也能明显降低星图滚动与切换成本。 */
+.pr-sm-universe .pr-sm-universe-actions button,
+.pr-sm-universe .pr-sm-relation-lens,
+.pr-sm-universe .pr-sm-sidebar,
+.pr-sm-universe .pr-sm-floating-panel,
+.pr-sm-universe .pr-sm-floating-panel .pr-sm-panel-header {
+    background: rgb(var(--sm-paper));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
 .pr-immersive:has(.pr-sm-universe) .pr-sm-universe-header {
     right: 84px;
 }
@@ -5593,9 +5590,9 @@
          * 必须用局部纸色遮罩拦截底层卡片，避免误触与双层文字竞争。 */
         display: block;
         z-index: 47;
-        background: rgb(var(--sm-paper) / .72);
-        backdrop-filter: blur(4px) saturate(.88);
-        -webkit-backdrop-filter: blur(4px) saturate(.88);
+        background: rgb(var(--sm-paper) / .96);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
         animation: pr-sm-overlay-in 160ms cubic-bezier(.16, 1, .3, 1);
     }
 

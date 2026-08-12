@@ -331,6 +331,10 @@ export function StarMapPage() {
         () => data.nodes.filter((node) => node.type === 'Poem').length,
         [data.nodes],
     )
+    const visiblePoemNodeCount = useMemo(
+        () => universeScene.graph.nodes.filter((node) => node.type === 'Poem').length,
+        [universeScene.graph.nodes],
+    )
     const relationLensLabel = RELATION_LENSES.find((lens) => lens.id === relationLens)?.label ?? '全部诗脉'
 
     /* ---------- 渲染 ---------- */
@@ -366,24 +370,22 @@ export function StarMapPage() {
                     </div>
                     <div className="pr-sm-universe-metrics" aria-label="星图数据口径">
                         <span data-testid="starmap-library-nodes">
-                            <small>ARCHIVE · 全库</small>
-                            <strong>{universeScene.fullNodeCount}</strong>
-                            <em>节点</em>
+                            <small>诗篇总数</small>
+                            <strong>{domeNodeCount}</strong>
+                            <em>首</em>
                         </span>
                         <span data-testid="starmap-visible-nodes">
-                            <small>{canvasView === 'universe' ? 'DOME · 穹顶' : 'FILTER · 筛选'}</small>
-                            <strong>
-                                {canvasView === 'universe' ? domeNodeCount : universeScene.graph.nodes.length}
-                            </strong>
-                            <em>节点</em>
+                            <small>{canvasView === 'universe' ? '穹顶展示' : '当前筛选'}</small>
+                            <strong>{canvasView === 'universe' ? domeNodeCount : visiblePoemNodeCount}</strong>
+                            <em>首</em>
                         </span>
                         <span data-testid="starmap-visible-edges">
-                            <small>FILTERED · 筛选关系</small>
+                            <small>当前关系</small>
                             <strong>{universeScene.graph.edges.length}</strong>
                             <em>条</em>
                         </span>
                         <span data-testid="starmap-library-edges">
-                            <small>GRAPH · 可验证关系</small>
+                            <small>全库关系</small>
                             <strong>{universeScene.fullEdgeCount}</strong>
                             <em>条</em>
                         </span>

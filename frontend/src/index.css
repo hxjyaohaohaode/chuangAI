@@ -24,6 +24,17 @@
     color-scheme: light;
 }
 
+/* 生产界面禁止实时背景采样模糊。
+ * 旧版在 50 余个样式文件中累计了数百条 backdrop-filter：滚动时会不断重采样
+ * 页面像素，不仅降低文字清晰度，也会在集显、投屏和移动端形成明显掉帧。
+ * 这里用最终全局门禁统一关闭；层级继续依靠实色表面、边框与阴影表达。 */
+#root *,
+#root *::before,
+#root *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
 /* 禁用 emoji 渲染污染 —— 统一使用 SVG 图标（规范 13.1） */
 
 /* 全局通用旋转动画 —— 用于加载态图标（App.tsx Suspense fallback 等） */

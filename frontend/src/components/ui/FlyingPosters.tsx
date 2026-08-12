@@ -148,7 +148,7 @@ export const FlyingPosters = memo(function FlyingPosters({
                 canvas,
                 alpha: true,
                 antialias: window.innerWidth > 640,
-                dpr: Math.min(window.devicePixelRatio || 1, 1.5),
+                dpr: Math.min(window.devicePixelRatio || 1, 1.25),
                 powerPreference: 'high-performance',
             })
         } catch {
@@ -163,13 +163,13 @@ export const FlyingPosters = memo(function FlyingPosters({
         camera.fov = cameraFov
         camera.position.z = cameraZ
         const scene = new Transform()
-        const geometry = new Plane(gl, { widthSegments: 48, heightSegments: 1 })
+        const geometry = new Plane(gl, { widthSegments: 24, heightSegments: 1 })
         let destroyed = false
 
         // 诗库当前有 148 张图。一次性为全库创建纹理会同时触发 148 次图片解码，
-        // 并把所有位图常驻显存。固定纹理池只保留前景附近 9 张（移动端 5 张），
+        // 并把所有位图常驻显存。固定纹理池只保留前景附近 7 张（移动端 3 张），
         // 仍可循环浏览全库，但网络、解码、program 与显存成本不再随诗库线性增长。
-        const poolSize = Math.min(items.length, window.innerWidth <= 640 ? 5 : 9)
+        const poolSize = Math.min(items.length, window.innerWidth <= 640 ? 3 : 7)
         const poolCenter = Math.floor(poolSize / 2)
         const media = Array.from({ length: poolSize }, (_, poolIndex) => {
             const texture = new Texture(gl, { generateMipmaps: false })
@@ -274,7 +274,9 @@ export const FlyingPosters = memo(function FlyingPosters({
                 const positionY = (entry.offset - fractionalOffset) * itemSpacing
                 entry.mesh.position.y = positionY
                 const distance = Math.min(1, Math.abs(positionY) / Math.max(viewportWorldHeight * 0.5, 0.001))
-                entry.program.uniforms.uPosition.value = 10 + positionY * 0.42
+                // 中心卡必须以正面完整展示。旧基值 10 会令 fract(10 * .05)=.5，
+                // 恰好把中心平面旋转 90° 成一条细线；只让离中心距离驱动侧卡旋转。
+                entry.program.uniforms.uPosition.value = positionY * 0.42
                 entry.program.uniforms.uAlpha.value = entry.loaded ? 1 - distance * 0.62 : 0
             }
             renderer.render({ scene, camera })

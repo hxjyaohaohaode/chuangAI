@@ -228,10 +228,10 @@ export const StarMapSidebar = memo(function StarMapSidebar({
             sidebar.setAttribute('inert', '')
             return
         }
+        sidebar.removeAttribute('inert')
         // 打开提交时先同步解除 inert，再聚焦真实输入。额外在点击事件结束和
         // 抽屉首帧之后校准两次，避免触发按钮/浏览器默认聚焦在 React 提交后
         // 又夺回焦点；所有任务都随关闭或卸载清理，不能产生迟到焦点跳转。
-        sidebar.removeAttribute('inert')
         const focusSearch = () => searchInputRef.current?.focus({ preventScroll: true })
         focusSearch()
         const frame = window.requestAnimationFrame(focusSearch)

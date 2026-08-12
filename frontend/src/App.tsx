@@ -136,10 +136,8 @@ const AppBrandTitle = () => (
     </span>
 )
 
-/** 懒加载页面统一 Suspense fallback
- * v5.2 性能修正：minHeight 从 60vh 提升到 calc(100vh - 56px)
- *   填满 Header 以下的全部内容区，使 Footer 初始就位于视口底部，
- *   减少懒加载真实页面渲染时 Footer 的布局偏移（CLS） */
+/** 懒加载页面统一 Suspense fallback。
+ * 填满 Header 以下的内容区，避免真实页面加载时产生明显布局跳动。 */
 function PageFallback() {
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 56px)' }}>
