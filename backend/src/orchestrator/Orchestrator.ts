@@ -779,25 +779,44 @@ export class Orchestrator {
         controller: AbortController,
     ): Promise<ReturnType<BaseAgent['invoke']>> {
         const signal = controller.signal
-        const release = await this.limiter.acquire(agentId, signal)
-        // 超时/中止可以结束当前任务，但共享 Agent 的租约必须等底层调用真正
-        // 结束后才释放，避免忽略 AbortSignal 的 SDK 与下一次调用并发写状态。
-        const invocation = Promise.resolve().then(() => agent.invoke(input, ctx))
-        void invocation.finally(release).catch(() => {})
         let timer: ReturnType<typeof setTimeout> | undefined
         let onAbort: (() => void) | undefined
-        const cancelled = new Promise<never>((_, reject) => {
-            onAbort = () => reject(new DOMException('Aborted', 'AbortError'))
-            signal.addEventListener('abort', onAbort, { once: true })
+        let timedOut = false
+        // 同一个截止时间同时覆盖准入排队和实际调用。底层 SDK 即使永不结束，
+        // 后续排队任务也会按自己的截止时间退出，而不是永久占用会话槽位。
+        const deadline = new Promise<never>((_, reject) => {
             timer = setTimeout(() => {
+                timedOut = true
                 reject(new Error(`节点超时（${timeoutMs}ms）`))
                 controller.abort('node-timeout')
             }, timeoutMs)
             timer.unref?.()
+        })
+        const cancelled = new Promise<never>((_, reject) => {
+            onAbort = () => {
+                if (!timedOut) reject(new DOMException('Aborted', 'AbortError'))
+            }
+            signal.addEventListener('abort', onAbort, { once: true })
             if (signal.aborted) onAbort()
         })
         try {
-            return await Promise.race([invocation, cancelled])
+            const admission = this.limiter.acquire(agentId, signal).then((lease) => {
+                // 截止时间与准入授予同时发生时，也不能遗失刚取得的租约。
+                if (signal.aborted) {
+                    lease()
+                    throw new DOMException('Aborted', 'AbortError')
+                }
+                return lease
+            })
+            const release = await Promise.race([admission, deadline, cancelled])
+            if (signal.aborted) {
+                release()
+                throw new DOMException('Aborted', 'AbortError')
+            }
+            // 已发出的模型调用可能不响应取消；租约须在真实调用结束时释放。
+            const invocation = Promise.resolve().then(() => agent.invoke(input, ctx))
+            void invocation.finally(release).catch(() => {})
+            return await Promise.race([invocation, deadline, cancelled])
         } finally {
             if (timer) clearTimeout(timer)
             if (onAbort) signal.removeEventListener('abort', onAbort)

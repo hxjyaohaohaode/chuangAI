@@ -172,6 +172,30 @@ describe('integrated orchestrator execution', () => {
         expect(result.failedTasks).toEqual(['a'])
         expect(result.results.size).toBe(0)
     })
+    it('times out admission behind an Agent that ignores cancellation', async () => {
+        vi.useFakeTimers()
+        let settleUnderlying!: (value: unknown) => void
+        const agent = { invoke: vi.fn(() => new Promise(resolve => { settleUnderlying = resolve })) }
+        const { engine } = harness({ a: agent })
+        try {
+            const first = engine.execute(plan(task('a')), { sessionId: 'hung-first', teacherId: 't' })
+            await vi.advanceTimersByTimeAsync(0)
+            expect(agent.invoke).toHaveBeenCalledTimes(1)
+            await vi.advanceTimersByTimeAsync(60_001)
+            expect((await first).failedTasks).toEqual(['a'])
+
+            const second = engine.execute(plan(task('a')), { sessionId: 'queued-second', teacherId: 't' })
+            await vi.advanceTimersByTimeAsync(0)
+            expect(agent.invoke).toHaveBeenCalledTimes(1)
+            await vi.advanceTimersByTimeAsync(60_001)
+            expect((await second).failedTasks).toEqual(['a'])
+            expect(agent.invoke).toHaveBeenCalledTimes(1)
+        } finally {
+            settleUnderlying?.(output())
+            await vi.advanceTimersByTimeAsync(0)
+            vi.useRealTimers()
+        }
+    })
     it('cancels a paused session to terminal failure rather than hanging or reporting success', async () => {
         const a = { invoke: vi.fn((_input: unknown, ctx: { signal: AbortSignal }) => new Promise((_resolve, reject) => ctx.signal.addEventListener('abort', () => reject(new Error('cancelled')), { once: true }))) }
         const { engine } = harness({ a })
