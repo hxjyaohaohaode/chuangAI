@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=https://render.com/schema/render.yaml.json
+# Existing Render services do not rotate credentials when sync:false is added.
+# Rotate the previously published password in the Dashboard before real deployment.
 services:
   - type: web
     name: poetic-realm-ai
@@ -15,7 +17,7 @@ services:
       sizeGB: 1
     envVars:
       - key: NODE_VERSION
-        value: 20.19.0
+        value: 24.21.0
       - key: SKIP_INSTALL_DEPS
         value: "true"
       - key: NODE_ENV
@@ -29,7 +31,7 @@ services:
       - key: DEMO_MODE
         value: "false"
       - key: SEED_LEARNING_DEMO
-        value: "true"
+        value: "false"
       - key: ALLOW_UNAUTHENTICATED_NON_LOOPBACK
         value: "false"
       - key: AUTH_MODE
@@ -43,10 +45,8 @@ services:
       - key: CREDENTIAL_VAULT_MASTER_KEY
         generateValue: true
       - key: AUTH_PASSWORD_SCRYPT
-        value: "scrypt$16384$8$1$xE1QJPQtPxD7uTMsvy-jYg$Ol3joviyOl1ng1DiPNDVLdtkAZ0hSdEAZd9TEGyUPjwNIrHBWJ-O0Ffus9EisWX4g3kyCvLVOWIa8J6cYIq02A"
+        sync: false
       - key: AUTH_TEACHER_ID
         value: teacher-001
       - key: AUTH_TEACHER_NAME
-        value: 曹老师
-      - key: AUTH_TEACHER_PHONE
-        value: "13177091153"
+        value: 教师
