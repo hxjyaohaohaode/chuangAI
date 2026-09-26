@@ -7,7 +7,7 @@ def replace_once(text, old, new):
         raise RuntimeError('Source anchor mismatch: ' + old[:100])
     return text.replace(old, new, 1)
 def replace_section(text, start, end, new):
-    a = text.index(start); b = text.index(end, a)
+    a = text.index(start); b = text.index(end, a + len(start))
     return text[:a] + new + '\n\n' + text[b:]
 
 p = ROOT / 'backend/src/orchestrator/Orchestrator.ts'
@@ -38,13 +38,12 @@ if "from './runtime-policy.mjs'" not in s:
 p = ROOT / 'frontend/scripts/run-e2e-isolated.mjs'
 s = p.read_text()
 if "from '../../scripts/runtime-policy.mjs'" not in s:
-    # Place imports after an optional hashbang rather than invalidating executable scripts.
     line = "import { assertSupportedRuntime } from '../../scripts/runtime-policy.mjs'\n"
     if s.startswith('#!'):
         first, rest = s.split('\n', 1); s = first + '\n' + line + rest
     else:
         s = line + s
-    s = replace_section(s, 'function assertCompetitionNodeRuntime() {', 'assertCompetitionNodeRuntime()', "function assertCompetitionNodeRuntime() { assertSupportedRuntime('生产同源 E2E') }")
+    s = replace_section(s, 'function assertCompetitionNodeRuntime() {', '\nassertCompetitionNodeRuntime()\n', "function assertCompetitionNodeRuntime() { assertSupportedRuntime('生产同源 E2E') }")
     changes[p] = s
 p = ROOT / 'scripts/competition-preflight.mjs'
 s = p.read_text()
@@ -55,7 +54,7 @@ if "from './runtime-policy.mjs'" not in s:
     s = s.replace('>=20.19 <21', '>=24.0.0 <25').replace('Node 20', 'Node 24')
     changes[p] = s
 
-# Current prose guides are updated, while dated audit evidence is deliberately left untouched.
+# Current prose guides are updated; dated audit evidence is deliberately left untouched.
 for filename in ['README.md', 'INSTALL.md', 'DEVELOPMENT.md', 'DEPLOY_RENDER.md', 'USAGE.md']:
     p = ROOT / filename
     if not p.exists(): continue
