@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process'
 import net from 'node:net'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { isSupportedNode, NODE_ENGINE } from './runtime-policy.mjs'
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const argv = process.argv.slice(2)
@@ -97,8 +98,8 @@ const nginxExactLocationBlock = (source, routePath) => {
 
 const nodeVersion = process.versions.node
 const [nodeMajor, nodeMinor] = nodeVersion.split('.').map(Number)
-if (nodeMajor === 24 && nodeMinor >= 11) {
-    record('runtime.node', 'PASS', `Node.js ${nodeVersion} 符合运行时 >=24.11 <25`)
+if (isSupportedNode(nodeVersion)) {
+    record('runtime.node', 'PASS', `Node.js ${nodeVersion} 符合运行时 ${NODE_ENGINE}`)
 } else if (deployment === 'local' && mode === 'live') {
     record('runtime.node', 'FAIL', `本地 LIVE 放行必须使用 Node.js >=24.11 <25；当前为 ${nodeVersion}`)
 } else if (nodeMajor === 22 || (nodeMajor === 24 && nodeMinor < 11)) {
@@ -124,7 +125,7 @@ for (const area of ['backend', 'frontend']) {
     const packageJson = await readJson(`${area}/package.json`)
     const lockExists = await exists(path.join(rootDir, area, 'pnpm-lock.yaml'))
     const managerOk = packageJson?.packageManager === 'pnpm@10.34.5'
-    const engineOk = packageJson?.engines?.node === '>=24.11 <25'
+    const engineOk = packageJson?.engines?.node === NODE_ENGINE
     record(`dependencies.${area}`, lockExists && managerOk && engineOk ? 'PASS' : 'FAIL',
         `${area} 锁文件${lockExists ? '存在' : '缺失'}，包管理器${managerOk ? '已锁定' : '未锁定'}，Node 引擎${engineOk ? '已锁定 >=24.11 <25' : '未锁定'}`)
 }

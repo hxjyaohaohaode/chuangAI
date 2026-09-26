@@ -42,7 +42,7 @@ describe('credential vault', () => {
 
         const target = join(directory, 'provider-credentials.v1.json')
         const envelope = JSON.parse(readFileSync(target, 'utf8')) as { ciphertext: string }
-        envelope.ciphertext = `${envelope.ciphertext.slice(0, -1)}A`
+        envelope.ciphertext = `${envelope.ciphertext[0] === 'A' ? 'B' : 'A'}${envelope.ciphertext.slice(1)}`
         writeFileSync(target, JSON.stringify(envelope), 'utf8')
         expect(() => readCredentialVault(directory, masterKey)).toThrow(/无法解密|完整性/u)
     })

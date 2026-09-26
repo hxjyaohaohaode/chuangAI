@@ -52,7 +52,9 @@ function vaultPath(dataDir: string): string {
 
 function parseEnvelope(raw: string): VaultEnvelope {
     const parsed = JSON.parse(raw) as Partial<VaultEnvelope>
-    if (parsed.v !== 1
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)
+        || Object.keys(parsed).some((key) => !['v', 'iv', 'tag', 'ciphertext'].includes(key))
+        || parsed.v !== 1
         || typeof parsed.iv !== 'string'
         || typeof parsed.tag !== 'string'
         || typeof parsed.ciphertext !== 'string') {
@@ -106,13 +108,15 @@ export function readCredentialVault(dataDir: string, masterKey: string): VaultVa
 }
 
 export function writeCredentialVault(dataDir: string, masterKey: string, values: VaultValues): void {
+    const payload = JSON.stringify(values)
+    parseValues(payload)
     const target = vaultPath(dataDir)
     mkdirSync(dirname(target), { recursive: true })
     const iv = randomBytes(12)
     const cipher = createCipheriv('aes-256-gcm', deriveKey(masterKey), iv)
     cipher.setAAD(VAULT_AAD)
     const ciphertext = Buffer.concat([
-        cipher.update(JSON.stringify(values), 'utf8'),
+        cipher.update(payload, 'utf8'),
         cipher.final(),
     ])
     const envelope: VaultEnvelope = {
@@ -121,9 +125,11 @@ export function writeCredentialVault(dataDir: string, masterKey: string, values:
         tag: cipher.getAuthTag().toString('base64url'),
         ciphertext: ciphertext.toString('base64url'),
     }
+    const serialized = `${JSON.stringify(envelope)}\n`
+    if (Buffer.byteLength(serialized, 'utf8') > MAX_VAULT_BYTES) throw new Error('凭据保险柜异常过大')
     const temporary = join(dirname(target), `.${VAULT_FILE}.${process.pid}.${randomBytes(6).toString('hex')}.tmp`)
     try {
-        writeFileSync(temporary, `${JSON.stringify(envelope)}\n`, { encoding: 'utf8', mode: 0o600, flag: 'wx' })
+        writeFileSync(temporary, serialized, { encoding: 'utf8', mode: 0o600, flag: 'wx' })
         chmodSync(temporary, 0o600)
         renameSync(temporary, target)
         chmodSync(target, 0o600)

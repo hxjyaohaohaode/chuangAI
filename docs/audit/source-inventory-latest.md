@@ -6,22 +6,22 @@
 
 | 指标 | 数量 |
 |---|---:|
-| sourceFiles | 639 |
-| totalLines | 256237 |
-| totalNonBlankLines | 230856 |
-| typescriptFiles | 544 |
+| sourceFiles | 643 |
+| totalLines | 256308 |
+| totalNonBlankLines | 230979 |
+| typescriptFiles | 548 |
 | cssFiles | 94 |
 | sqlFiles | 1 |
-| functions | 10169 |
+| functions | 10317 |
 | backendEndpoints | 220 |
 | frontendRoutes | 25 |
 | frontendProductionRoutes | 23 |
 | frontendDevelopmentRoutes | 2 |
 | frontendApiReferences | 222 |
-| testDeclarations | 836 |
-| findings | 541 |
+| testDeclarations | 869 |
+| findings | 552 |
 
-生成时间：2026-09-26T19:00:10.780Z
+生成时间：2026-09-26T19:51:39.186Z
 
 ## 后端端点（完整）
 
@@ -244,9 +244,9 @@
 | POST | `/api/agents/export` | `backend/src/routes/workbench.ts` | 1012 |
 | POST | `/api/agents/publish` | `backend/src/routes/workbench.ts` | 1066 |
 | POST | `/api/agents/orchestrate` | `backend/src/routes/workbench.ts` | 1362 |
-| GET | `/api/auth/status` | `backend/src/security/auth.ts` | 508 |
-| POST | `/api/auth/login` | `backend/src/security/auth.ts` | 523 |
-| POST | `/api/auth/logout` | `backend/src/security/auth.ts` | 558 |
+| GET | `/api/auth/status` | `backend/src/security/auth.ts` | 516 |
+| POST | `/api/auth/login` | `backend/src/security/auth.ts` | 531 |
+| POST | `/api/auth/logout` | `backend/src/security/auth.ts` | 566 |
 
 ## 前端路由（完整）
 
@@ -377,12 +377,13 @@
 | 类型 | 命中 |
 |---|---:|
 | css-important | 220 |
-| non-null-assertion | 200 |
-| console | 72 |
+| non-null-assertion | 208 |
+| console | 74 |
 | hardcoded-localhost | 29 |
 | possible-secret | 9 |
 | todo | 9 |
 | dangerous-html | 2 |
+| explicit-any | 1 |
 
 ## 解释边界
 

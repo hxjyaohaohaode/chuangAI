@@ -1,6 +1,6 @@
 # Third-Party Notices / 第三方软件声明
 
-生成时间：2026-09-26T18:59:57.034Z
+生成时间：2026-09-26T19:50:52.959Z
 
 本项目原创部分采用根目录 `LICENSE` 中的 MIT License。该许可不覆盖下列第三方依赖、上游改编组件、字体、模型或外部服务；它们继续受各自条款约束。本文件由已安装且锁定的生产依赖树生成，不是法律意见。更换平台、依赖版本或发布形态后必须重新生成并复核。
 
@@ -13,7 +13,7 @@
 
 ## 受控前端回归证据
 
-- 证据：`docs/audit/production-e2e-latest.json`；生成时间 2026-09-26T18:43:40.089Z；路由/视口组合 32；warnings=0；failures=0。
+- 证据：`docs/audit/production-e2e-latest.json`；生成时间 2026-09-26T19:47:29.288Z；路由/视口组合 32；warnings=0；failures=0。
 - Radar、PixelSnow、TextSwitch、MagicBento、LessonPlan SphereGallery、StarMapDome 诗篇画廊及 SphereGallery 轻量资源边界的 checked 状态：{"radarDecoration":true,"pixelSnowDecoration":true,"classroomTextSwitch":true,"dashboardMagicBento":true,"lessonPlanImageGallery":true,"starMapPoetryGallery":true,"sphereGalleryLightweightResourceBoundary":true}。
 - 边界：This aggregate and its checked contracts prove only the controlled frontend behavior, accessibility, geometry, fallback and resource boundaries named in that evidence file. They do not prove image or knowledge-graph provenance, teaching outcomes, production backend availability, untested-browser GPU behavior or competition results.
 

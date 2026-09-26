@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { resolveTaskInput } from './runtime-data.js'
 import type { Intent, ParsedInstruction, SubTask } from './types.js'
 
 const MAX_TASKS = 32
@@ -191,6 +192,7 @@ export function validateExecutablePlan(
         if (edge.from === edge.to) reject(`执行边不能自环: ${edge.from}`)
     }
 
+    for (const task of parsed.data.subTasks) resolveTaskInput(task.input, task.dependencies)
     assertAcyclic(parsed.data.subTasks)
 
     const conditions = new Map<string, string>()

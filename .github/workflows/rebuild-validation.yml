@@ -1,0 +1,49 @@
+name: Runtime refactor verification
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: verified-foundation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24.21.0'
+      - name: Prepare runtime
+        run: |
+          mkdir -p "$RUNNER_TEMP/poetic-evidence"
+          corepack enable
+          corepack prepare pnpm@10.34.5 --activate
+          node --version
+          pnpm --version
+      - name: Confirm checkout contains the runtime under test
+        run: |
+          git diff --exit-code
+          git diff --cached --exit-code
+          node --check scripts/render-build.mjs
+          node --check scripts/render-start.mjs
+      - name: Runtime entrypoint and deployment contracts
+        run: |
+          set -o pipefail
+          node --test scripts/runtime-policy.test.mjs 2>&1 | tee "$RUNNER_TEMP/poetic-evidence/runtime-policy.log"
+      - name: Execute all regression gates
+        run: python3 scripts/verify-runtime-refactor.py
+      - name: Preserve raw verification evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: runtime-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/poetic-evidence/
+          retention-days: 14
+          if-no-files-found: error

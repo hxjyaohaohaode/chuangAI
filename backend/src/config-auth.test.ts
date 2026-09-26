@@ -1,5 +1,6 @@
 import { randomBytes, scryptSync } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
+import { DEMO_TEACHERS } from './security/auth.js'
 import {
     assertValidAuthConfiguration,
     buildCorsOrigins,
@@ -76,13 +77,19 @@ describe('authentication startup configuration', () => {
 
     it('密码模式要求持久强密钥和可执行的 scrypt 摘要', () => {
         expect(() => assertValidAuthConfiguration({
-            mode: 'password', sessionSecret: '', passwordScrypt: validPasswordHash(),
+            mode: 'password', teacherPhone: '13900000000', sessionSecret: '', passwordScrypt: validPasswordHash(),
         })).toThrow(/必须配置/)
         expect(() => assertValidAuthConfiguration({
-            mode: 'password', sessionSecret: 'x'.repeat(32), passwordScrypt: 'scrypt$1048576$32$1$AA$AA',
+            mode: 'password', teacherPhone: '13900000000', sessionSecret: 'x'.repeat(32), passwordScrypt: 'scrypt$1048576$32$1$AA$AA',
         })).toThrow(/可执行/)
         expect(() => assertValidAuthConfiguration({
-            mode: 'password', sessionSecret: '密'.repeat(11), passwordScrypt: validPasswordHash(),
+            mode: 'password', teacherPhone: '13900000000', sessionSecret: '密'.repeat(11), passwordScrypt: validPasswordHash(),
         })).not.toThrow()
+        expect(() => assertValidAuthConfiguration({
+            mode: 'password', sessionSecret: 'x'.repeat(32), passwordScrypt: validPasswordHash(),
+        })).toThrow(/AUTH_TEACHER_PHONE/)
+        expect(() => assertValidAuthConfiguration({
+            mode: 'password', teacherPhone: '13900000000', sessionSecret: 'x'.repeat(32), passwordScrypt: DEMO_TEACHERS[0]!.passwordScrypt,
+        })).toThrow(/必须轮换/)
     })
 })

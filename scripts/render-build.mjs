@@ -2,15 +2,9 @@ import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { delimiter, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { assertSupportedRuntime } from './runtime-policy.mjs'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-
-function assertSupportedNode() {
-    const [major, minor] = process.versions.node.split('.').map(Number)
-    if (major !== 24 || minor < 11) {
-        throw new Error(`Render 构建要求 Node >=24.11 <25，当前为 ${process.versions.node}`)
-    }
-}
 
 function runPnpm(directory, ...args) {
     // 本地机器可能同时装有多个 Node。若只按 PATH 查找 corepack，顶层虽由
@@ -51,7 +45,7 @@ function requireArtifact(relativePath) {
     if (!existsSync(artifact)) throw new Error(`构建产物缺失：${relativePath}`)
 }
 
-assertSupportedNode()
+assertSupportedRuntime('Render 构建')
 process.stdout.write(`[render-build] 使用 Node ${process.versions.node}，前后端分别使用各自冻结锁文件。\n`)
 
 // 前后端保留各自的 pnpm-lock.yaml。NODE_ENV=production 会影响安装选择，

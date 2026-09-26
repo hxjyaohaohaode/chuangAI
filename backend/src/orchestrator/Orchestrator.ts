@@ -37,6 +37,8 @@ import {
 import type { WSBroadcaster } from './websocket/broadcaster.js'
 import { evolutionEngine } from '../agents/base/evolution-engine.js'
 import { DAGScheduler } from './dag-scheduler.js'
+import { ExecutionLimiter } from './execution-limiter.js'
+import { resolveTaskInput } from './runtime-data.js'
 import { validateExecutablePlan } from './plan-validation.js'
 import {
     ORCH_EVENTS,
@@ -217,6 +219,7 @@ export class Orchestrator {
     private readonly agentRegistry: Map<string, BaseAgent>
     /** 活跃执行上下文：sessionId -> ActiveExecution */
     private readonly activeExecutions = new Map<string, ActiveExecution>()
+    private readonly limiter = new ExecutionLimiter(8, 256)
     constructor(
         private readonly router: LLMRouter,
         agents: Record<string, BaseAgent>,
@@ -358,8 +361,9 @@ export class Orchestrator {
         plan: ParsedInstruction,
         ctx: OrchestratorContext,
     ): Promise<ExecutionResult> {
+        ctx = { ...ctx }
         if (this.activeExecutions.has(ctx.sessionId)) {
-            throw new Error(`会话 ${ctx.sessionId} 已在执行，不能启动第二个调度循环`)
+            throw new Error(`会话 ${ctx.sessionId} 正在执行，拒绝重入或启动第二个调度循环`)
         }
         if (this.activeExecutions.size >= MAX_ACTIVE_EXECUTIONS) {
             throw new Error(
@@ -367,6 +371,7 @@ export class Orchestrator {
             )
         }
 
+        for (const node of plan.executionPlan.nodes) resolveTaskInput(node.input, node.dependencies)
         const execution: ActiveExecution = {
             sessionId: ctx.sessionId,
             scheduler: new DAGScheduler(plan.executionPlan),
@@ -435,7 +440,7 @@ export class Orchestrator {
         if (node?.status !== 'paused') throw new Error(`任务 ${taskId} 当前未暂停`)
         execution.pausedTasks.delete(taskId)
         execution.scheduler.modifyInput(taskId, node.input)
-        execution.ctx.onTaskUpdate?.(execution.scheduler.getNode(taskId)!)
+        this.notifyTaskUpdate(execution.ctx, execution.scheduler.getNode(taskId)!)
     }
 
     /**
@@ -458,6 +463,12 @@ export class Orchestrator {
      */
     async modify(sessionId: string, taskId: string, newInput: unknown): Promise<void> {
         const execution = this.requireActiveTask(sessionId, taskId)
+        const node = execution.scheduler.getNode(taskId)!
+        resolveTaskInput(newInput, node.dependencies)
+        const affected = execution.scheduler.getAffectedTaskIds(taskId)
+        if (affected.some((id) => id !== taskId && execution.scheduler.getNode(id)?.status === 'running')) {
+            throw new Error('下游仍在运行，请先暂停下游再修改上游')
+        }
         const controller = execution.runningControllers.get(taskId)
         if (controller) {
             execution.pausedTasks.add(taskId)
@@ -467,7 +478,10 @@ export class Orchestrator {
         if (execution.sessionController.signal.aborted) throw new Error('会话已中止')
         execution.scheduler.modifyInput(taskId, newInput)
         execution.pausedTasks.delete(taskId)
-        execution.ctx.onTaskUpdate?.(execution.scheduler.getNode(taskId)!)
+        for (const id of affected) {
+            const changed = execution.scheduler.getNode(id)
+            if (changed) this.notifyTaskUpdate(execution.ctx, changed)
+        }
     }
 
     /**
@@ -593,52 +607,40 @@ export class Orchestrator {
      */
     private async runDAGLoop(execution: ActiveExecution): Promise<void> {
         const { scheduler, sessionController } = execution
-
-        while (!scheduler.isComplete()) {
-            // 会话中止
-            if (sessionController.signal.aborted) {
-                this.abortAllRunning(execution)
-                await this.waitForRunningTasks(execution)
-                for (const node of scheduler.getAllNodes()) {
-                    if (node.status === 'pending' || node.status === 'paused') {
-                        scheduler.markSkipped(node.id, '会话已中止')
-                        const skipped = scheduler.getNode(node.id)
-                        if (skipped) execution.ctx.onTaskUpdate?.(skipped)
-                    }
-                }
-                break
-            }
-
-            // 评估条件分支
-            scheduler.evaluateConditions(scheduler.collectResults())
-
-            // 获取就绪节点
-            const ready = scheduler.getReadyNodes()
-
-            if (ready.length === 0) {
-                // 无就绪节点：检查是否有运行中任务
-                if (execution.runningControllers.size === 0) {
-                    // 无运行中任务也无就绪节点：可能全部暂停或死锁
-                    const snap = scheduler.snapshot()
-                    if (snap.paused > 0) {
-                        // 等待 resume（短暂让出事件循环）
-                        await sleep(100)
-                        continue
-                    }
-                    // 真正的死锁或完成
+        const inFlight = new Map<string, Promise<void>>()
+        try {
+            while (!scheduler.isComplete() || inFlight.size > 0) {
+                if (sessionController.signal.aborted) {
+                    this.abortAllRunning(execution)
+                    scheduler.cancel()
+                    for (const node of scheduler.getAllNodes()) this.notifyTaskUpdate(execution.ctx, node)
+                    await Promise.allSettled(inFlight.values())
                     break
                 }
-                // 等待运行中任务完成
-                await this.waitForRunningTasks(execution)
-                continue
+                scheduler.evaluateConditions(scheduler.collectResults())
+                for (const node of scheduler.getReadyNodes()) {
+                    if (inFlight.size >= 4) break
+                    if (inFlight.has(node.id)) continue
+                    const task = this.executeNode(node, execution).finally(() => { inFlight.delete(node.id) })
+                    inFlight.set(node.id, task)
+                }
+                if (inFlight.size > 0) {
+                    // 任一前驱完成即可立即调度其后继，不等待无关的慢任务。
+                    await Promise.race(inFlight.values())
+                    continue
+                }
+                if (scheduler.isComplete()) break
+                if (scheduler.snapshot().paused > 0) {
+                    await sleep(50)
+                    continue
+                }
+                throw new Error('执行图仍有未完成节点但不可调度')
             }
-
-            // 并行执行就绪节点
-            const batchPromises = ready.map((node) => this.executeNode(node, execution))
-            await Promise.allSettled(batchPromises)
-
-            // 批次完成后再次评估条件
-            scheduler.evaluateConditions(scheduler.collectResults())
+        } catch (error) {
+            this.abortAllRunning(execution)
+            scheduler.cancel('调度异常中止')
+            await Promise.allSettled(inFlight.values())
+            throw error
         }
     }
 
@@ -678,12 +680,13 @@ export class Orchestrator {
 
         // markRunning
         scheduler.markRunning(node.id)
+        const attemptRevision = scheduler.getRevision(node.id)
         this.emitTaskEvent(ORCH_EVENTS.TASK_START, ctx.sessionId, node.id, {
             agentId: node.agentId,
             inputPreview: this.previewInput(node.input),
         })
         const runningNode = scheduler.getNode(node.id)
-        if (runningNode) ctx.onTaskUpdate?.(runningNode)
+        if (runningNode) this.notifyTaskUpdate(ctx, runningNode)
 
         const startedAt = Date.now()
 
@@ -702,32 +705,39 @@ export class Orchestrator {
             // 若 A/B 测试进行中，getPromptOverride 会按流量分配返回候选或活跃版本。
             const agentCtx = evolutionEngine.injectPromptOverride(baseAgentCtx, node.agentId)
 
+            const resolvedInput = resolveTaskInput(node.input, node.dependencies, scheduler.collectResults())
             // 带超时调用
             const result = await this.invokeWithTimeout(
                 agent,
-                node.input,
+                node.agentId,
+                resolvedInput,
                 agentCtx,
                 DEFAULT_NODE_TIMEOUT_MS,
                 taskController,
             )
 
+            if (!scheduler.isCurrent(node.id, attemptRevision)) return
+            if (taskController.signal.aborted) throw new DOMException('Aborted', 'AbortError')
+            const tokens = result.usage?.promptTokens + result.usage?.completionTokens
+            if (!Number.isFinite(tokens) || tokens < 0) throw new Error('Agent 返回的 token 用量无效')
             // 成功
-            scheduler.markDone(node.id, result.output)
+            scheduler.markDone(node.id, result.output, attemptRevision)
             const latency = Date.now() - startedAt
             execution.agentInvocations.push({
                 agentId: node.agentId,
                 latencyMs: latency,
-                tokens: result.usage.promptTokens + result.usage.completionTokens,
+                tokens,
             })
 
             this.emitTaskEvent(ORCH_EVENTS.TASK_DONE, ctx.sessionId, node.id, {
                 agentId: node.agentId,
                 latencyMs: latency,
-                tokens: result.usage.promptTokens + result.usage.completionTokens,
+                tokens,
             })
             const completedNode = scheduler.getNode(node.id)
-            if (completedNode) ctx.onTaskUpdate?.(completedNode)
+            if (completedNode) this.notifyTaskUpdate(ctx, completedNode)
         } catch (err) {
+            if (!scheduler.isCurrent(node.id, attemptRevision)) return
             const isPaused = execution.pausedTasks.has(node.id)
             const reason = this.getAbortReason(taskController.signal)
 
@@ -741,16 +751,16 @@ export class Orchestrator {
             } else {
                 // 真正失败
                 const errMsg = err instanceof Error ? err.message : String(err)
-                scheduler.markFailed(node.id, errMsg)
+                scheduler.markFailed(node.id, errMsg, attemptRevision)
                 this.emitTaskEvent(ORCH_EVENTS.TASK_FAILED, ctx.sessionId, node.id, {
                     agentId: node.agentId,
                     error: errMsg,
                 })
             }
             const settledNode = scheduler.getNode(node.id)
-            if (settledNode) ctx.onTaskUpdate?.(settledNode)
+            if (settledNode) this.notifyTaskUpdate(ctx, settledNode)
         } finally {
-            execution.runningControllers.delete(node.id)
+            if (execution.runningControllers.get(node.id) === taskController) execution.runningControllers.delete(node.id)
             sessionController.signal.removeEventListener('abort', onSessionAbort)
         }
     }
@@ -762,60 +772,54 @@ export class Orchestrator {
      */
     private async invokeWithTimeout(
         agent: BaseAgent,
+        agentId: string,
         input: unknown,
         ctx: AgentContext,
         timeoutMs: number,
         controller: AbortController,
     ): Promise<ReturnType<BaseAgent['invoke']>> {
         const signal = controller.signal
-        return new Promise((resolve, reject) => {
-            let timedOut = false
-            const timer = setTimeout(() => {
-                // 超时不仅结束等待 Promise，还中止传给 Agent/SDK 的信号，
-                // 避免模型调用在编排层已失败后继续占用连接、费用和副作用。
+        let timer: ReturnType<typeof setTimeout> | undefined
+        let onAbort: (() => void) | undefined
+        let timedOut = false
+        // 同一个截止时间同时覆盖准入排队和实际调用。底层 SDK 即使永不结束，
+        // 后续排队任务也会按自己的截止时间退出，而不是永久占用会话槽位。
+        const deadline = new Promise<never>((_, reject) => {
+            timer = setTimeout(() => {
                 timedOut = true
-                signal.removeEventListener('abort', onAbort)
-                controller.abort('node-timeout')
                 reject(new Error(`节点超时（${timeoutMs}ms）`))
+                controller.abort('node-timeout')
             }, timeoutMs)
             timer.unref?.()
-
-            const onAbort = () => {
-                clearTimeout(timer)
-                if (timedOut) return
-                reject(new DOMException('Aborted', 'AbortError'))
-            }
-
-            if (signal.aborted) {
-                onAbort()
-                return
+        })
+        const cancelled = new Promise<never>((_, reject) => {
+            onAbort = () => {
+                if (!timedOut) reject(new DOMException('Aborted', 'AbortError'))
             }
             signal.addEventListener('abort', onAbort, { once: true })
-
-            agent.invoke(input, ctx).then(
-                (result) => {
-                    clearTimeout(timer)
-                    signal.removeEventListener('abort', onAbort)
-                    resolve(result)
-                },
-                (err) => {
-                    clearTimeout(timer)
-                    signal.removeEventListener('abort', onAbort)
-                    reject(err)
-                },
-            )
+            if (signal.aborted) onAbort()
         })
-    }
-
-    /**
-     * 等待所有运行中任务完成
-     *
-     * 通过轮询 runningControllers 大小判断是否全部完成。
-     * 简单但可靠，轮询间隔 50ms。
-     */
-    private async waitForRunningTasks(execution: ActiveExecution): Promise<void> {
-        while (execution.runningControllers.size > 0) {
-            await sleep(50)
+        try {
+            const admission = this.limiter.acquire(agentId, signal).then((lease) => {
+                // 截止时间与准入授予同时发生时，也不能遗失刚取得的租约。
+                if (signal.aborted) {
+                    lease()
+                    throw new DOMException('Aborted', 'AbortError')
+                }
+                return lease
+            })
+            const release = await Promise.race([admission, deadline, cancelled])
+            if (signal.aborted) {
+                release()
+                throw new DOMException('Aborted', 'AbortError')
+            }
+            // 已发出的模型调用可能不响应取消；租约须在真实调用结束时释放。
+            const invocation = Promise.resolve().then(() => agent.invoke(input, ctx))
+            void invocation.finally(release).catch(() => {})
+            return await Promise.race([invocation, deadline, cancelled])
+        } finally {
+            if (timer) clearTimeout(timer)
+            if (onAbort) signal.removeEventListener('abort', onAbort)
         }
     }
 
@@ -989,12 +993,24 @@ ${contextBlock}
         taskId: string,
         payload: Record<string, unknown>,
     ): void {
-        this.broadcaster.broadcast({
-            type,
-            timestamp: Date.now(),
-            sessionId,
-            payload: { taskId, ...payload },
-        })
+        try {
+            this.broadcaster.broadcast({
+                type,
+                timestamp: Date.now(),
+                sessionId,
+                payload: { taskId, ...payload },
+            })
+        } catch (error) {
+            console.warn('[orchestrator] 事件订阅者异常', error)
+        }
+    }
+
+    private notifyTaskUpdate(ctx: OrchestratorContext, node: SubTask): void {
+        try {
+            ctx.onTaskUpdate?.(node)
+        } catch (error) {
+            console.warn('[orchestrator] 任务观察者异常', error)
+        }
     }
 
     private previewInput(input: unknown): string {
@@ -1060,5 +1076,3 @@ export function flattenAgents(agents: {
 
 /** 仅供单测/类型校验使用：导出能力清单 */
 export { AGENT_CAPABILITIES, CAPABILITY_INDEX }
-
-

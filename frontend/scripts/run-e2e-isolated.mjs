@@ -10,6 +10,8 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { createRequire } from 'node:module'
+import { assertSupportedRuntime } from '../../scripts/runtime-policy.mjs'
 
 const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const projectRoot = path.resolve(frontendRoot, '..')
@@ -166,13 +168,7 @@ export async function assertProductionBuildFreshness({
 }
 
 function assertCompetitionNodeRuntime() {
-    const [major, minor] = process.versions.node.split('.').map(Number)
-    if (major !== 24 || minor < 11) {
-        throw new Error(
-            `生产同源 E2E 必须由锁定的 Node.js >=24.11 <25 启动；当前为 ${process.versions.node}。` +
-            '请先切换到比赛运行时后再运行，避免子进程与 better-sqlite3 原生模块发生 ABI 不匹配。',
-        )
-    }
+    assertSupportedRuntime('生产同源 E2E')
 }
 
 assertCompetitionNodeRuntime()
@@ -334,16 +330,12 @@ async function verifySecurityHeaders(baseUrl, session) {
 }
 
 async function verifyGeneratedMediaBoundary(baseUrl, session, runtimeRoot) {
-    const sourceDirectory = path.join(projectRoot, 'data', 'uploads', 'generated')
-    const entries = await fs.readdir(sourceDirectory, { withFileTypes: true })
-    const mediaFile = entries
-        .filter((entry) => entry.isFile() && !entry.isSymbolicLink() && entry.name.endsWith('.webp'))
-        .map((entry) => entry.name)
-        .sort()[0]
-    if (!mediaFile) throw new Error('生成媒体认证边界 E2E 缺少可验证的 WebP 夹具')
     const generatedDirectory = path.join(runtimeRoot, 'uploads', 'generated')
     await fs.mkdir(generatedDirectory, { recursive: true })
-    await fs.copyFile(path.join(sourceDirectory, mediaFile), path.join(generatedDirectory, mediaFile))
+    const mediaFile = 'security-fixture.webp'
+    const sharp = createRequire(path.join(backendRoot, 'package.json'))('sharp')
+    await sharp({ create: { width: 2, height: 2, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 1 } } })
+        .webp().toFile(path.join(generatedDirectory, mediaFile))
 
     const mediaUrl = `${baseUrl}/uploads/generated/${encodeURIComponent(mediaFile)}`
     const unauthenticated = await fetch(mediaUrl)
