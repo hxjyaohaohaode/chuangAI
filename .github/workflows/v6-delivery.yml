@@ -1,0 +1,35 @@
+name: v6 candidate delivery
+on:
+  push:
+    branches: [refactor/poeticrealm-v6-20260926]
+    paths: ['.delivery/**', '.github/workflows/v6-delivery.yml']
+permissions:
+  contents: write
+concurrency:
+  group: v6-candidate-delivery
+  cancel-in-progress: false
+jobs:
+  verify-and-expand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+      - name: Delivery capability check
+        run: node --version
+      - name: Expand, verify, and publish readable source to the candidate branch only
+        if: hashFiles('.delivery/manifest.json') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = 'refs/heads/refactor/poeticrealm-v6-20260926'
+          node .delivery/unpack.mjs
+          (cd v6 && npm run verify)
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- v6
+          git diff --cached --quiet && exit 0
+          git commit -m 'feat(v6): materialize hash-verified source and record Node 24 regression'
+          git push origin HEAD:refs/heads/refactor/poeticrealm-v6-20260926
