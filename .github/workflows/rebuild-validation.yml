@@ -17,7 +17,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
-          node-version: '24'
+          node-version: '24.21.0'
       - name: Prepare runtime
         run: |
           mkdir -p "$RUNNER_TEMP/poetic-evidence"
@@ -26,14 +26,26 @@ jobs:
           node --version
           pnpm --version
       - name: Integrate inspected runtime sources
-        run: python3 scripts/apply-runtime-refactor.py
+        run: |
+          python3 scripts/apply-runtime-refactor.py
+          python3 scripts/finalize-runtime-refactor.py
+          BEFORE="$(git diff --binary | sha256sum)"
+          python3 scripts/apply-runtime-refactor.py
+          python3 scripts/finalize-runtime-refactor.py
+          AFTER="$(git diff --binary | sha256sum)"
+          test "$BEFORE" = "$AFTER"
+          echo 'SOURCE_MIGRATION_IDEMPOTENT=true'
+      - name: Runtime entrypoint and deployment contracts
+        run: |
+          set -o pipefail
+          node --test scripts/runtime-policy.test.mjs 2>&1 | tee "$RUNNER_TEMP/poetic-evidence/runtime-policy.log"
       - name: Execute all regression gates
         run: python3 scripts/verify-runtime-refactor.py
       - name: Publish tested source integration to the same branch
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add -- backend/src/orchestrator/Orchestrator.ts backend/src/orchestrator/plan-validation.ts backend/src/orchestrator/session-store.ts backend/package.json frontend/package.json .node-version .nvmrc docs/runtime-verification.json
+          git add -- backend/src/orchestrator/Orchestrator.ts backend/src/orchestrator/dag-scheduler.ts backend/src/orchestrator/plan-validation.ts backend/src/orchestrator/session-store.ts backend/package.json frontend/package.json .node-version .nvmrc docs/runtime-verification.json scripts/render-build.mjs scripts/render-start.mjs scripts/competition-preflight.mjs frontend/scripts/run-e2e-isolated.mjs README.md INSTALL.md DEVELOPMENT.md DEPLOY_RENDER.md USAGE.md
           if git diff --cached --quiet; then exit 0; fi
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'refactor: integrate runtime kernel after executed full-stack regression'
           HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
