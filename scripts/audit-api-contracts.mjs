@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module'
+import { execFileSync } from 'node:child_process'
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -8,7 +9,7 @@ const projectRoot = path.resolve(scriptDir, '..')
 const require = createRequire(import.meta.url)
 const ts = require(path.join(projectRoot, 'frontend', 'node_modules', 'typescript', 'lib', 'typescript.js'))
 
-const inventoryPath = path.join(projectRoot, 'docs', 'audit', '2026-08-01-source-inventory.json')
+const inventoryPath = path.join(projectRoot, 'docs', 'audit', 'source-inventory-latest.json')
 const frontendSourceRoot = path.join(projectRoot, 'frontend', 'src')
 const outputJsonPath = path.join(projectRoot, 'docs', 'audit', 'api-contract-latest.json')
 const outputMarkdownPath = path.join(projectRoot, 'docs', 'audit', 'api-contract-latest.md')
@@ -143,6 +144,11 @@ function correctedBackendEndpoints(inventory) {
     })
 }
 
+// 必须以当前工作区重新扫描；历史日期台账不能被当成现行 API 真相源。
+execFileSync(process.execPath, [path.join(scriptDir, 'audit-source-inventory.mjs')], {
+  cwd: projectRoot,
+  stdio: 'pipe',
+})
 const inventory = JSON.parse(readFileSync(inventoryPath, 'utf8'))
 const frontendCalls = extractFrontendCalls()
 const backendEndpoints = correctedBackendEndpoints(inventory)

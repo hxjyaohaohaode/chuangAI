@@ -15,7 +15,7 @@ services:
       sizeGB: 1
     envVars:
       - key: NODE_VERSION
-        value: 20.19.0
+        value: 24.21.0
       - key: SKIP_INSTALL_DEPS
         value: "true"
       - key: NODE_ENV

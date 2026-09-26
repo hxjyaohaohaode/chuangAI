@@ -82,8 +82,8 @@ async function readControlledFrontendEvidence() {
 }
 
 function runPnpmLicenses(area) {
-    // 许可证结果属于提交物证据，必须与 package.json 的 Node 20 兼容 pnpm 锁定值一致。
-    // 不使用机器缓存的默认 pnpm，避免 pnpm 11 在 Node 20 上因 node:sqlite 而不可复现。
+    // 许可证结果属于提交物证据，必须与 package.json 的 pnpm 锁定值一致。
+    // 不使用机器缓存的默认 pnpm，避免工具版本漂移改变依赖树与许可统计。
     const args = ['pnpm@10.34.5', 'licenses', 'list', '--prod', '--json']
     const result = process.platform === 'win32'
         ? spawnSync(process.execPath, [

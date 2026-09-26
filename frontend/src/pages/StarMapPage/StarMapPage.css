@@ -5261,27 +5261,32 @@
 }
 
 .pr-sm-universe .pr-sm-relation-lens-scroll {
-    gap: 4px;
+    gap: 8px;
 }
 
 .pr-sm-universe .pr-sm-relation-chip {
     min-height: 30px;
-    padding: 0 11px;
-    border: 1px solid rgb(var(--sm-ink) / .08);
-    border-radius: 999px;
+    padding: 0 7px;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    border-radius: 0;
     color: rgb(var(--sm-muted));
-    background: rgb(var(--sm-paper));
-    box-shadow: 0 3px 10px rgb(var(--sm-ink) / .045);
+    background: transparent;
+    box-shadow: none;
     font-size: 9px;
 }
 
 .pr-sm-universe .pr-sm-relation-chip:hover {
     color: rgb(var(--sm-ink));
-    background: rgb(var(--sm-ink) / .05);
+    border-bottom-color: rgb(var(--sm-ink) / .32);
+    background: transparent;
 }
 
 .pr-sm-universe .pr-sm-relation-chip.is-active {
     color: rgb(var(--sm-paper));
+    padding-inline: 11px;
+    border: 0;
+    border-radius: 999px;
     background: rgb(var(--sm-ink));
     box-shadow: none;
 }
@@ -5484,7 +5489,6 @@
 /* 发布版阅读优先：这些控件与面板必须使用实色纸面，禁止把底层图像模糊后
  * 混进文字区域。除去 GPU backdrop pass 也能明显降低星图滚动与切换成本。 */
 .pr-sm-universe .pr-sm-universe-actions button,
-.pr-sm-universe .pr-sm-relation-lens,
 .pr-sm-universe .pr-sm-sidebar,
 .pr-sm-universe .pr-sm-floating-panel,
 .pr-sm-universe .pr-sm-floating-panel .pr-sm-panel-header {
@@ -5563,7 +5567,7 @@
 
     .pr-sm-universe .pr-sm-relation-lens {
         overflow: hidden;
-        border-radius: 14px;
+        border-radius: 0;
     }
 
     .pr-sm-universe .pr-sm-relation-lens-title {

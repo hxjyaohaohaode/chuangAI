@@ -2,13 +2,13 @@
 
 > 本报告从 `frontend/src/**/*.{ts,tsx}` 的调用表达式与后端 Fastify 路由声明生成。它能发现路径和方法漂移；动态分支、请求/响应字段语义仍需契约测试和运行时验证。
 
-生成时间：2026-08-10T07:17:09.476Z
+生成时间：2026-09-26T19:00:11.340Z
 
 | 指标 | 数量 |
 |---|---:|
-| frontendCalls | 210 |
-| backendEndpoints | 219 |
-| matched | 210 |
+| frontendCalls | 211 |
+| backendEndpoints | 220 |
+| matched | 211 |
 | missingPaths | 0 |
 | methodMismatches | 0 |
 | backendNotCalled | 17 |

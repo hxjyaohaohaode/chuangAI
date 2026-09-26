@@ -4,7 +4,7 @@
   "version": "5.0.0",
   "packageManager": "pnpm@10.34.5",
   "engines": {
-    "node": ">=20.19 <21"
+    "node": ">=24.11 <25"
   },
   "type": "module",
   "description": "诗脉·启明 PoeticRealm AI v5.0 前端 - 面向小学古诗词教学的异构多智能体 Web 应用",
@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
-    "@types/node": "^20.19.43",
+    "@types/node": "^24.19.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@types/three": "^0.169.0",

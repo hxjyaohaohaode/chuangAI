@@ -276,6 +276,11 @@ function resolveServerPrefixes(records) {
   // 认证路由与服务/钩子共处 security/auth.ts；显式登记，避免跨 register 正则把
   // 前一个无 options 的插件和后一个 prefix 对误配。
   prefixByFile.set('backend/src/security/auth.ts', '/api/auth')
+  // 报告分享路由由 report.ts 在插件内部调用注册函数，不能只扫描 server.ts 的 app.register。
+  if (records.some((record) => record.file === 'backend/src/routes/report.ts')
+      && readFileSync(path.join(projectRoot, 'backend', 'src', 'routes', 'report.ts'), 'utf8').includes('registerReportSharingRoutes(app,')) {
+    prefixByFile.set('backend/src/routes/report-sharing.ts', '/api/report')
+  }
   return prefixByFile
 }
 
@@ -371,8 +376,8 @@ const report = {
 
 const outputDirectory = path.join(projectRoot, 'docs', 'audit')
 mkdirSync(outputDirectory, { recursive: true })
-const jsonPath = path.join(outputDirectory, '2026-08-01-source-inventory.json')
-const markdownPath = path.join(outputDirectory, '2026-08-01-source-inventory.md')
+const jsonPath = path.join(outputDirectory, 'source-inventory-latest.json')
+const markdownPath = path.join(outputDirectory, 'source-inventory-latest.md')
 writeFileSync(jsonPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8')
 
 const byKind = Object.entries(
@@ -387,7 +392,7 @@ const complexFunctions = [...functionInventory]
   .sort((a, b) => b.complexity - a.complexity || b.lines - a.lines)
   .slice(0, 50)
 
-const markdown = `# 2026-08-01 全量源码资产台账\n\n` +
+const markdown = `# 当前源码资产台账\n\n` +
   `> 本文件由 \`scripts/audit-source-inventory.mjs\` 从当前工作区生成。JSON 明细包含每个文件的 SHA-256、行数、每个函数位置、每个后端端点、前端路由、API 字符串与静态风险标记。\n\n` +
   `## 汇总\n\n` +
   `| 指标 | 数量 |\n|---|---:|\n` +

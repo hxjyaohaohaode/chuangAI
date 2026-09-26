@@ -4,11 +4,11 @@
 services:
   # 前端服务 - React 18 + Vite 开发服务器
   frontend:
-    image: node:20-alpine
+    image: node:24.21.0-alpine
     working_dir: /app
     container_name: poetic-realm-frontend
     ports:
-      # demo 账号具有服务端签名会话；入口仍只绑定本机，避免公开暴露免密码演示档案。
+      # demo 账号具有服务端签名会话；入口仍只绑定本机，避免公开暴露固定口令演示档案。
       - '127.0.0.1:5173:5173'
     volumes:
       - ./frontend:/app
@@ -24,9 +24,9 @@ services:
     networks:
       - poetic-network
 
-  # 后端服务 - Node.js 20 + Fastify
+  # 后端服务 - Node.js 24 LTS + Fastify
   backend:
-    image: node:20-alpine
+    image: node:24.21.0-alpine
     working_dir: /app
     container_name: poetic-realm-backend
     # 不向宿主机发布后端端口；只允许同一 Docker 网络中的前端代理访问。

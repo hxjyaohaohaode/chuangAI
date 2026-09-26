@@ -25,6 +25,7 @@ const MODULE_PREFIXES = {
     'workbench.ts': '/api/workbench',
     'copilot.ts': '/api/copilot',
     'report.ts': '/api/report',
+    'report-sharing.ts': '/api/report',
     'recitation.ts': '/api/recitation',
     'diagnosis.ts': '/api/diagnosis',
     'creation.ts': '/api/creation',

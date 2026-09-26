@@ -10,7 +10,7 @@
 
 ## 一、核心创新点
 
-诗脉·启明不是又一个“古诗背诵 App”，而是一套面向教学场景的**认知诊断与教学决策原型**。以下三项是当前版本重点验证的产品与技术设计；“原创性”及竞品差异仍需由可检索的对比证据支撑，不能只凭项目自述下结论：
+诗脉·启明是一套面向教学场景的**认知诊断与教学决策原型**。以下能力是当前版本重点验证的产品与技术设计；“原创性”及竞品差异仍需由可检索的对比证据支撑，不能只凭项目自述下结论：
 
 ### 1. 异构多智能体协作编排（Orchestrator + 4 类子 Agent + 静态 DAG）
 
@@ -38,8 +38,8 @@
 
 | 依赖 | 版本 | 说明 |
 |------|------|------|
-| Node.js | 20.19.x LTS（`>=20.19 <21`） | 前后端与比赛机统一锁定运行时 |
-| pnpm | 10.34.5（由 Corepack 锁定） | 前后端统一包管理器；与 Node 20 运行时兼容，锁文件与依赖构建许可均纳入复现 |
+| Node.js | 24.21.0 LTS（`>=24.11 <25`） | 前后端与部署环境统一锁定运行时；Node 20 已结束官方维护 |
+| pnpm | 10.34.5（由 Corepack 锁定） | 前后端统一包管理器，锁文件与依赖构建许可纳入复现 |
 | SQLite | 内置 | 业务数据存储，无需安装 |
 | Neo4j | ≥ 5.x（可选） | 知识图谱存储，无则降级为内存图 |
 
@@ -47,18 +47,20 @@
 
 首次使用先执行 `corepack enable`；仓库 `packageManager` 字段会固定 pnpm 10.34.5。不得改用无锁的 `npm install` 生成另一套依赖树。
 
-参赛放行前执行：
+参赛演示预检执行：
 
 ```powershell
-python scripts/refresh-submission-artifacts.py
+node scripts/audit-api-contracts.mjs
 node scripts/audit-production-dependencies.mjs
 node scripts/audit-release-boundary.mjs
-node scripts/competition-preflight.mjs --mode live --deployment local --write
+node scripts/competition-preflight.mjs --mode demo --deployment local --write
 ```
 
-`refresh-submission-artifacts.py` 只会在 DOCX/PPTX 内定点同步已审计的 API、路由、测试和首屏包体数字，并在原子替换前验证 Office ZIP 完整性；随后必须保留 `提交材料/00-提交物清单与SHA256.md` 的 8/8 哈希校验结果。
+`提交材料/` 中的 Office 文件和 `scripts/refresh-submission-artifacts.py` 是早期参赛快照；脚本包含固定的旧测试数字，不能用于当前源码的软著或参赛材料。申请时按 `docs/audit/*-latest.json`、本次测试日志与 `docs/CURRENT_ARCHITECTURE_AND_COPYRIGHT.md` 重新编制材料，并由权利人核对署名、来源和哈希。
 
-本地 LIVE 放行还要求实际运行时为 Node `>=20.19 <21` 与 pnpm 10.34.5，并使用 `AUTH_MODE=password`、至少 32 字符持久会话密钥和 scrypt 密码摘要；公开 demo 教师档案只允许 DEMO 演示，不能承载真实课堂数据。
+本地 LIVE 放行还要求实际运行时为 Node `>=24.11 <25` 与 pnpm 10.34.5，并使用 `AUTH_MODE=password`、至少 32 字符持久会话密钥和 scrypt 密码摘要；公开 demo 教师档案只允许 DEMO 演示，不能承载真实课堂数据。
+
+当前代码的架构、证据边界与软著材料核对项见 [`docs/CURRENT_ARCHITECTURE_AND_COPYRIGHT.md`](./docs/CURRENT_ARCHITECTURE_AND_COPYRIGHT.md)。`docs/audit` 中带日期的报告是当时的快照，历史测试数字不能当作当前版本的回归结果。
 
 禁止把整个工作目录直接复制为参赛包：其中可能包含本地 `.env`、日志和运行数据库。放行前先验证受控发布边界，再用白名单打包器在项目目录之外生成新目录：
 
@@ -110,7 +112,7 @@ open http://localhost:5173
 
 | 角色 | 账号 | 密码 | 权限 |
 |------|------|------|------|
-| 教师演示身份 | `teacher-001` / 王雅琴 | 无密码（仅 `AUTH_MODE=demo` 的回环演示） | 12 个教师导航模块 |
+| 教师演示身份 | `teacher-001` / 曹老师 | 固定演示手机号与口令（仅 `AUTH_MODE=demo` 的回环演示；以登录页配置为准） | 12 个教师导航模块 |
 
 > 本版本只提供教师端。在线身份由 Fastify 签名 HttpOnly 会话验证；demo 只是公开演示主体，不等同现实教师身份。当前构建采用单教师本地租户，混入第二主体的数据会在启动期失败关闭；它不是校园多租户 RBAC。后端默认仅绑定 `127.0.0.1`，Compose 只把前端入口映射到宿主机回环地址，后端与 Neo4j 不发布宿主机端口。没有 TLS、学校身份源和逐资源多租户授权审计时，不得直接暴露到公网或不受信任局域网。
 

@@ -231,7 +231,8 @@ interface ClassroomState {
     /** 进入下一题 */
     next: () => Promise<void>
     /** 提交答案 */
-    submit: (studentId: string, answer: string, studentName?: string, latencyMs?: number) => Promise<boolean>
+    /** 成功返回判定结果；主观题待评返回 false；请求失败返回 null。 */
+    submit: (studentId: string, answer: string, studentName?: string, latencyMs?: number) => Promise<boolean | null>
     /** 推送启发提示 */
     pushHint: (type?: 'nudge' | 'scaffold' | 'reframe') => Promise<void>
     /** 推送讨论题 */
@@ -642,6 +643,10 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
                 discussions: [],
                 responses: [],
                 scoreEntries: [],
+                // 新课堂先清掉上一堂课的关卡/通关横幅，再以 status 响应补水。
+                // 否则慢网下会短暂显示上一堂课的榜单和诗力值。
+                quest: null,
+                lastLevelCleared: null,
                 commentStreaming: false,
                 commentText: '',
                 aiOpponent: { ...DEFAULT_AI_OPPONENT },
@@ -729,6 +734,7 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
                     currentQuestion: res.currentQuestion,
                 },
                 responses: [],
+                quest: res.quest,
                 advancing: false,
             })
             toast.info({ title: '已切换题目', message: `第 ${res.currentQuestionIndex + 1} 题` })
@@ -741,7 +747,7 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
 
     submit: async (studentId, answer, studentName, latencyMs) => {
         const { lessonId, currentQuestion } = get()
-        if (!lessonId || !currentQuestion) return false
+        if (!lessonId || !currentQuestion) return null
         try {
             const res = await api.classroom.submit(
                 lessonId,
@@ -754,8 +760,10 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
             // 乐观更新：追加到 responses
             const newResponse: StudentResponse = {
                 studentId,
+                studentName,
                 answer,
-                correct: res.correct,
+                correct: res.pendingAiReview ? undefined : res.correct,
+                pendingAiReview: res.pendingAiReview,
                 at: Date.now(),
             }
             set((state) => {
@@ -778,6 +786,9 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
                 aiGenerated: res.aiGenerated,
             }
             set({
+                // 同一端直接采用 POST 响应中的服务端权威快照；WS 仍负责
+                // 其他大屏/标签页同步。这样 WS 抖动不会让 UI 落后于数据库。
+                quest: res.quest,
                 aiMessages: appendBoundedHistory(
                     get().aiMessages,
                     [aiMessage],
@@ -788,7 +799,7 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
         } catch (err) {
             const msg = getDisplayError(err, '提交失败')
             toast.error({ title: '提交失败', message: msg })
-            return false
+            return null
         }
     },
 
@@ -1197,6 +1208,8 @@ export const useClassroomStore = create<ClassroomState>((set, get) => ({
             started: false,
             ended: false,
             status: EMPTY_STATUS,
+            quest: null,
+            lastLevelCleared: null,
             currentQuestion: undefined,
             responses: [],
             hints: [],

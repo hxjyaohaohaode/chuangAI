@@ -1,7 +1,7 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-12T01:32:14.005Z",
-  "auditRoot": "C:\\Users\\LENOVO\\Nutstore\\1\\创AI\\系统\\poetic-realm-v3",
+  "generatedAt": "2026-09-26T19:02:18.283Z",
+  "auditRoot": "D:\\项目文件\\比赛文件\\创AI比赛\\系统\\poetic-realm-v3",
   "mode": "source-and-build",
   "gate": "PASS",
   "status": "passed",
@@ -19113,8 +19113,8 @@
     },
     {
       "path": "scripts/competition-preflight.mjs",
-      "sha256": "df377676b78aeb1f5373bc2302eaf3ba7d199ab2a4bce7e42d3b9dc53eb28e42",
-      "bytes": 75088
+      "sha256": "65920d19a3f4a81a895658208d07b1ec7dff91746b7cc3d356340c50aba1111b",
+      "bytes": 75773
     },
     {
       "path": "scripts/prepare-competition-release.mjs",

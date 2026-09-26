@@ -283,38 +283,41 @@ export class SqliteMap<K, V> implements Map<K, V> {
     }
 
     /** 遍历所有 [key, value] 对 */
-    *entries(): IterableIterator<[K, V]> {
+    entries(): MapIterator<[K, V]> {
         const rows = db.prepare(`SELECT key, value FROM "${this.table}"`).all() as Array<{
             key: string
             value: string
         }>
+        const snapshot = new Map<K, V>()
         for (const row of rows) {
             try {
-                yield [row.key as K, this.deserialize(row.value)]
+                snapshot.set(row.key as K, this.deserialize(row.value))
             } catch {
                 // 跳过损坏的 JSON
             }
         }
+        return snapshot.entries()
     }
 
     /** 遍历所有 key */
-    *keys(): IterableIterator<K> {
+    keys(): MapIterator<K> {
         const rows = db.prepare(`SELECT key FROM "${this.table}"`).all() as Array<{ key: string }>
-        for (const row of rows) {
-            yield row.key as K
-        }
+        return new Map(rows.map((row) => [row.key as K, undefined])).keys()
     }
 
     /** 遍历所有 value */
-    *values(): IterableIterator<V> {
+    values(): MapIterator<V> {
         const rows = db.prepare(`SELECT value FROM "${this.table}"`).all() as Array<{ value: string }>
+        const snapshot = new Map<number, V>()
+        let index = 0
         for (const row of rows) {
             try {
-                yield this.deserialize(row.value)
+                snapshot.set(index++, this.deserialize(row.value))
             } catch {
                 // 跳过损坏的 JSON
             }
         }
+        return snapshot.values()
     }
 
     /** 回调遍历 */
@@ -324,7 +327,7 @@ export class SqliteMap<K, V> implements Map<K, V> {
         }
     }
 
-    [Symbol.iterator](): IterableIterator<[K, V]> {
+    [Symbol.iterator](): MapIterator<[K, V]> {
         return this.entries()
     }
 

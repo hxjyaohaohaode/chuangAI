@@ -97,14 +97,14 @@ const nginxExactLocationBlock = (source, routePath) => {
 
 const nodeVersion = process.versions.node
 const [nodeMajor, nodeMinor] = nodeVersion.split('.').map(Number)
-if (nodeMajor === 20 && nodeMinor >= 19) {
-    record('runtime.node', 'PASS', `Node.js ${nodeVersion} 符合锁定的比赛机运行时 >=20.19 <21`)
+if (nodeMajor === 24 && nodeMinor >= 11) {
+    record('runtime.node', 'PASS', `Node.js ${nodeVersion} 符合运行时 >=24.11 <25`)
 } else if (deployment === 'local' && mode === 'live') {
-    record('runtime.node', 'FAIL', `本地 LIVE 放行必须锁定 Node.js >=20.19 <21；当前为 ${nodeVersion}`)
-} else if (nodeMajor > 20 && nodeMajor < 25) {
-    record('runtime.node', 'WARN', `Node.js ${nodeVersion} 可用于带警告审查；比赛机须锁定 Node >=20.19 <21`)
+    record('runtime.node', 'FAIL', `本地 LIVE 放行必须使用 Node.js >=24.11 <25；当前为 ${nodeVersion}`)
+} else if (nodeMajor === 22 || (nodeMajor === 24 && nodeMinor < 11)) {
+    record('runtime.node', 'WARN', `Node.js ${nodeVersion} 可用于带警告审查；发布运行时须为 >=24.11 <25`)
 } else {
-    record('runtime.node', 'FAIL', `Node.js ${nodeVersion} 不在可审查范围 20.19 <= version < 25`)
+    record('runtime.node', 'FAIL', `Node.js ${nodeVersion} 不在可审查范围`)
 }
 
 const corepackEntry = process.platform === 'win32'
@@ -112,21 +112,21 @@ const corepackEntry = process.platform === 'win32'
     : 'corepack'
 const pnpm = process.platform === 'win32'
     // 预检在仓库根目录执行，而 packageManager 声明位于 frontend/backend。
-    // 显式指定受管版本，避免 Corepack 退回机器缓存的默认 pnpm（它可能不支持 Node 20）。
+    // 显式指定受管版本，避免 Corepack 退回机器缓存的默认 pnpm。
     ? spawnSync(process.execPath, [corepackEntry, 'pnpm@10.34.5', '--version'], { encoding: 'utf8' })
     : spawnSync(corepackEntry, ['pnpm@10.34.5', '--version'], { encoding: 'utf8' })
 const pnpmVersion = pnpm.status === 0 ? pnpm.stdout.trim() : ''
 record('runtime.pnpm', pnpmVersion === '10.34.5' ? 'PASS' : 'FAIL', pnpmVersion
-    ? `Corepack pnpm ${pnpmVersion}，要求 10.34.5（该版本支持 Node 20）`
+    ? `Corepack pnpm ${pnpmVersion}，要求 10.34.5`
     : '无法通过 Corepack 获取 pnpm 版本')
 
 for (const area of ['backend', 'frontend']) {
     const packageJson = await readJson(`${area}/package.json`)
     const lockExists = await exists(path.join(rootDir, area, 'pnpm-lock.yaml'))
     const managerOk = packageJson?.packageManager === 'pnpm@10.34.5'
-    const engineOk = packageJson?.engines?.node === '>=20.19 <21'
+    const engineOk = packageJson?.engines?.node === '>=24.11 <25'
     record(`dependencies.${area}`, lockExists && managerOk && engineOk ? 'PASS' : 'FAIL',
-        `${area} 锁文件${lockExists ? '存在' : '缺失'}，包管理器${managerOk ? '已锁定 Node 20 兼容版本' : '未锁定'}，Node 引擎${engineOk ? '已锁定 >=20.19 <21' : '未锁定'}`)
+        `${area} 锁文件${lockExists ? '存在' : '缺失'}，包管理器${managerOk ? '已锁定' : '未锁定'}，Node 引擎${engineOk ? '已锁定 >=24.11 <25' : '未锁定'}`)
 }
 
 for (const port of [3001, 5173]) {
@@ -569,13 +569,15 @@ record('evidence.bundle', bundle?.pass === true && bundle.gzipBytes <= 120000 ? 
     ? `初始 JS gzip ${bundle.gzipBytes}B / 120000B`
     : '缺少首屏包体证据')
 const api = await readJson('docs/audit/api-contract-latest.json')
-const apiOk = api?.summary?.frontendCalls === 210
-    && api?.summary?.backendEndpoints === 219
-    && api?.summary?.matched === 210
+const apiOk = Number.isInteger(api?.summary?.frontendCalls)
+    && api.summary.frontendCalls > 0
+    && Number.isInteger(api?.summary?.backendEndpoints)
+    && api.summary.backendEndpoints >= api.summary.frontendCalls
+    && api?.summary?.matched === api.summary.frontendCalls
     && api?.summary?.missingPaths === 0
     && api?.summary?.methodMismatches === 0
 record('evidence.api-contract', apiOk ? 'PASS' : 'FAIL', api
-    ? `前端调用 ${api.summary.frontendCalls}/210，后端端点 ${api.summary.backendEndpoints}/219，匹配 ${api.summary.matched}，路径缺失 ${api.summary.missingPaths}，方法错配 ${api.summary.methodMismatches}`
+    ? `前端调用 ${api.summary.frontendCalls}，后端端点 ${api.summary.backendEndpoints}，匹配 ${api.summary.matched}，路径缺失 ${api.summary.missingPaths}，方法错配 ${api.summary.methodMismatches}`
     : '缺少 API 契约证据')
 const route = await readJson('docs/audit/route-smoke-latest.json')
 const routeFailures = route?.summary?.failed ?? route?.failed ?? route?.failedCount
@@ -584,7 +586,10 @@ record('evidence.routes', routeFailures === 0 ? 'PASS' : 'FAIL', route
     : '缺少路由冒烟证据')
 const runtimeEndpoints = await readJson('docs/audit/runtime-endpoint-verification-latest.json')
 const runtimeEndpointsOk = runtimeEndpoints?.status === 'passed'
-    && runtimeEndpoints?.http?.verifiedDeclarations === 214
+    && runtimeEndpoints?.http?.verifiedDeclarations === api?.summary?.backendEndpoints - runtimeEndpoints?.websocket?.verifiedDeclarations
+    && runtimeEndpoints?.http?.verifiedDeclarations === (runtimeEndpoints?.http?.mainDestructiveRoutes ?? 0)
+        + (runtimeEndpoints?.http?.memoryGovernanceRoutes ?? 0)
+        + (runtimeEndpoints?.http?.authenticationRoutes ?? 0)
     && runtimeEndpoints?.http?.failures === 0
     && runtimeEndpoints?.websocket?.verifiedDeclarations === 1
     && runtimeEndpoints?.websocket?.unauthenticatedRejected === true
@@ -918,9 +923,13 @@ const productionE2EOk = productionE2E?.hosting === 'fastify-production-same-orig
     && productionE2E?.starMapLightweightView?.checked === true
     && Array.isArray(productionE2E?.starMapLightweightView?.verifies)
     && [
-        'reduced-motion-defaults-to-accessible-starmap-directory',
-        'three-vendor-is-not-downloaded-before-or-after-starmap-teacher-opt-in',
-        'teacher-opt-in-renders-the-reference-33-bounded-ogl-gallery-with-exactly-one-canvas',
+        'reference-33-ogl-gallery-is-the-default-view-even-under-reduced-motion',
+        'reduced-motion-stops-animation-without-replacing-layout-or-images',
+        'closed-observatory-drawer-is-aria-hidden-and-inert-open-focuses-search-and-close-restores-trigger',
+        'directory-category-tablist-controls-panel-and-supports-arrow-home-end-navigation',
+        'optional-directory-round-trip-restores-reference-33-gallery',
+        'three-vendor-is-not-downloaded-before-or-after-directory-round-trip',
+        'reference-33-bounded-ogl-gallery-uses-exactly-one-canvas',
     ].every((verification) => productionE2E.starMapLightweightView.verifies.includes(verification))
     && productionAuthE2EOk
 record('evidence.production-e2e', productionE2EOk ? 'PASS' : 'FAIL', (productionE2E

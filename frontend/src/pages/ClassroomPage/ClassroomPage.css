@@ -1432,10 +1432,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
-    padding: clamp(var(--space-md), 2vw, var(--space-xl));
+    padding: clamp(var(--space-lg), 2.4vw, var(--space-2xl));
     border-radius: var(--radius-xl);
-    background: rgb(var(--c-surface-secondary));
-    box-shadow: 0 12px 36px rgb(var(--c-text-primary) / 0.07);
+    background: rgb(var(--c-surface-elevated));
+    box-shadow: inset 0 0 0 1px rgb(var(--c-text-primary) / 0.08);
 }
 
 .pr-six-level-tiers {
@@ -1446,14 +1446,15 @@
 
 .pr-six-level-tier {
     display: flex;
-    min-height: 116px;
+    min-height: 132px;
     flex-direction: column;
     justify-content: space-between;
     gap: var(--space-sm);
     padding: var(--space-md);
-    border-radius: var(--radius-lg);
-    background-color: rgb(var(--c-surface-tertiary) / 0.72);
-    opacity: 0.62;
+    border-bottom: 3px solid rgb(var(--c-text-primary) / 0.1);
+    border-radius: var(--radius-sm);
+    background-color: rgb(var(--c-surface-tertiary) / 0.52);
+    opacity: 0.72;
     transition:
         transform var(--dur-micro) var(--ease-out),
         opacity var(--dur-micro) var(--ease-out),
@@ -1461,13 +1462,15 @@
 }
 
 .pr-six-level-tier--current {
-    background-color: rgb(var(--c-accent-primary) / 0.14);
+    border-bottom-color: rgb(var(--c-accent-primary));
+    background-color: rgb(var(--c-accent-primary) / 0.12);
     opacity: 1;
-    transform: translateY(-4px);
-    box-shadow: 0 10px 24px rgb(var(--c-accent-primary) / 0.14);
+    transform: none;
+    box-shadow: inset 0 0 0 1px rgb(var(--c-accent-primary) / 0.22);
 }
 
 .pr-six-level-tier--cleared {
+    border-bottom-color: rgb(var(--c-accent-success));
     background-color: rgb(var(--c-accent-success) / 0.12);
     opacity: 0.92;
 }
@@ -1544,11 +1547,11 @@
     flex-direction: column;
     gap: var(--space-sm);
     padding: var(--space-md) var(--space-lg);
-    background-color: var(--surface-glass);
-    backdrop-filter: blur(12px);
-    border-radius: var(--radius-lg);
-    max-height: 280px;
-    min-height: 120px;
+    background-color: rgb(var(--c-surface-elevated));
+    border-radius: var(--radius-xl);
+    box-shadow: inset 0 0 0 1px rgb(var(--c-text-primary) / 0.08);
+    max-height: 420px;
+    min-height: 180px;
 }
 
 .pr-ai-assistant-header {
@@ -1882,10 +1885,20 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
-    max-height: 194px;
+    max-height: 146px;
     padding: 2px;
     overflow-y: auto;
     scrollbar-gutter: stable;
+}
+
+.pr-student-input-roster-status {
+    min-height: 18px;
+    color: rgb(var(--c-text-tertiary));
+    font-size: var(--text-2xs);
+}
+
+.pr-student-input-roster-status.is-error {
+    color: rgb(var(--c-accent-error));
 }
 
 .pr-student-input-name,
@@ -1938,7 +1951,7 @@
     align-items: center;
     gap: var(--space-xs);
     width: 100%;
-    min-height: 38px;
+    min-height: 44px;
     padding: var(--space-xs) var(--space-sm);
     border: 0;
     border-radius: var(--radius-xs);

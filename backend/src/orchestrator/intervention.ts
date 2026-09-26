@@ -14,7 +14,7 @@
  * 3. 调用 Orchestrator 的底层 pause/resume/abort/modify
  * 4. 通过 broadcaster 推送介入事件
  *
- * 对 resume 与 modifyAndRerun，会触发后台重新执行（不阻塞 HTTP 请求）。
+ * 恢复与修改由当前会话已有的执行循环继续调度，不启动第二条执行循环。
  */
 
 import type { Orchestrator } from './Orchestrator.js'
@@ -56,7 +56,7 @@ export class InterventionManager {
         }
 
         // 调用底层暂停
-        this.orchestrator.pause(taskId)
+        await this.orchestrator.pause(sessionId, taskId)
 
         // 更新 SessionStore（executeNode 完成后会通过 onTaskUpdate 同步，
         // 但这里也主动更新以减少延迟）
@@ -75,7 +75,7 @@ export class InterventionManager {
      * 1. 校验 session 与 task 存在且为 paused
      * 2. 调用 orchestrator.resume 重置为 pending
      * 3. 广播 orch:task:resumed 事件
-     * 4. 后台触发重新执行（不阻塞）
+     * 4. 由原执行循环继续调度
      */
     async resume(sessionId: string, taskId: string): Promise<void> {
         const session = this.sessionStore.getSession(sessionId)
@@ -91,27 +91,14 @@ export class InterventionManager {
         }
 
         // 调用底层恢复
-        this.orchestrator.resume(taskId)
+        this.orchestrator.resume(sessionId, taskId)
 
         this.broadcastIntervention(ORCH_EVENTS.TASK_RESUMED, sessionId, {
             taskId,
             agentId: task.agentId,
         })
 
-        // 后台触发重新执行（execute 会复用已有的调度器状态）
-        if (session.currentPlan) {
-            void this.orchestrator.execute(session.currentPlan, {
-                sessionId,
-                teacherId: session.teacherId,
-                classId: session.classId,
-            }).catch((err) => {
-                // 后台执行错误仅记录，不抛出（已通过事件推送）
-                this.broadcastIntervention(ORCH_EVENTS.TASK_FAILED, sessionId, {
-                    taskId,
-                    error: `恢复执行失败: ${err instanceof Error ? err.message : String(err)}`,
-                })
-            })
-        }
+        // 原执行循环仍持有该会话的调度器，会在下一轮拾取 pending 任务。
     }
 
     /**
@@ -145,7 +132,7 @@ export class InterventionManager {
      * 1. 校验 session 与 task 存在
      * 2. 调用 orchestrator.modify（中止当前 + 修改输入 + 重置 pending）
      * 3. 广播 orch:task:resumed 事件
-     * 4. 后台触发重新执行
+     * 4. 由原执行循环使用新输入继续调度
      */
     async modifyAndRerun(sessionId: string, taskId: string, newInput: unknown): Promise<void> {
         const session = this.sessionStore.getSession(sessionId)
@@ -161,7 +148,7 @@ export class InterventionManager {
         }
 
         // 调用底层修改（会中止当前运行 + 重置状态）
-        this.orchestrator.modify(taskId, newInput)
+        await this.orchestrator.modify(sessionId, taskId, newInput)
 
         // 更新 SessionStore
         this.sessionStore.updateTaskState(sessionId, {
@@ -180,19 +167,7 @@ export class InterventionManager {
             reason: 'teacher-modify',
         })
 
-        // 后台触发重新执行
-        if (session.currentPlan) {
-            void this.orchestrator.execute(session.currentPlan, {
-                sessionId,
-                teacherId: session.teacherId,
-                classId: session.classId,
-            }).catch((err) => {
-                this.broadcastIntervention(ORCH_EVENTS.TASK_FAILED, sessionId, {
-                    taskId,
-                    error: `修改后重跑失败: ${err instanceof Error ? err.message : String(err)}`,
-                })
-            })
-        }
+        // 不创建第二个执行循环，原循环会使用修改后的权威输入继续调度。
     }
 
     /**

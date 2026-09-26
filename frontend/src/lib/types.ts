@@ -333,6 +333,8 @@ export interface StudentResponse {
     studentName?: string
     answer: string
     correct?: boolean
+    /** 主观题已提交但 AI 尚未给出最终判定 */
+    pendingAiReview?: boolean
     /** AI 批改得分（速答 PK 模式由后端计算） */
     score?: number
     at: number
@@ -406,7 +408,17 @@ export interface ClassroomStatus {
 export interface SubmitResponse {
     correct: boolean
     feedback: string
-    aiGenerated: true
+    pendingAiReview: boolean
+    gradedBy: 'rule' | 'pending'
+    quest: QuestSnapshot
+    delta: {
+        power: number
+        combo: number
+        levelCleared: boolean
+        nextLevel: string | null
+        allCleared: boolean
+    }
+    aiGenerated: boolean
 }
 
 /** 启发提示响应 */

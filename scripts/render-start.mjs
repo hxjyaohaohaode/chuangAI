@@ -7,8 +7,8 @@ const serverEntry = resolve(repositoryRoot, 'backend', 'dist', 'server.js')
 const frontendEntry = resolve(repositoryRoot, 'frontend', 'dist', 'index.html')
 
 const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number)
-if (nodeMajor !== 20 || nodeMinor < 19) {
-    throw new Error(`运行时要求 Node >=20.19 <21，当前为 ${process.versions.node}`)
+if (nodeMajor !== 24 || nodeMinor < 11) {
+    throw new Error(`运行时要求 Node >=24.11 <25，当前为 ${process.versions.node}`)
 }
 if (!existsSync(serverEntry) || !existsSync(frontendEntry)) {
     throw new Error('生产构建产物缺失；请先执行 node scripts/render-build.mjs')

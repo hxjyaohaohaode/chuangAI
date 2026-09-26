@@ -61,6 +61,14 @@ function parseEnvelope(raw: string): VaultEnvelope {
     return parsed as VaultEnvelope
 }
 
+function decodeCanonicalBase64Url(value: string): Buffer {
+    if (!/^[A-Za-z0-9_-]+$/u.test(value)) throw new Error('凭据保险柜格式无效')
+    const decoded = Buffer.from(value, 'base64url')
+    // Node 的解码器容忍非规范尾位；这种文本篡改可能解成同一字节串。
+    if (decoded.toString('base64url') !== value) throw new Error('凭据保险柜完整性校验失败')
+    return decoded
+}
+
 function parseValues(raw: string): VaultValues {
     const parsed = JSON.parse(raw) as Record<string, unknown>
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
@@ -81,9 +89,9 @@ export function readCredentialVault(dataDir: string, masterKey: string): VaultVa
     const raw = readFileSync(target, 'utf8')
     if (Buffer.byteLength(raw, 'utf8') > MAX_VAULT_BYTES) throw new Error('凭据保险柜异常过大')
     const envelope = parseEnvelope(raw)
-    const iv = Buffer.from(envelope.iv, 'base64url')
-    const tag = Buffer.from(envelope.tag, 'base64url')
-    const ciphertext = Buffer.from(envelope.ciphertext, 'base64url')
+    const iv = decodeCanonicalBase64Url(envelope.iv)
+    const tag = decodeCanonicalBase64Url(envelope.tag)
+    const ciphertext = decodeCanonicalBase64Url(envelope.ciphertext)
     if (iv.length !== 12 || tag.length !== 16 || ciphertext.length === 0) {
         throw new Error('凭据保险柜格式无效')
     }

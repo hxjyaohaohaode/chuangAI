@@ -96,6 +96,11 @@ export class SessionStore {
         return session
     }
 
+    /** 广播权限查询不改变 LRU 次序，避免高频事件触发检查点写入。 */
+    getSessionOwner(id: string): string | undefined {
+        return this.sessions.get(id)?.teacherId
+    }
+
     /**
      * 更新会话状态
      *

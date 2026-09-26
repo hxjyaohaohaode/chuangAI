@@ -312,7 +312,7 @@ export const WorkbenchToolbar = memo(function WorkbenchToolbar({ onPublish }: Wo
                 onClose={() => {
                     if (!isExporting) setExportModalOpen(false)
                 }}
-                size="md"
+                size="lg"
                 title="导出题卡文档"
                 footer={
                     <div className="pr-wb-export-footer">

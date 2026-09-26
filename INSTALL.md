@@ -24,8 +24,8 @@
 
 | 组件 | 最低版本 | 推荐版本 | 用途说明 |
 | --- | --- | --- | --- |
-| Node.js | 20.19.0 LTS | 当前 Node 20 LTS | 前后端 JavaScript 运行时（Fastify 5 与构建工具要求） |
-| pnpm | 10.34.5 | 10.34.5 | 由 Corepack 按 `packageManager` 字段锁定；该版本支持 Node 20，使用仓库锁文件复现依赖 |
+| Node.js | 24.21.0 LTS | >=24.11 <25 | 前后端 JavaScript 运行时 |
+| pnpm | 10.34.5 | 10.34.5 | 由 Corepack 按 `packageManager` 字段锁定，使用仓库锁文件复现依赖 |
 | Docker Engine | 24.0 | 27.0 | 容器运行时 |
 | Docker Compose | v2.20 | v2.29 | 多容器编排工具 |
 | Git | 2.40 | 2.45 | 版本控制（克隆源码） |
@@ -127,7 +127,7 @@ docker compose up -d
 
 首次启动会执行以下操作；耗时取决于镜像源、依赖源和网络，不承诺固定分钟数：
 
-1. 拉取 `node:20-alpine` 与 `neo4j:5-community` 镜像
+1. 拉取 `node:24.21.0-alpine` 与 `neo4j:5-community` 镜像
 2. 在容器内安装前后端 npm 依赖
 3. 初始化 Neo4j 数据库（含 APOC 插件）
 4. 启动后端时会自动创建 SQLite 学情数据库并写入种子数据（含示例班级与 Prompt 配方）
@@ -477,24 +477,24 @@ sqlite3 backend/data/poetic-realm.db ".backup '/opt/backup/poetic-realm-$(date +
 
 > 发行版版本、CPU 架构、官方软件源和安全策略可能不同。不要假设代号、包名或 Docker 官方源完全一致；先查目标系统官方文档与组织软件源策略。
 
-### 5.2 安装 Node.js 20 LTS（统信 UOS 示例）
+### 5.2 安装 Node.js 24 LTS（统信 UOS 示例）
 
 ```bash
 # 更新包索引
 sudo apt update
 
 # 安装 NodeSource 仓库（提供官方 LTS 版本）
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 
-# 安装 Node.js 20（含 npm）
+# 安装 Node.js 24（含 npm）
 sudo apt install -y nodejs
 
 # 验证版本
-node --version    # 预期 v20.x.x
-npm --version     # 预期 10.x.x
+node --version    # 预期 v24.x.x，且不低于 v24.11.0
+npm --version
 ```
 
-> 如果系统源没有 Node.js 20.19+，应优先采用组织批准的运行时或容器镜像。是否允许 NodeSource 由目标单位的软件源与供应链策略决定。
+> 如果系统源没有 Node.js 24.11+，应优先采用组织批准的运行时或容器镜像。是否允许 NodeSource 由目标单位的软件源与供应链策略决定。
 
 ### 5.3 安装 Docker Engine
 
@@ -671,26 +671,26 @@ docker compose exec backend ls -la /app/data
 
 **现象**：启动时报错 `Error: require() of ES Module` 或 `SyntaxError: Cannot use import statement outside a module`。
 
-**原因**：本项目前后端均使用 ES Modules（`"type": "module"`），Fastify 5 与构建链要求 Node.js 20.19.0 及以上版本。
+**原因**：本项目前后端均使用 ES Modules（`"type": "module"`），发布契约要求 Node.js `>=24.11 <25`。
 
 **排查**：
 
 ```bash
 node --version
-# 若低于 v20.19.0，需升级
+# 若不在 >=24.11 <25，需切换运行时
 ```
 
 **解决方案**：
 
 ```bash
 # 使用 nvm 升级 Node.js（推荐）
-nvm install 20
-nvm use 20
-nvm alias default 20
+nvm install 24.21.0
+nvm use 24.21.0
+nvm alias default 24.21.0
 
 # 或使用 n（npm 全局包）
 sudo npm install -g n
-sudo n 20
+sudo n 24.21.0
 ```
 
 ### 6.6 better-sqlite3 原生模块编译失败
@@ -709,7 +709,7 @@ sudo n 20
 sudo apt install -y python3 make g++ build-essential
 ```
 
-> `node:20-alpine` 不应被假设包含完整原生编译工具链；优先使用依赖提供的匹配预编译二进制。若目标架构需要源码编译，应在自建镜像中显式安装并固定 `python3 make g++`，再做供应链与体积复审。
+> `node:24.21.0-alpine` 不应被假设包含完整原生编译工具链；优先使用依赖提供的匹配预编译二进制。若目标架构需要源码编译，应在自建镜像中显式安装并固定 `python3 make g++`，再做供应链与体积复审。
 
 ### 6.7 前端无法连接后端 WebSocket
 
@@ -767,7 +767,7 @@ docker volume rm poetic-realm-v3_frontend_node_modules \
                  poetic-realm-v3_neo4j_logs
 
 # 步骤三（可选）：删除 Docker 镜像
-docker rmi node:20-alpine neo4j:5-community
+docker rmi node:24.21.0-alpine neo4j:5-community
 ```
 
 ### 7.2 本地开发模式卸载

@@ -557,7 +557,7 @@ export const IntelligentRecommendation = memo(function IntelligentRecommendation
                 onClose={() => {
                     if (!isComposing) setComposeModalOpen(false)
                 }}
-                size="md"
+                size="lg"
                 title="智能组卷参数"
                 footer={
                     <div className="pr-wb-recommend-compose-footer">

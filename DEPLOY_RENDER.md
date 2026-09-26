@@ -4,7 +4,7 @@
 
 ## 1. 已固化的部署契约
 
-- Render 原生 Node 运行时，Node `20.19.0`；应用自身再次校验 `>=20.19 <21`。
+- Render 原生 Node 运行时，Node `24.21.0`；应用自身再次校验 `>=24.11 <25`。
 - `scripts/render-build.mjs` 分别使用 `frontend/pnpm-lock.yaml` 与 `backend/pnpm-lock.yaml` 执行 `pnpm install --frozen-lockfile --prod=false`，不会制造或合并第三套锁文件。
 - 前端先构建到 `frontend/dist`，后端构建到 `backend/dist`；生产时由 Fastify 同源托管前端、API、SSE、WebSocket 和受保护媒体。
 - Web Service 监听 Render 注入的 `PORT`，并强制 `HOST=0.0.0.0`。

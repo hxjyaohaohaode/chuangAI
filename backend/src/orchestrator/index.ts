@@ -131,7 +131,7 @@ export function initOrchestrator(fastify: FastifyInstance): {
     proactive: ProactiveIntelligence
     traceStore: TraceStore
 } {
-    const broadcaster = new WSBroadcaster(fastify)
+    const broadcaster = new WSBroadcaster(fastify, (sessionId) => sessionStore.getSessionOwner(sessionId))
     const flatAgents = flattenAgents(agents)
     const orchestrator = new Orchestrator(router, flatAgents, broadcaster, billing)
     const intervention = new InterventionManager(orchestrator, sessionStore, broadcaster)

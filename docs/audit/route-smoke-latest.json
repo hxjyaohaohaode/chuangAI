@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-08-11T03:15:56.836Z",
-  "baseUrl": "http://127.0.0.1:51419",
+  "generatedAt": "2026-09-26T18:57:37.058Z",
+  "baseUrl": "http://127.0.0.1:60822",
   "authentication": "signed-session-with-csrf",
   "timeoutMs": 20000,
-  "routeCount": 206,
-  "passedCount": 206,
+  "routeCount": 211,
+  "passedCount": 211,
   "failedCount": 0,
   "failures": [],
   "results": [
@@ -14,7 +14,7 @@
       "declaredPath": "/orchestrate",
       "path": "/api/agents/orchestrate",
       "status": 400,
-      "durationMs": 36,
+      "durationMs": 34,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"task\",\"message\":\"Invalid literal value, expected \\\"question_generate\\\"\"},{\"field\":\"params\",\"message\":\"Required\"}]}"
@@ -25,7 +25,7 @@
       "declaredPath": "/asr",
       "path": "/api/ai/asr",
       "status": 400,
-      "durationMs": 7,
+      "durationMs": 5,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"INVALID_MULTIPART\",\"message\":\"音频上传解析失败\"}"
@@ -36,7 +36,7 @@
       "declaredPath": "/chat",
       "path": "/api/ai/chat",
       "status": 400,
-      "durationMs": 5,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"messages\",\"message\":\"Required\"}]}"
@@ -47,7 +47,7 @@
       "declaredPath": "/image-generate",
       "path": "/api/ai/image-generate",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"prompt\",\"message\":\"Required\"}]}"
@@ -58,7 +58,7 @@
       "declaredPath": "/tts",
       "path": "/api/ai/tts",
       "status": 400,
-      "durationMs": 5,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"text\",\"message\":\"Required\"}]}"
@@ -80,7 +80,7 @@
       "declaredPath": "/:lessonId/after-action-report",
       "path": "/api/classroom/audit-invalid-lessonId/after-action-report",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"复盘报告尚未生成，请先调用 POST /:lessonId/after-action-report/generate\"}"
@@ -102,7 +102,7 @@
       "declaredPath": "/:lessonId/ai/followup",
       "path": "/api/classroom/audit-invalid-lessonId/ai/followup",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"questionId\",\"message\":\"Required\"}]}"
@@ -135,7 +135,7 @@
       "declaredPath": "/:lessonId/ai/suggest",
       "path": "/api/classroom/audit-invalid-lessonId/ai/suggest",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"questionId\",\"message\":\"Required\"},{\"field\":\"studentId\",\"message\":\"Required\"}]}"
@@ -146,7 +146,7 @@
       "declaredPath": "/:lessonId/ai/supplement",
       "path": "/api/classroom/audit-invalid-lessonId/ai/supplement",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"questionId\",\"message\":\"Required\"}]}"
@@ -157,7 +157,7 @@
       "declaredPath": "/:lessonId/dance/event",
       "path": "/api/classroom/audit-invalid-lessonId/dance/event",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"actor\",\"message\":\"Required\"},{\"field\":\"subType\",\"message\":\"Required\"},{\"field\":\"content\",\"message\":\"Required\"}]}"
@@ -168,7 +168,7 @@
       "declaredPath": "/:lessonId/dance/start",
       "path": "/api/classroom/audit-invalid-lessonId/dance/start",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"课堂不存在或已结束\"}"
@@ -190,7 +190,7 @@
       "declaredPath": "/:lessonId/discuss",
       "path": "/api/classroom/audit-invalid-lessonId/discuss",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"questionId\",\"message\":\"Required\"}]}"
@@ -212,7 +212,7 @@
       "declaredPath": "/:lessonId/hint",
       "path": "/api/classroom/audit-invalid-lessonId/hint",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"questionId\",\"message\":\"Required\"}]}"
@@ -223,7 +223,7 @@
       "declaredPath": "/:lessonId/mode",
       "path": "/api/classroom/audit-invalid-lessonId/mode",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"mode\",\"message\":\"Required\"}]}"
@@ -245,7 +245,7 @@
       "declaredPath": "/:lessonId/quest",
       "path": "/api/classroom/audit-invalid-lessonId/quest",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"课堂不存在\"}"
@@ -256,7 +256,7 @@
       "declaredPath": "/:lessonId/quest/ai-turn",
       "path": "/api/classroom/audit-invalid-lessonId/quest/ai-turn",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"课堂不存在\"}"
@@ -289,7 +289,7 @@
       "declaredPath": "/:lessonId/question/replace",
       "path": "/api/classroom/audit-invalid-lessonId/question/replace",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"课堂不存在\"}"
@@ -311,7 +311,7 @@
       "declaredPath": "/:lessonId/schedule/next",
       "path": "/api/classroom/audit-invalid-lessonId/schedule/next",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"课堂不存在或已结束\"}"
@@ -322,7 +322,7 @@
       "declaredPath": "/:lessonId/schedule/override",
       "path": "/api/classroom/audit-invalid-lessonId/schedule/override",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"studentId\",\"message\":\"Required\"}]}"
@@ -333,7 +333,7 @@
       "declaredPath": "/:lessonId/schedule/status",
       "path": "/api/classroom/audit-invalid-lessonId/schedule/status",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"课堂不存在或已结束\"}"
@@ -344,7 +344,7 @@
       "declaredPath": "/:lessonId/status",
       "path": "/api/classroom/audit-invalid-lessonId/status",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"课堂不存在或已结束\"}"
@@ -355,7 +355,7 @@
       "declaredPath": "/:lessonId/submit",
       "path": "/api/classroom/audit-invalid-lessonId/submit",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"studentId\",\"message\":\"Required\"},{\"field\":\"answer\",\"message\":\"Required\"},{\"field\":\"questionId\",\"message\":\"Required\"}]}"
@@ -366,7 +366,7 @@
       "declaredPath": "/classes",
       "path": "/api/classroom/classes",
       "status": 200,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"classes\":[{\"id\":\"class-001\",\"name\":\"三（2）班\"},{\"id\":\"class-002\",\"name\":\"三（3）班\"},{\"id\":\"class-003\",\"name\":\"四（1）班\"}]}"
@@ -432,7 +432,7 @@
       "declaredPath": "/sessions/:sessionId/comment",
       "path": "/api/classroom/sessions/audit-invalid-sessionId/comment",
       "status": 404,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"会话不存在或已结束\"}"
@@ -443,7 +443,7 @@
       "declaredPath": "/sessions/:sessionId/score",
       "path": "/api/classroom/sessions/audit-invalid-sessionId/score",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"studentId\",\"message\":\"Required\"},{\"field\":\"score\",\"message\":\"Required\"}]}"
@@ -454,7 +454,7 @@
       "declaredPath": "/sessions/:sessionId/smart-score",
       "path": "/api/classroom/sessions/audit-invalid-sessionId/smart-score",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"studentId\",\"message\":\"Required\"},{\"field\":\"answer\",\"message\":\"Required\"}]}"
@@ -465,7 +465,7 @@
       "declaredPath": "/sessions/:sessionId/virtual-opponent",
       "path": "/api/classroom/sessions/audit-invalid-sessionId/virtual-opponent",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"会话不存在或已结束\"}"
@@ -476,7 +476,7 @@
       "declaredPath": "/start",
       "path": "/api/classroom/start",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"classId\",\"message\":\"Required\"},{\"field\":\"poemId\",\"message\":\"Required\"},{\"field\":\"mode\",\"message\":\"Required\"}]}"
@@ -520,7 +520,7 @@
       "declaredPath": "/quick-action",
       "path": "/api/copilot/quick-action",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"action\",\"message\":\"Required\"}]}"
@@ -553,7 +553,7 @@
       "declaredPath": "/sessions/:id",
       "path": "/api/copilot/sessions/audit-invalid-id",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"会话不存在: audit-invalid-id\"}"
@@ -564,7 +564,7 @@
       "declaredPath": "/stream-chat",
       "path": "/api/copilot/stream-chat",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"messages\",\"message\":\"Required\"}]}"
@@ -575,7 +575,7 @@
       "declaredPath": "/thinking-chains",
       "path": "/api/copilot/thinking-chains",
       "status": 200,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"chains\":[],\"aiGenerated\":false}"
@@ -630,7 +630,7 @@
       "declaredPath": "/collaborate/start",
       "path": "/api/creation/collaborate/start",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"taskId\",\"message\":\"Required\"}]}"
@@ -663,7 +663,7 @@
       "declaredPath": "/tasks/create",
       "path": "/api/creation/tasks/create",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"poemId\",\"message\":\"Required\"},{\"field\":\"type\",\"message\":\"Required\"},{\"field\":\"requirements\",\"message\":\"Required\"},{\"field\":\"teacherId\",\"message\":\"Required"
@@ -685,7 +685,7 @@
       "declaredPath": "/works",
       "path": "/api/creation/works",
       "status": 200,
-      "durationMs": 1,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"works\":[{\"id\":\"demo-creation-work-01\",\"taskId\":\"demo-creation-task-jingyesi\",\"poemId\":\"tongbian-001\",\"poemTitle\":\"静夜思\",\"poet\":\"李白\",\"type\":\"rewrite\",\"typeLabel\":\"改写\",\"studentId\":\"demo-student-01\",\"anonymousName\":\"清风同学\",\"class"
@@ -707,7 +707,7 @@
       "declaredPath": "/works/:id/like",
       "path": "/api/creation/works/audit-invalid-id/like",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"statusCode\":404,\"error\":\"Not Found\",\"message\":\"作品 audit-invalid-id 不存在\"}"
@@ -729,7 +729,7 @@
       "declaredPath": "/works/submit",
       "path": "/api/creation/works/submit",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"taskId\",\"message\":\"Required\"},{\"field\":\"studentId\",\"message\":\"Required\"},{\"field\":\"title\",\"message\":\"Required\"},{\"field\":\"content\",\"message\":\"Required\"}]}"
@@ -773,7 +773,7 @@
       "declaredPath": "/images/:imageId",
       "path": "/api/culture/images/audit-invalid-imageId",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"图片不存在或已失效\"}"
@@ -784,7 +784,7 @@
       "declaredPath": "/immersive/:poemId/status",
       "path": "/api/culture/immersive/audit-invalid-poemId/status",
       "status": 200,
-      "durationMs": 2,
+      "durationMs": 0,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"state\":{\"poemId\":\"audit-invalid-poemId\",\"status\":\"idle\",\"currentImageIndex\":0,\"slideIntervalMs\":8000,\"narrationEnabled\":true,\"bgmEnabled\":true,\"startedAt\":0,\"updatedAt\":0}}"
@@ -806,7 +806,7 @@
       "declaredPath": "/immersive/stop",
       "path": "/api/culture/immersive/stop",
       "status": 200,
-      "durationMs": 2,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"stoppedCount\":0,\"aiGenerated\":true}"
@@ -850,7 +850,7 @@
       "declaredPath": "/alerts/:alertId/resolve",
       "path": "/api/dashboard/alerts/audit-invalid-alertId/resolve",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"statusCode\":404,\"error\":\"Not Found\",\"message\":\"预警 audit-invalid-alertId 不存在\"}"
@@ -905,10 +905,10 @@
       "declaredPath": "/class-hotspot",
       "path": "/api/dashboard/class-hotspot",
       "status": 200,
-      "durationMs": 6,
+      "durationMs": 4,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"ok\",\"hotspot\":{\"classId\":\"class-001\",\"className\":\"三（2）班\",\"generatedAt\":1786418156590,\"aiGenerated\":false,\"hotspots\":{\"strengths\":[],\"weaknesses\":[],\"anomalies\":[],\"interestTrend\":{\"type\":\"interest-trend\",\"dynastyDistribution\":[],"
+      "responsePreview": "{\"status\":\"ok\",\"hotspot\":{\"classId\":\"class-001\",\"className\":\"三（2）班\",\"generatedAt\":1790449056818,\"aiGenerated\":false,\"hotspots\":{\"strengths\":[],\"weaknesses\":[],\"anomalies\":[],\"interestTrend\":{\"type\":\"interest-trend\",\"dynastyDistribution\":[],"
     },
     {
       "file": "dashboard.ts",
@@ -916,7 +916,7 @@
       "declaredPath": "/class/:classId/hotspot",
       "path": "/api/dashboard/class/audit-invalid-classId/hotspot",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"CLASS_NOT_FOUND\",\"message\":\"班级不存在\"}"
@@ -927,7 +927,7 @@
       "declaredPath": "/class/:classId/hotspot/refresh",
       "path": "/api/dashboard/class/audit-invalid-classId/hotspot/refresh",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"CLASS_NOT_FOUND\",\"message\":\"班级不存在\"}"
@@ -938,10 +938,10 @@
       "declaredPath": "/innovation",
       "path": "/api/dashboard/innovation",
       "status": 200,
-      "durationMs": 2,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"ok\",\"classId\":\"class-001\",\"period\":{\"from\":1785813356596,\"to\":1786418156596},\"totalLessons\":0,\"modeUsage\":[],\"aiGeneratedContent\":{\"questions\":0,\"hints\":0,\"discussions\":0,\"comments\":0,\"total\":0},\"creationStats\":{\"tasks\":0,\"works\""
+      "responsePreview": "{\"status\":\"ok\",\"classId\":\"class-001\",\"period\":{\"from\":1789844256825,\"to\":1790449056825},\"totalLessons\":0,\"modeUsage\":[],\"aiGeneratedContent\":{\"questions\":0,\"hints\":0,\"discussions\":0,\"comments\":0,\"total\":0},\"creationStats\":{\"tasks\":0,\"works\""
     },
     {
       "file": "dashboard.ts",
@@ -949,7 +949,7 @@
       "declaredPath": "/stats",
       "path": "/api/dashboard/stats",
       "status": 200,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"classId\":\"global\",\"className\":\"全局视图\",\"studentCount\":113,\"weekLearnedPoems\":0,\"classMasteryAvg\":0,\"masteryRecordCount\":0,\"pendingAlerts\":0,\"weekProgress\":{\"learned\":0,\"total\":0},\"totalStudents\":113,\"newStudentsThisWeek\":0,\"to"
@@ -1004,7 +1004,7 @@
       "declaredPath": "/classes/:classId/heatmap",
       "path": "/api/diagnosis/classes/audit-invalid-classId/heatmap",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"CLASS_NOT_FOUND\",\"message\":\"班级不存在\"}"
@@ -1037,7 +1037,7 @@
       "declaredPath": "/classes/:classId/suggestions",
       "path": "/api/diagnosis/classes/audit-invalid-classId/suggestions",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 0,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"CLASS_NOT_FOUND\",\"message\":\"班级不存在\"}"
@@ -1070,7 +1070,7 @@
       "declaredPath": "/students/:studentId/learning-path",
       "path": "/api/diagnosis/students/audit-invalid-studentId/learning-path",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"学生 audit-invalid-studentId 不存在\"}"
@@ -1081,7 +1081,7 @@
       "declaredPath": "/students/:studentId/prescription",
       "path": "/api/diagnosis/students/audit-invalid-studentId/prescription",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"学生 audit-invalid-studentId 不存在\"}"
@@ -1147,7 +1147,7 @@
       "declaredPath": "/:id",
       "path": "/api/error-notebook/audit-invalid-id",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"错题条目不存在\"}"
@@ -1158,7 +1158,7 @@
       "declaredPath": "/list",
       "path": "/api/error-notebook/list",
       "status": 200,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"items\":[],\"total\":0,\"dueToday\":0,\"masteredCount\":0}"
@@ -1169,7 +1169,7 @@
       "declaredPath": "/review",
       "path": "/api/error-notebook/review",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"itemId\",\"message\":\"Required\"},{\"field\":\"quality\",\"message\":\"Invalid input\"}]}"
@@ -1183,7 +1183,7 @@
       "durationMs": 1,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"totalItems\":0,\"dueToday\":0,\"masteredCount\":0,\"averageMastery\":0,\"reviewCurve\":[{\"date\":\"2026-08-05\",\"count\":0,\"correctCount\":0},{\"date\":\"2026-08-06\",\"count\":0,\"correctCount\":0},{\"date\":\"2026-08-07\",\"count\":0,\"correctCount\":0},{\"date\":\"202"
+      "responsePreview": "{\"totalItems\":0,\"dueToday\":0,\"masteredCount\":0,\"averageMastery\":0,\"reviewCurve\":[{\"date\":\"2026-09-20\",\"count\":0,\"correctCount\":0},{\"date\":\"2026-09-21\",\"count\":0,\"correctCount\":0},{\"date\":\"2026-09-22\",\"count\":0,\"correctCount\":0},{\"date\":\"202"
     },
     {
       "file": "evolution.ts",
@@ -1202,7 +1202,7 @@
       "declaredPath": "/ab-tests",
       "path": "/api/evolution/ab-tests",
       "status": 200,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"active\":[],\"history\":[],\"threshold\":0.05,\"minSamples\":8,\"aiGenerated\":false}"
@@ -1213,7 +1213,7 @@
       "declaredPath": "/genealogy",
       "path": "/api/evolution/genealogy",
       "status": 200,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"nodes\":[],\"edges\":[],\"agentIds\":[],\"aiGenerated\":false}"
@@ -1235,7 +1235,7 @@
       "declaredPath": "/predict",
       "path": "/api/evolution/predict",
       "status": 200,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"agentId\":null,\"horizon\":7,\"hotPatterns\":[],\"emergingPatterns\":[],\"coolingPatterns\":[],\"predictedNextEvolution\":\"全系统在最近 7 天内暂无足够进化数据。建议持续收集教师修正与 Agent 错误事件以触发 Prompt 演化。\",\"confidence\":0,\"aiGenerated\":false}"
@@ -1257,7 +1257,7 @@
       "declaredPath": "/:id/attribute",
       "path": "/api/grading/audit-invalid-id/attribute",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"studentAnswer\",\"message\":\"Required\"}]}"
@@ -1268,7 +1268,7 @@
       "declaredPath": "/:id/score-multi-dim",
       "path": "/api/grading/audit-invalid-id/score-multi-dim",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"studentAnswer\",\"message\":\"Required\"}]}"
@@ -1290,7 +1290,7 @@
       "declaredPath": "/batch/:batchId",
       "path": "/api/grading/batch/audit-invalid-batchId",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"批次不存在: audit-invalid-batchId\"}"
@@ -1323,7 +1323,7 @@
       "declaredPath": "/grade",
       "path": "/api/grading/grade",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"batchId\",\"message\":\"Required\"},{\"field\":\"items\",\"message\":\"Required\"}]}"
@@ -1334,7 +1334,7 @@
       "declaredPath": "/history",
       "path": "/api/grading/history",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"查询参数校验失败\",\"details\":[{\"field\":\"classId\",\"message\":\"Required\"}]}"
@@ -1389,7 +1389,7 @@
       "declaredPath": "/review",
       "path": "/api/grading/review",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"fileId\",\"message\":\"Required\"}]}"
@@ -1400,7 +1400,7 @@
       "declaredPath": "/students",
       "path": "/api/grading/students",
       "status": 400,
-      "durationMs": 0,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"查询参数校验失败\",\"details\":[{\"field\":\"classId\",\"message\":\"Required\"}]}"
@@ -1411,7 +1411,7 @@
       "declaredPath": "/upload",
       "path": "/api/grading/upload",
       "status": 400,
-      "durationMs": 3,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"INVALID_MULTIPART_FORM\",\"message\":\"批改上传表单格式无效\"}"
@@ -1425,7 +1425,7 @@
       "durationMs": 1,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"ok\",\"timestamp\":\"2026-08-11T03:15:56.656Z\",\"uptime\":2.1067994,\"service\":\"poetic-realm-v5-backend\",\"version\":\"5.0.0\"}"
+      "responsePreview": "{\"status\":\"ok\",\"timestamp\":\"2026-09-26T18:57:36.881Z\",\"uptime\":1.4933584,\"service\":\"poetic-realm-v5-backend\",\"version\":\"5.0.0\"}"
     },
     {
       "file": "health.ts",
@@ -1436,7 +1436,7 @@
       "durationMs": 1,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"ok\",\"connected\":true,\"path\":\"C:\\\\Users\\\\LENOVO\\\\AppData\\\\Local\\\\Temp\\\\poetic-realm-route-smoke-iBK1pw\\\\route-smoke.db\",\"schemaInitialized\":true,\"tableCount\":47,\"timestamp\":\"2026-08-11T03:15:56.657Z\"}"
+      "responsePreview": "{\"status\":\"ok\",\"connected\":true,\"path\":\"C:\\\\Users\\\\LENOVO\\\\AppData\\\\Local\\\\Temp\\\\poetic-realm-route-smoke-z4eoZ1\\\\route-smoke.db\",\"schemaInitialized\":true,\"tableCount\":47,\"timestamp\":\"2026-09-26T18:57:36.882Z\"}"
     },
     {
       "file": "illustration.ts",
@@ -1444,7 +1444,7 @@
       "declaredPath": "/scene/:sceneId",
       "path": "/api/illustration/scene/audit-invalid-sceneId",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"路径参数校验失败\",\"details\":[{\"field\":\"sceneId\",\"message\":\"Invalid enum value. Expected 'diagnose' | 'classroom' | 'grading' | 'selfstudy' | 'recitation' | 'culture' | 'workbench' | 'lessonpla"
@@ -1455,7 +1455,7 @@
       "declaredPath": "/scenes",
       "path": "/api/illustration/scenes",
       "status": 200,
-      "durationMs": 0,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"scenes\":[{\"id\":\"diagnose\",\"alt\":\"学情诊断场景：书案上的卷轴与放大镜\"},{\"id\":\"classroom\",\"alt\":\"课堂导播场景：晨光中的教室讲台\"},{\"id\":\"grading\",\"alt\":\"智能批改场景：笔架毛笔与朱砂印泥\"},{\"id\":\"selfstudy\",\"alt\":\"自学舱场景：窗边书桌与合起的书\"},{\"id\":\"recitation\",\"alt\":\"诗音阁场景：古琴与扩散的声韵涟漪\""
@@ -1477,7 +1477,7 @@
       "declaredPath": "/full",
       "path": "/api/knowledge-graph/full",
       "status": 200,
-      "durationMs": 34,
+      "durationMs": 31,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"nodes\":[{\"id\":\"汉\",\"label\":\"汉\",\"type\":\"Era\",\"properties\":{\"name\":\"汉\",\"startYear\":-206,\"endYear\":220}},{\"id\":\"三国\",\"label\":\"三国\",\"type\":\"Era\",\"properties\":{\"name\":\"三国\",\"startYear\":220,\"endYear\":280}},{\"id\":\"东晋\",\"label\":\"东晋\",\"type\":\"Era\",\"prop"
@@ -1488,7 +1488,7 @@
       "declaredPath": "/mastery-colored",
       "path": "/api/knowledge-graph/mastery-colored",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"查询参数校验失败\",\"details\":[{\"field\":\"classId\",\"message\":\"Required\"}]}"
@@ -1510,7 +1510,7 @@
       "declaredPath": "/student/:studentId/gaps",
       "path": "/api/knowledge-graph/student/audit-invalid-studentId/gaps",
       "status": 200,
-      "durationMs": 11,
+      "durationMs": 9,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"nodes\":[],\"edges\":[]}"
@@ -1532,7 +1532,7 @@
       "declaredPath": "/:id/export",
       "path": "/api/lesson-plan/audit-invalid-id/export",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"format\",\"message\":\"Required\"}]}"
@@ -1543,7 +1543,7 @@
       "declaredPath": "/generate",
       "path": "/api/lesson-plan/generate",
       "status": 400,
-      "durationMs": 5,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"poemId\",\"message\":\"Required\"},{\"field\":\"gradeLevel\",\"message\":\"Required\"}]}"
@@ -1554,7 +1554,7 @@
       "declaredPath": "/layered-design/generate",
       "path": "/api/lesson-plan/layered-design/generate",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"poemId\",\"message\":\"Required\"}]}"
@@ -1587,7 +1587,7 @@
       "declaredPath": "/lessons/generate",
       "path": "/api/lesson-plan/lessons/generate",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"poemId\",\"message\":\"Required\"},{\"field\":\"gradeLevel\",\"message\":\"Required\"},{\"field\":\"lessonCount\",\"message\":\"Invalid input\"},{\"field\":\"objectives\",\"message"
@@ -1609,7 +1609,7 @@
       "declaredPath": "/objectives/generate",
       "path": "/api/lesson-plan/objectives/generate",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"poemId\",\"message\":\"Required\"},{\"field\":\"gradeLevel\",\"message\":\"Required\"},{\"field\":\"lessonCount\",\"message\":\"Invalid input\"}]}"
@@ -1620,7 +1620,7 @@
       "declaredPath": "/poems/:id/detail",
       "path": "/api/lesson-plan/poems/audit-invalid-id/detail",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"诗歌不存在\"}"
@@ -1642,7 +1642,7 @@
       "declaredPath": "/save",
       "path": "/api/lesson-plan/save",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"id\",\"message\":\"Required\"},{\"field\":\"poemId\",\"message\":\"Required\"},{\"field\":\"poemTitle\",\"message\":\"Required\"},{\"field\":\"poet\",\"message\":\"Required\"},{\"field"
@@ -1667,7 +1667,7 @@
       "durationMs": 1,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"ok\",\"templates\":[{\"id\":\"tpl-low-new-basic-jingyesi\",\"title\":\"低年级·静夜思·新授课（基础）\",\"grade\":\"low\",\"type\":\"new\",\"difficulty\":\"basic\",\"duration\":40,\"description\":\"面向 1-2 年级学生，通过朗读感悟李白思乡之情。重点识字正音，借助插图理解诗意，配画创作延伸。\",\"thumbnail\":\"/images/poe"
+      "responsePreview": "{\"status\":\"ok\",\"templates\":[{\"id\":\"tpl-low-new-basic-jingyesi\",\"title\":\"低年级·静夜思·新授课（基础）\",\"grade\":\"low\",\"type\":\"new\",\"difficulty\":\"basic\",\"duration\":40,\"description\":\"面向 1-2 年级学生，通过朗读感悟李白思乡之情。重点识字正音，借助插图理解诗意，配画创作延伸。\",\"thumbnail\":\"/images/gen"
     },
     {
       "file": "lesson-plan-templates.ts",
@@ -1708,7 +1708,7 @@
       "declaredPath": "/modify",
       "path": "/api/orchestrator/modify",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"sessionId\",\"message\":\"Required\"},{\"field\":\"taskId\",\"message\":\"Required\"},{\"field\":\"newInput\",\"message\":\"输入只能包含可序列化的 JSON 值\"}]}"
@@ -1719,7 +1719,7 @@
       "declaredPath": "/parse",
       "path": "/api/orchestrator/parse",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"instruction\",\"message\":\"Required\"}]}"
@@ -1741,7 +1741,7 @@
       "declaredPath": "/resume",
       "path": "/api/orchestrator/resume",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"sessionId\",\"message\":\"Required\"},{\"field\":\"taskId\",\"message\":\"Required\"}]}"
@@ -1785,7 +1785,7 @@
       "declaredPath": "/:poemId",
       "path": "/api/poem-content/audit-invalid-poemId",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"NOT_FOUND\",\"message\":\"古诗不存在\"}"
@@ -1796,7 +1796,7 @@
       "declaredPath": "/asr/transcribe",
       "path": "/api/recitation/asr/transcribe",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"音频上传解析失败\"}"
@@ -1829,7 +1829,7 @@
       "declaredPath": "/:recitationId",
       "path": "/api/recitation/audit-invalid-recitationId",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"message\":\"朗读记录不存在\"}"
@@ -1873,7 +1873,7 @@
       "declaredPath": "/poems",
       "path": "/api/recitation/poems",
       "status": 200,
-      "durationMs": 6,
+      "durationMs": 4,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"poems\":[{\"id\":\"tongbian-001\",\"title\":\"咏鹅\",\"poet\":\"骆宾王\",\"dynasty\":\"唐\",\"content\":\"鹅，鹅，鹅，曲项向天歌。\\n白毛浮绿水，红掌拨清波。\",\"theme\":[\"咏物\"],\"rhetoric\":[\"对偶\",\"白描\"],\"gradeLevel\":\"一年级\",\"recitedByStudent\":false},{\"id\":\"tongbian-002\",\"title\":\"春晓\""
@@ -1884,7 +1884,7 @@
       "declaredPath": "/tts/generate",
       "path": "/api/recitation/tts/generate",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"poemId\",\"message\":\"Required\"}]}"
@@ -1895,7 +1895,7 @@
       "declaredPath": "/",
       "path": "/api/report/",
       "status": 200,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"total\":0,\"limit\":10,\"offset\":0,\"items\":[],\"aiGenerated\":true}"
@@ -1906,7 +1906,7 @@
       "declaredPath": "/:reportId",
       "path": "/api/report/audit-invalid-reportId",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 6,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"statusCode\":404,\"error\":\"Not Found\",\"message\":\"报告 audit-invalid-reportId 不存在\"}"
@@ -1928,7 +1928,7 @@
       "declaredPath": "/:reportId/charts",
       "path": "/api/report/audit-invalid-reportId/charts",
       "status": 404,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"statusCode\":404,\"error\":\"Not Found\",\"message\":\"报告 audit-invalid-reportId 不存在\"}"
@@ -1972,7 +1972,7 @@
       "declaredPath": "/generate",
       "path": "/api/report/generate",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"classId\",\"message\":\"Required\"},{\"field\":\"teacherId\",\"message\":\"Required\"},{\"field\":\"period\",\"message\":\"Required\"}]}"
@@ -1983,7 +1983,7 @@
       "declaredPath": "/history",
       "path": "/api/report/history",
       "status": 200,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"total\":0,\"limit\":20,\"offset\":0,\"items\":[],\"filters\":{}}"
@@ -1994,7 +1994,7 @@
       "declaredPath": "/home-school/:reportId/activity/:activityId/complete",
       "path": "/api/report/home-school/audit-invalid-reportId/activity/audit-invalid-activityId/complete",
       "status": 404,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"statusCode\":404,\"error\":\"Not Found\",\"message\":\"周报或活动不存在：audit-invalid-reportId / audit-invalid-activityId\"}"
@@ -2027,7 +2027,7 @@
       "declaredPath": "/home-school/:reportId/note",
       "path": "/api/report/home-school/audit-invalid-reportId/note",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"content\",\"message\":\"Required\"},{\"field\":\"teacherName\",\"message\":\"Required\"}]}"
@@ -2077,12 +2077,67 @@
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"studentId\",\"message\":\"Required\"},{\"field\":\"classId\",\"message\":\"Required\"}]}"
     },
     {
+      "file": "report-sharing.ts",
+      "method": "POST",
+      "declaredPath": "/share",
+      "path": "/api/report/share",
+      "status": 400,
+      "durationMs": 1,
+      "leakedStack": false,
+      "failed": false,
+      "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"reportId\",\"message\":\"Required\"}]}"
+    },
+    {
+      "file": "report-sharing.ts",
+      "method": "POST",
+      "declaredPath": "/share/preview",
+      "path": "/api/report/share/preview",
+      "status": 400,
+      "durationMs": 1,
+      "leakedStack": false,
+      "failed": false,
+      "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"reportId\",\"message\":\"Required\"}]}"
+    },
+    {
+      "file": "report-sharing.ts",
+      "method": "GET",
+      "declaredPath": "/shared",
+      "path": "/api/report/shared",
+      "status": 200,
+      "durationMs": 1,
+      "leakedStack": false,
+      "failed": false,
+      "responsePreview": "{\"status\":\"ok\",\"shares\":[],\"total\":0}"
+    },
+    {
+      "file": "report-sharing.ts",
+      "method": "DELETE",
+      "declaredPath": "/shared/:token",
+      "path": "/api/report/shared/audit-invalid-token",
+      "status": 404,
+      "durationMs": 1,
+      "leakedStack": false,
+      "failed": false,
+      "responsePreview": "{\"statusCode\":404,\"error\":\"Not Found\",\"message\":\"分享链接不存在、已过期或已撤销\"}"
+    },
+    {
+      "file": "report-sharing.ts",
+      "method": "GET",
+      "declaredPath": "/shared/:token",
+      "path": "/api/report/shared/audit-invalid-token",
+      "status": 404,
+      "durationMs": 0,
+      "leakedStack": false,
+      "failed": false,
+      "responsePreview": "{\"statusCode\":404,\"error\":\"Not Found\",\"message\":\"分享链接不存在、已过期或已撤销\"}"
+    },
+    {
       "file": "report.ts",
       "method": "GET",
       "declaredPath": "/templates",
       "path": "/api/report/templates",
       "status": 200,
-      "durationMs": 0,
+      "durationMs": 3,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"templates\":[{\"key\":\"standard\",\"label\":\"标准教研报告\"},{\"key\":\"data-driven\",\"label\":\"数据驱动型报告\"},{\"key\":\"narrative\",\"label\":\"叙事型报告\"},{\"key\":\"executive\",\"label\":\"摘要型报告\"}],\"sections\":[{\"key\":\"background\",\"label\":\"教学背景\"},{\"key\":\"interve"
@@ -2093,32 +2148,32 @@
       "declaredPath": "/credentials",
       "path": "/api/settings/credentials",
       "status": 200,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"ok\",\"providers\":[{\"provider\":\"deepseek\",\"label\":\"DeepSeek\",\"powers\":\"命题 / 诊断 / 批改 / 报告 / 副驾对话\",\"console\":\"https://platform.deepseek.com\",\"configured\":true,\"masked\":\"sk-****a1df\"},{\"provider\":\"mimo\",\"label\":\"MiMo（小米）\",\"powers\":\"语音"
+      "responsePreview": "{\"status\":\"ok\",\"providers\":[{\"provider\":\"deepseek\",\"label\":\"DeepSeek\",\"powers\":\"命题 / 诊断 / 批改 / 报告 / 副驾对话\",\"console\":\"https://platform.deepseek.com\",\"configured\":true,\"masked\":\"\",\"inputKind\":\"secret\"},{\"provider\":\"mimo\",\"label\":\"MiMo（小米）\",\"p"
     },
     {
       "file": "settings.ts",
       "method": "PUT",
       "declaredPath": "/credentials/:id",
       "path": "/api/settings/credentials/audit-invalid-id",
-      "status": 400,
-      "durationMs": 2,
+      "status": 403,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"路径参数校验失败\",\"details\":[{\"field\":\"id\",\"message\":\"Invalid enum value. Expected 'deepseek' | 'mimo' | 'dashscope', received 'audit-invalid-id'\"}]}"
+      "responsePreview": "{\"status\":\"error\",\"error\":\"DEMO_ACCOUNT_READ_ONLY\",\"message\":\"演示账号不能查看或修改模型凭据，请使用系统所有者账号。\",\"statusCode\":403,\"management\":{\"mutable\":false,\"managedBy\":\"local-env\"}}"
     },
     {
       "file": "settings.ts",
       "method": "POST",
       "declaredPath": "/credentials/:id/test",
       "path": "/api/settings/credentials/audit-invalid-id/test",
-      "status": 400,
-      "durationMs": 1,
+      "status": 403,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"路径参数校验失败\",\"details\":[{\"field\":\"id\",\"message\":\"Invalid enum value. Expected 'deepseek' | 'mimo' | 'dashscope', received 'audit-invalid-id'\"}]}"
+      "responsePreview": "{\"status\":\"error\",\"error\":\"DEMO_ACCOUNT_READ_ONLY\",\"message\":\"演示账号不能发起供应商凭据检测。\",\"statusCode\":403}"
     },
     {
       "file": "students.ts",
@@ -2126,10 +2181,10 @@
       "declaredPath": "/",
       "path": "/api/students/",
       "status": 200,
-      "durationMs": 14,
+      "durationMs": 12,
       "leakedStack": false,
       "failed": false,
-      "responsePreview": "{\"status\":\"ok\",\"students\":[{\"id\":\"class-002-stu-01\",\"name\":\"S01-Li\",\"classId\":\"class-002\",\"className\":\"三（3）班\"},{\"id\":\"class-003-stu-01\",\"name\":\"S01-Li\",\"classId\":\"class-003\",\"className\":\"四（1）班\"},{\"id\":\"class001-student-S01\",\"name\":\"S01-Li\","
+      "responsePreview": "{\"status\":\"ok\",\"students\":[{\"id\":\"class-003-stu-11\",\"name\":\"陈景行\",\"classId\":\"class-003\",\"className\":\"四（1）班\"},{\"id\":\"class-002-stu-14\",\"name\":\"陈明远\",\"classId\":\"class-002\",\"className\":\"三（3）班\"},{\"id\":\"class-001-stu-38\",\"name\":\"陈若溪\",\"classId\":\"cl"
     },
     {
       "file": "students.ts",
@@ -2148,7 +2203,7 @@
       "declaredPath": "/export",
       "path": "/api/workbench/export",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"questionIds\",\"message\":\"Required\"},{\"field\":\"format\",\"message\":\"Required\"}]}"
@@ -2159,7 +2214,7 @@
       "declaredPath": "/generate",
       "path": "/api/workbench/generate",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"poemId\",\"message\":\"Required\"},{\"field\":\"gradeLevel\",\"message\":\"Required\"},{\"field\":\"questionTypes\",\"message\":\"Required\"},{\"field\":\"bloomWeights\",\"message\""
@@ -2170,7 +2225,7 @@
       "declaredPath": "/poems",
       "path": "/api/workbench/poems",
       "status": 200,
-      "durationMs": 3,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"ok\",\"poems\":[{\"id\":\"tongbian-001\",\"title\":\"咏鹅\",\"poet\":\"骆宾王\",\"dynasty\":\"唐\"},{\"id\":\"tongbian-002\",\"title\":\"春晓\",\"poet\":\"孟浩然\",\"dynasty\":\"唐\"},{\"id\":\"tongbian-003\",\"title\":\"静夜思\",\"poet\":\"李白\",\"dynasty\":\"唐\"},{\"id\":\"tongbian-004\",\"title\":\""
@@ -2214,7 +2269,7 @@
       "declaredPath": "/questions/:id",
       "path": "/api/workbench/questions/audit-invalid-id",
       "status": 404,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"NOT_FOUND\",\"message\":\"题卡不存在\"}"
@@ -2236,7 +2291,7 @@
       "declaredPath": "/questions/:id/favorite",
       "path": "/api/workbench/questions/audit-invalid-id/favorite",
       "status": 400,
-      "durationMs": 2,
+      "durationMs": 1,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"favorited\",\"message\":\"Required\"}]}"
@@ -2258,7 +2313,7 @@
       "declaredPath": "/refine",
       "path": "/api/workbench/refine",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 2,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"question\",\"message\":\"Required\"},{\"field\":\"instruction\",\"message\":\"Required\"},{\"field\":\"poemId\",\"message\":\"Required\"},{\"field\":\"gradeLevel\",\"message\":\"Requ"
@@ -2269,7 +2324,7 @@
       "declaredPath": "/smart-compose",
       "path": "/api/workbench/smart-compose",
       "status": 400,
-      "durationMs": 1,
+      "durationMs": 4,
       "leakedStack": false,
       "failed": false,
       "responsePreview": "{\"status\":\"error\",\"error\":\"VALIDATION_ERROR\",\"message\":\"请求体校验失败\",\"details\":[{\"field\":\"totalCount\",\"message\":\"Required\"},{\"field\":\"difficultyDistribution\",\"message\":\"Required\"},{\"field\":\"knowledgePoints\",\"message\":\"Required\"},{\"field\":\"total"

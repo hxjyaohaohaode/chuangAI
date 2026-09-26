@@ -1573,10 +1573,10 @@ export const api = {
 
         /** 进入下一题 */
         next: (lessonId: string) =>
-            fetchJSON<{ currentQuestionIndex: number; currentQuestion: ClassroomStatus['currentQuestion'] } & ApiEnvelope>(
+            fetchJSON<{ currentQuestionIndex: number; currentQuestion: ClassroomStatus['currentQuestion']; quest: QuestSnapshot } & ApiEnvelope>(
                 `/classroom/${encodeURIComponent(lessonId)}/next`,
                 { method: 'POST' },
-            ).then(unwrap<{ currentQuestionIndex: number; currentQuestion: ClassroomStatus['currentQuestion'] }>),
+            ).then(unwrap<{ currentQuestionIndex: number; currentQuestion: ClassroomStatus['currentQuestion']; quest: QuestSnapshot }>),
 
         /** 学生提交答案（实时批改） */
         submit: (

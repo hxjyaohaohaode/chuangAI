@@ -122,7 +122,6 @@ function useEscapeKey(handler: () => void, active: boolean) {
 export function StarMapPage() {
     // 响应式断点
     const isMobile = useMediaQuery('(max-width: 767px)')
-    const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 
     // 路由参数：classId
     const [searchParams, setSearchParams] = useSearchParams()
@@ -148,13 +147,11 @@ export function StarMapPage() {
     const fetchIdRef = useRef(0)
     const hasNotifiedRef = useRef(false)
 
-    // 常规桌面仍以沉浸星图为主；小屏与“减少动态效果”环境优先进入完整、
-    // 可访问的星体目录，避免尚未确认需求时加载沉浸渲染资源。教师主动切回
-    // 宇宙视图后保持该选择，不能因为一次视口变化把正在探索的图谱强制切走。
-    const [hasExplicitlyEnabledImmersiveView, setHasExplicitlyEnabledImmersiveView] = useState(false)
-    const [canvasView, setCanvasView] = useState<CanvasView>(() => (
-        isMobile || prefersReducedMotion ? 'list' : 'universe'
-    ))
+    // 33号 FlyingPosters 是诗脉星图的主界面，所有视口默认进入穹顶。
+    // 组件内部已对 reduced-motion、离屏和 document.hidden 做静态/停帧降级，
+    // 因此不能再以无障碍为由把整个产品界面悄悄替换成目录。目录仍由教师
+    // 主动切换，或在 WebGL 初始化失败时作为可访问兜底。
+    const [canvasView, setCanvasView] = useState<CanvasView>('universe')
     const [relationLens, setRelationLens] = useState<RelationLens>('context')
     const [selectedEdge, setSelectedEdge] = useState<GraphEdge | null>(null)
     const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -165,9 +162,6 @@ export function StarMapPage() {
 
     // classId 优先级：URL > store > 默认 demo
     const effectiveClassId = classIdFromUrl || storeClassId || ''
-    const shouldPreferLightweightView = isMobile || prefersReducedMotion
-    const isUsingLightweightView = shouldPreferLightweightView && !hasExplicitlyEnabledImmersiveView
-
     /* ---------- 数据加载（带三级降级） ---------- */
     const fetchData = useCallback(async () => {
         const id = ++fetchIdRef.current
@@ -234,11 +228,6 @@ export function StarMapPage() {
         }
     }, [classIdFromUrl, storeClassId, searchParams, setSearchParams])
 
-    useEffect(() => {
-        if (!isUsingLightweightView) return
-        setCanvasView((current) => current === 'list' ? current : 'list')
-    }, [isUsingLightweightView])
-
     /* ---------- 回调 ---------- */
     const handleSelectNode = useCallback(
         (node: GraphNode | null) => {
@@ -258,13 +247,11 @@ export function StarMapPage() {
     }, [])
 
     const handleCanvasViewChange = useCallback((nextView: CanvasView) => {
-        if (nextView === 'universe') setHasExplicitlyEnabledImmersiveView(true)
         setCanvasView(nextView)
     }, [])
 
     const handleToggleCanvasView = useCallback(() => {
         if (canvasView === 'list') {
-            setHasExplicitlyEnabledImmersiveView(true)
             setCanvasView('universe')
             return
         }
@@ -393,16 +380,6 @@ export function StarMapPage() {
                 </header>
 
                 <div className="pr-sm-canvas-area" data-anchor data-anchor-label="诗脉图谱">
-                    {canvasView === 'list' && isUsingLightweightView && (
-                        <div className="pr-sm-lightweight-view-note" role="status" data-testid="starmap-lightweight-view-note">
-                            <Icon name="list" size={15} aria-hidden={true} />
-                            <span>
-                                {prefersReducedMotion
-                                    ? '已尊重“减少动态效果”设置，先使用可检索、可点选的星体目录。'
-                                    : '当前为小屏设备，先使用可检索、可点选的星体目录。'}
-                            </span>
-                        </div>
-                    )}
                     {canvasView === 'list' ? (
                         <SectionErrorBoundary
                             title="星图列表加载失败"
@@ -483,12 +460,12 @@ export function StarMapPage() {
                             data-testid="starmap-toggle-immersive-view"
                             onClick={handleToggleCanvasView}
                             aria-label={canvasView === 'list'
-                                ? (isUsingLightweightView ? '开启沉浸星图' : '返回诗境穹顶')
+                                ? '返回诗境穹顶'
                                 : '打开星体目录'}
                         >
                             <Icon name={canvasView === 'list' ? 'sparkle' : 'list'} size={18} />
                             <span>{canvasView === 'list'
-                                ? (isUsingLightweightView ? '开启沉浸星图' : '返回宇宙')
+                                ? '返回宇宙'
                                 : '星体目录'}
                             </span>
                         </button>

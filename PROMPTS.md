@@ -1,8 +1,8 @@
-# 诗脉·启明 PoeticRealm AI v3.0 —— Prompt 工程手册
+# 诗脉·启明 Prompt 历史设计摘录
 
-> 本手册是异构多智能体系统的 Prompt 工程权威文档，覆盖 1 个中央编排官、3 个主 Agent、11 个子 Agent 的完整 Prompt 体系，以及自我进化引擎的版本管理机制。
+> 本文保留早期 v3 设计与提示词示例，供追溯使用，不作为当前代码、模型配置或运行结果的权威说明。当前可执行实现以 `backend/src/agents/`、`backend/src/orchestrator/`、`backend/src/llm/` 为准；现行边界与验证方式见 `docs/CURRENT_ARCHITECTURE_AND_COPYRIGHT.md`。文中的“必须准确无误”等语句只是对模型的指令，不构成事实核验或教学效果证据。
 >
-> 所有 Prompt 设计遵循两大理论支柱：**Context Engineering** 与 **Loop Engineering**，并以 X-MAS 异构多智能体路由矩阵为模型选择依据。
+> 每次发布前应以实际调用记录、结构校验、教师审核和外部来源台账复核具体输出。旧版模型名称、Agent 数量、测试结论与版本叙述不得直接引用到软件著作权或比赛材料。
 
 ---
 

@@ -32,10 +32,12 @@
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid rgb(var(--dome-ink) / .12);
-    border-radius: 20px;
-    background: rgb(250 248 244);
-    box-shadow: 0 14px 38px rgb(var(--dome-ink) / .08);
+    /* 画廊是沉浸场景本身，不再套一层“卡片中的卡片”。裁切仍由
+     * overflow 负责，海报、文字与轨道直接共享同一张纸面。 */
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     transform: translateX(-50%);
 }
 
@@ -538,7 +540,7 @@
         bottom: 184px;
         left: 12px;
         width: auto;
-        border-radius: 16px;
+        border-radius: 0;
         transform: none;
     }
 

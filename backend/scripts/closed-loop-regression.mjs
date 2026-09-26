@@ -42,7 +42,7 @@ async function authenticate() {
     const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teacherId: 'teacher-001', name: '王雅琴' }),
+        body: JSON.stringify({ phone: '13177091153', password: 'Chy101713' }),
     })
     assert(response.status === 200, `闭环认证失败：HTTP ${response.status}`)
     const body = await response.json()

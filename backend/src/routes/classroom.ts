@@ -897,6 +897,9 @@ export const classroomRoutes: FastifyPluginAsync<ClassroomRoutesOptions> = async
             status: 'ok',
             currentQuestionIndex: nextIndex,
             currentQuestion: sanitizeQuestion(currentQuestion),
+            // HTTP 调用方必须立即拿到权威闯关快照。WebSocket 是跨端同步补充，
+            // 不能成为同一教师端更新关卡状态的唯一通道。
+            quest: questSnapshot(runtime),
         })
     })
 

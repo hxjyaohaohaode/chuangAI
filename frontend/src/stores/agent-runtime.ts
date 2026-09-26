@@ -103,8 +103,20 @@ const STALE_THRESHOLD_MS = 5 * 60 * 1000
 // 辅助函数
 // ─────────────────────────────────────────────────────────────
 
-function makeCallId(agentId: string, taskId: string, startedAt: number): string {
-    return `${agentId}:${taskId}:${startedAt}`
+function makeCallId(sessionId: string | undefined, agentId: string, taskId: string, startedAt: number): string {
+    return `${sessionId ?? 'global'}:${agentId}:${taskId}:${startedAt}`
+}
+
+function eventSessionId(event: { sessionId: string }, payload: Record<string, unknown>): string | undefined {
+    const value = payload.sessionId ?? event.sessionId
+    return typeof value === 'string' && value.length > 0 ? value : undefined
+}
+
+function runningCallIndex(calls: AgentCall[], agentId: string, taskId: string, sessionId: string | undefined): number {
+    return calls.findIndex((call) => call.agentId === agentId
+        && call.taskId === taskId
+        && call.sessionId === sessionId
+        && call.status === 'running')
 }
 
 function getOrCreateHealth(
@@ -164,20 +176,22 @@ export const useAgentRuntimeStore = create<AgentRuntimeState>((set, get) => ({
                 const agentId = p.agentId as string
                 const taskId = p.taskId as string
                 const startedAt = (p.timestamp as number) ?? timestamp
+                if (!agentId || !taskId || !Number.isFinite(startedAt)) break
                 const call: AgentCall = {
-                    id: makeCallId(agentId, taskId, startedAt),
+                    id: makeCallId(eventSessionId(event, p), agentId, taskId, startedAt),
                     agentId,
                     domain: (p.domain as string) ?? '',
                     function: (p.function as string) ?? '',
                     bloomLevel: (p.bloomLevel as string) ?? '',
                     promptVersion: (p.promptVersion as string) ?? '',
                     taskId,
-                    sessionId: p.sessionId as string | undefined,
+                    sessionId: eventSessionId(event, p),
                     inputPreview: (p.inputPreview as string) ?? '',
                     status: 'running',
                     startedAt,
                 }
                 set((s) => {
+                    if (s.calls.some((existing) => existing.id === call.id && existing.sessionId === call.sessionId)) return s
                     const calls = [call, ...s.calls].slice(0, MAX_CALLS)
                     const health = new Map(s.health)
                     const h = getOrCreateHealth(health, agentId)
@@ -194,13 +208,15 @@ export const useAgentRuntimeStore = create<AgentRuntimeState>((set, get) => ({
             case 'agent:call:success': {
                 const agentId = p.agentId as string
                 const taskId = p.taskId as string
+                const sessionId = eventSessionId(event, p)
                 const endedAt = (p.timestamp as number) ?? timestamp
                 const latencyMs = (p.latencyMs as number) ?? 0
                 const usage = p.usage as { promptTokens: number; completionTokens: number; cachedTokens?: number } | undefined
                 set((s) => {
-                    const calls = s.calls.map((c) => {
-                        // 匹配同 agentId + taskId 的 running 调用
-                        if (c.agentId === agentId && c.taskId === taskId && c.status === 'running') {
+                    const matchingIndex = runningCallIndex(s.calls, agentId, taskId, sessionId)
+                    if (matchingIndex < 0) return s
+                    const calls = s.calls.map((c, index) => {
+                        if (index === matchingIndex) {
                             return {
                                 ...c,
                                 status: 'success' as const,
@@ -230,12 +246,15 @@ export const useAgentRuntimeStore = create<AgentRuntimeState>((set, get) => ({
             case 'agent:call:error': {
                 const agentId = p.agentId as string
                 const taskId = p.taskId as string
+                const sessionId = eventSessionId(event, p)
                 const endedAt = (p.timestamp as number) ?? timestamp
                 const error = (p.error as string) ?? '未知错误'
                 const errorName = (p.errorName as string) ?? 'Unknown'
                 set((s) => {
-                    const calls = s.calls.map((c) => {
-                        if (c.agentId === agentId && c.taskId === taskId && c.status === 'running') {
+                    const matchingIndex = runningCallIndex(s.calls, agentId, taskId, sessionId)
+                    if (matchingIndex < 0) return s
+                    const calls = s.calls.map((c, index) => {
+                        if (index === matchingIndex) {
                             return {
                                 ...c,
                                 status: 'error' as const,
@@ -262,10 +281,14 @@ export const useAgentRuntimeStore = create<AgentRuntimeState>((set, get) => ({
             case 'agent:fallback': {
                 const agentId = p.agentId as string
                 const taskId = p.taskId as string
+                const sessionId = eventSessionId(event, p)
                 const reason = (p.reason as string) ?? '未知降级原因'
                 set((s) => {
-                    const calls = s.calls.map((c) => {
-                        if (c.agentId === agentId && c.taskId === taskId) {
+                    const matchingIndex = s.calls.findIndex((call) => call.agentId === agentId
+                        && call.taskId === taskId && call.sessionId === sessionId)
+                    if (matchingIndex < 0 || s.calls[matchingIndex]?.fallbackReason) return s
+                    const calls = s.calls.map((c, index) => {
+                        if (index === matchingIndex) {
                             return { ...c, fallbackReason: reason }
                         }
                         return c
@@ -283,11 +306,17 @@ export const useAgentRuntimeStore = create<AgentRuntimeState>((set, get) => ({
             case 'agent:verify': {
                 const targetAgentId = p.targetAgentId as string
                 const verdict = p.verdict as 'pass' | 'revise' | 'reject'
+                if (!targetAgentId || !['pass', 'revise', 'reject'].includes(verdict)) break
                 const score = (p.score as number) ?? 0
+                const sessionId = eventSessionId(event, p)
                 set((s) => {
-                    const calls = s.calls.map((c) => {
-                        // 关联到最近一条该 agent 的调用
-                        if (c.agentId === targetAgentId && c.status === 'success' && !c.verifyVerdict) {
+                    const matchingIndex = s.calls.findIndex((call) => call.agentId === targetAgentId
+                        && call.sessionId === sessionId
+                        && (!p.taskId || call.taskId === p.taskId)
+                        && call.status === 'success' && !call.verifyVerdict)
+                    if (matchingIndex < 0) return s
+                    const calls = s.calls.map((c, index) => {
+                        if (index === matchingIndex) {
                             return { ...c, verifyVerdict: verdict, verifyScore: score }
                         }
                         return c
@@ -330,9 +359,9 @@ export const useAgentRuntimeStore = create<AgentRuntimeState>((set, get) => ({
         for (const h of health.values()) {
             totalCalls += h.totalCalls
             totalSuccess += h.successCount
-            if (h.avgLatencyMs > 0) {
-                totalLatency += h.avgLatencyMs
-                latencyCount++
+            if (h.successCount > 0) {
+                totalLatency += h.avgLatencyMs * h.successCount
+                latencyCount += h.successCount
             }
         }
         for (const c of calls) {

@@ -6,7 +6,7 @@
  *
  * 数据规模：
  * - 1 个示例班级（三（2）班，40 学生）
- * - 40 个脱敏学生（anonymous_name 用"学号+姓首字母"格式，如 S01-Li）
+ * - 40 个固定生成的虚构中文姓名；内部学生 ID 与界面显示名严格分离
  * - 8 周教学进度（每周 2 首古诗，共 16 首，引用 tongbian-001 到 tongbian-016）
  * - 1600 条答题记录（40 学生 × 40 题）
  * - 3840 条布鲁姆六阶掌握度（16 首 × 6 阶 × 40 学生）
@@ -18,6 +18,8 @@
  * - 布鲁姆六阶掌握度按难度递减：识记 > 理解 > 应用 > 分析 > 评价 > 创造
  * - 答题正确率与掌握度正相关
  */
+
+import { syntheticStudentName } from './synthetic-roster.js'
 
 // ─────────────────────────────────────────────────────────────
 // 类型定义
@@ -133,20 +135,6 @@ const BLOOM_PENALTY: Record<SeedBloomLevel, number> = {
     create: 25,
 }
 
-/** 10 个常见姓氏首字母（循环使用，保证脱敏） */
-const SURNAMES: readonly string[] = [
-    'Li',
-    'Wang',
-    'Zhang',
-    'Liu',
-    'Chen',
-    'Yang',
-    'Huang',
-    'Zhao',
-    'Wu',
-    'Zhou',
-] as const
-
 /** 认知风格（循环分配） */
 const COGNITIVE_STYLES: readonly SeedCognitiveStyle[] = [
     'visual',
@@ -203,12 +191,11 @@ function generateSeedClassData(): SeedClassData {
     const mastery: SeedClassData['mastery'] = []
     const events: SeedClassData['events'] = []
 
-    // ── 1. 生成 40 个脱敏学生 ──
+    // ── 1. 生成 40 个固定虚构学生 ──
     for (let i = 0; i < 40; i++) {
         const sid = `S${String(i + 1).padStart(2, '0')}`
-        const surname = SURNAMES[i % SURNAMES.length] ?? 'Unknown'
         const style = COGNITIVE_STYLES[i % COGNITIVE_STYLES.length] ?? 'visual'
-        const displayName = `${sid}-${surname}`
+        const displayName = syntheticStudentName(i)
         students.push({
             id: `student-${sid}`,
             classId,

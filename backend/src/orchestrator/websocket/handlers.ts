@@ -14,8 +14,10 @@ import type { FastifyInstance, FastifyPluginAsync } from 'fastify'
 import type { WebSocket } from '@fastify/websocket'
 import type { WSBroadcaster } from './broadcaster.js'
 import type { InterventionManager } from '../intervention.js'
+import type { SessionStore } from '../session-store.js'
 import type { WSEvent, WSSubscriptionFilter } from '../types.js'
 import { ORCH_EVENTS } from '../types.js'
+import { boundedAgentInputSchema } from '../plan-validation.js'
 
 // ─────────────────────────────────────────────────────────────
 // 客户端控制消息类型
@@ -47,6 +49,7 @@ interface ClientMessage {
 export interface OrchestratorWSPluginOptions {
     broadcaster: WSBroadcaster
     intervention: InterventionManager
+    sessionStore: SessionStore
 }
 
 /**
@@ -58,11 +61,16 @@ export const orchestratorWSPlugin: FastifyPluginAsync<OrchestratorWSPluginOption
     app: FastifyInstance,
     opts: OrchestratorWSPluginOptions,
 ) => {
-    const { broadcaster, intervention } = opts
+    const { broadcaster, intervention, sessionStore } = opts
 
-    app.get('/orchestrator', { websocket: true }, (socket: WebSocket, _req) => {
+    app.get('/orchestrator', { websocket: true }, (socket: WebSocket, req) => {
+        const teacherId = req.auth?.id
+        if (!teacherId) {
+            socket.close(1008, 'Authentication required')
+            return
+        }
         // 1. 注册连接（默认无过滤器，接收全部事件）
-        broadcaster.registerConnection(socket, {})
+        broadcaster.registerConnection(socket, {}, teacherId)
 
         // 2. 发送 session:start 事件（客户端连接确认）
         const startEvent: WSEvent = {
@@ -91,7 +99,7 @@ export const orchestratorWSPlugin: FastifyPluginAsync<OrchestratorWSPluginOption
                 return
             }
 
-            handleClientMessage(socket, msg, broadcaster, intervention).catch((err) => {
+            handleClientMessage(socket, msg, broadcaster, intervention, sessionStore, teacherId).catch((err) => {
                 // 控制消息处理异常：发送错误反馈但不关闭连接
                 const errMsg = err instanceof Error ? err.message : String(err)
                 sendError(socket, `控制消息处理失败: ${errMsg}`)
@@ -109,7 +117,14 @@ async function handleClientMessage(
     msg: ClientMessage,
     broadcaster: WSBroadcaster,
     intervention: InterventionManager,
+    sessionStore: SessionStore,
+    teacherId: string,
 ): Promise<void> {
+    const requireOwnedSession = (sessionId: string | undefined): void => {
+        if (!sessionId || sessionStore.getSession(sessionId)?.teacherId !== teacherId) {
+            throw new Error('会话不存在或不属于当前教师')
+        }
+    }
     switch (msg.type) {
         case 'ping': {
             // 心跳响应
@@ -123,6 +138,7 @@ async function handleClientMessage(
         }
 
         case 'orch:subscribe': {
+            if (msg.filter?.sessionId) requireOwnedSession(msg.filter.sessionId)
             // 更新订阅过滤器
             broadcaster.updateFilter(socket, msg.filter ?? {})
             sendEvent(socket, {
@@ -139,6 +155,7 @@ async function handleClientMessage(
                 sendError(socket, 'orch:pause 需要 sessionId 与 taskId')
                 return
             }
+            requireOwnedSession(msg.sessionId)
             await intervention.pause(msg.sessionId, msg.taskId)
             break
         }
@@ -148,6 +165,7 @@ async function handleClientMessage(
                 sendError(socket, 'orch:resume 需要 sessionId 与 taskId')
                 return
             }
+            requireOwnedSession(msg.sessionId)
             await intervention.resume(msg.sessionId, msg.taskId)
             break
         }
@@ -157,6 +175,7 @@ async function handleClientMessage(
                 sendError(socket, 'orch:abort 需要 sessionId')
                 return
             }
+            requireOwnedSession(msg.sessionId)
             await intervention.abortSession(msg.sessionId)
             break
         }
@@ -166,6 +185,10 @@ async function handleClientMessage(
                 sendError(socket, 'orch:modify 需要 sessionId、taskId 与 newInput')
                 return
             }
+            requireOwnedSession(msg.sessionId)
+            if (!boundedAgentInputSchema.safeParse(msg.newInput).success) {
+                throw new Error('任务输入格式无效')
+            }
             await intervention.modifyAndRerun(msg.sessionId, msg.taskId, msg.newInput)
             break
         }
@@ -174,6 +197,12 @@ async function handleClientMessage(
             if (!msg.sessionId || !msg.taskId || !msg.feedback) {
                 sendError(socket, 'orch:feedback 需要 sessionId、taskId 与 feedback')
                 return
+            }
+            requireOwnedSession(msg.sessionId)
+            if (typeof msg.feedback.agentId !== 'string' || msg.feedback.agentId.length > 128
+                || !['good', 'bad', 'correction'].includes(msg.feedback.feedbackType)
+                || typeof msg.feedback.content !== 'string' || msg.feedback.content.length > 4000) {
+                throw new Error('反馈格式无效')
             }
             intervention.recordFeedback({
                 sessionId: msg.sessionId,
