@@ -11,6 +11,7 @@ GitHub 已接收主分支提交，但 Render 对该提交的新部署报告失�
 ## 1. 已固化的部署契约
 
 - Render 原生 Node 运行时，Node `24.21.0`；应用自身再次校验 `>=24.11 <25`。
+- Blueprint 明确连接 `main`，并配置 `autoDeployTrigger: checksPass`；主分支提交须先通过 GitHub Actions 回归才触发自动部署。若服务是手工创建或旧 Blueprint 尚未同步，仍须在 Dashboard 的 Auto-Deploy 中选择 **After CI Checks Pass**，并核对连接分支为 `main`。
 - `scripts/render-build.mjs` 分别使用 `frontend/pnpm-lock.yaml` 与 `backend/pnpm-lock.yaml` 执行 `pnpm install --frozen-lockfile --prod=false`，不会制造或合并第三套锁文件。
 - 前端先构建到 `frontend/dist`，后端构建到 `backend/dist`；生产时由 Fastify 同源托管前端、API、SSE、WebSocket 和受保护媒体。
 - Web Service 监听 Render 注入的 `PORT`，并强制 `HOST=0.0.0.0`。

@@ -718,19 +718,21 @@ export class Orchestrator {
 
             if (!scheduler.isCurrent(node.id, attemptRevision)) return
             if (taskController.signal.aborted) throw new DOMException('Aborted', 'AbortError')
+            const tokens = result.usage?.promptTokens + result.usage?.completionTokens
+            if (!Number.isFinite(tokens) || tokens < 0) throw new Error('Agent 返回的 token 用量无效')
             // 成功
             scheduler.markDone(node.id, result.output, attemptRevision)
             const latency = Date.now() - startedAt
             execution.agentInvocations.push({
                 agentId: node.agentId,
                 latencyMs: latency,
-                tokens: result.usage.promptTokens + result.usage.completionTokens,
+                tokens,
             })
 
             this.emitTaskEvent(ORCH_EVENTS.TASK_DONE, ctx.sessionId, node.id, {
                 agentId: node.agentId,
                 latencyMs: latency,
-                tokens: result.usage.promptTokens + result.usage.completionTokens,
+                tokens,
             })
             const completedNode = scheduler.getNode(node.id)
             if (completedNode) this.notifyTaskUpdate(ctx, completedNode)

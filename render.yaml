@@ -4,7 +4,9 @@
 services:
   - type: web
     name: poetic-realm-ai
+    branch: main
     runtime: node
+    autoDeployTrigger: checksPass
     region: singapore
     plan: starter
     numInstances: 1

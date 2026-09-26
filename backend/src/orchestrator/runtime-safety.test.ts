@@ -165,6 +165,13 @@ describe('integrated orchestrator execution', () => {
         try { const result = await engine.execute(plan(task('a')), { sessionId: 'observer', teacherId: 't', onTaskUpdate: () => { throw new Error('UI disconnected') } }); expect(result.success).toBe(true) }
         finally { warn.mockRestore() }
     })
+    it('rejects malformed Agent usage before committing a successful task', async () => {
+        const { engine } = harness({ a: { invoke: async () => ({ output: { answer: 1 }, usage: { promptTokens: NaN, completionTokens: 1 } }) } })
+        const result = await engine.execute(plan(task('a')), { sessionId: 'invalid-usage', teacherId: 't' })
+        expect(result.success).toBe(false)
+        expect(result.failedTasks).toEqual(['a'])
+        expect(result.results.size).toBe(0)
+    })
     it('cancels a paused session to terminal failure rather than hanging or reporting success', async () => {
         const a = { invoke: vi.fn((_input: unknown, ctx: { signal: AbortSignal }) => new Promise((_resolve, reject) => ctx.signal.addEventListener('abort', () => reject(new Error('cancelled')), { once: true }))) }
         const { engine } = harness({ a })

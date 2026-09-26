@@ -31,4 +31,6 @@ test('deployment template contains no published password verifier or personal ph
     assert.match(config, /key: AUTH_PASSWORD_SCRYPT\s+sync: false/)
     assert.match(config, /key: SEED_LEARNING_DEMO\s+value: "false"/)
     assert.match(config, /key: AUTH_MODE\s+value: password/)
+    assert.match(config, /branch: main/)
+    assert.match(config, /autoDeployTrigger: checksPass/)
 })

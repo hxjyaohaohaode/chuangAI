@@ -1,7 +1,7 @@
 name: Runtime refactor verification
 on:
   push:
-    branches: [refactor/verified-foundation-20260926]
+    branches: [main]
   pull_request:
     branches: [main]
 permissions:
