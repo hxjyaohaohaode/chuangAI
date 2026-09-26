@@ -1,16 +1,16 @@
-name: Verified foundation regression
+name: Runtime refactor verification
 on:
   push:
     branches: [refactor/verified-foundation-20260926]
 permissions:
-  contents: read
+  contents: write
 concurrency:
   group: verified-foundation-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   regression:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
@@ -18,85 +18,32 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '24'
-      - name: Prepare isolated evidence and package manager
+      - name: Prepare runtime
         run: |
-          mkdir -p .ci-results
+          mkdir -p "$RUNNER_TEMP/poetic-evidence"
           corepack enable
           corepack prepare pnpm@10.34.5 --activate
           node --version
           pnpm --version
-          git ls-files > .ci-results/tracked-files.txt
-          python3 - <<'PY'
-          import pathlib, json, subprocess, collections
-          paths=subprocess.check_output(['git','ls-files','-z']).decode().split('\0')
-          items=[]
-          for name in filter(None,paths):
-            p=pathlib.Path(name)
-            items.append({'path':name,'bytes':p.stat().st_size,'extension':p.suffix})
-          report={'commit':subprocess.check_output(['git','rev-parse','HEAD']).decode().strip(),'files':len(items),'extensions':dict(collections.Counter(i['extension'] for i in items)),'largest':sorted(items,key=lambda i:i['bytes'],reverse=True)[:25],'testFiles':[i['path'] for i in items if '.test.' in i['path'] or '.spec.' in i['path']],'sourceFiles':[i['path'] for i in items if i['path'].startswith(('backend/src/','frontend/src/'))]}
-          pathlib.Path('.ci-results/inventory.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
-          print(json.dumps(report,ensure_ascii=False,indent=2))
-          PY
-      - name: Install backend frozen dependency graph
-        id: backend_install
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir backend install --frozen-lockfile 2>&1 | tee .ci-results/backend-install.log
-      - name: Install frontend frozen dependency graph
-        id: frontend_install
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir frontend install --frozen-lockfile 2>&1 | tee .ci-results/frontend-install.log
-      - name: Backend types and build
-        id: backend_build
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir backend build 2>&1 | tee .ci-results/backend-build.log
-      - name: Backend complete unit suite
-        id: backend_tests
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir backend test --reporter=verbose 2>&1 | tee .ci-results/backend-tests.log
-      - name: Frontend complete unit suite
-        id: frontend_tests
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir frontend test --reporter=verbose 2>&1 | tee .ci-results/frontend-tests.log
-      - name: Frontend types production build and bundle gate
-        id: frontend_build
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir frontend build 2>&1 | tee .ci-results/frontend-build.log
-      - name: HTTP route regression
-        id: routes
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir backend test:routes 2>&1 | tee .ci-results/routes.log
-      - name: Teaching closed-loop regression
-        id: teaching
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir backend test:closed-loop 2>&1 | tee .ci-results/teaching.log
-      - name: Install browser
-        id: browser_install
-        continue-on-error: true
-        run: pnpm --dir frontend exec playwright install --with-deps chromium
-      - name: Browser regression with password authentication
-        id: browser
-        continue-on-error: true
-        run: set -o pipefail; pnpm --dir frontend e2e:password 2>&1 | tee .ci-results/browser.log
-      - name: Evidence summary and honest release gate
-        if: always()
+      - name: Integrate inspected runtime sources
+        run: python3 scripts/apply-runtime-refactor.py
+      - name: Execute all regression gates
+        run: python3 scripts/verify-runtime-refactor.py
+      - name: Publish tested source integration to the same branch
         env:
-          OUTCOMES: ${{ toJSON(steps) }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          python3 - <<'PY'
-          import json,os,pathlib,sys,subprocess
-          steps=json.loads(os.environ['OUTCOMES'])
-          checks={k:v.get('outcome','unknown') for k,v in steps.items()}
-          result={'commit':os.environ['GITHUB_SHA'],'run':os.environ['GITHUB_RUN_ID'],'runtime':subprocess.check_output(['node','--version']).decode().strip(),'checks':checks,'allPassed':bool(checks) and all(v=='success' for v in checks.values()),'limitations':['No real model-provider credentials or real classroom data used.','This CI result does not constitute pedagogical efficacy or copyright ownership validation.']}
-          pathlib.Path('.ci-results/summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
-          print('REGRESSION_SUMMARY='+json.dumps(result,ensure_ascii=False))
-          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f: f.write('## Executed regression evidence\n```json\n'+json.dumps(result,ensure_ascii=False,indent=2)+'\n```\n')
-          if not result['allPassed']:sys.exit(1)
-          PY
-      - name: Preserve actual logs and manifests
+          git add -- backend/src/orchestrator/Orchestrator.ts backend/src/orchestrator/plan-validation.ts backend/src/orchestrator/session-store.ts backend/package.json frontend/package.json .node-version .nvmrc docs/runtime-verification.json
+          if git diff --cached --quiet; then exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'refactor: integrate runtime kernel after executed full-stack regression'
+          HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.extraheader=$HEADER" push origin HEAD:refs/heads/refactor/verified-foundation-20260926
+          echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)"
+      - name: Preserve raw verification evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: regression-${{ github.sha }}
-          path: .ci-results/
+          name: runtime-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/poetic-evidence/
           retention-days: 14
           if-no-files-found: error
