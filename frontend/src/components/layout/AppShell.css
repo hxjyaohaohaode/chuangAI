@@ -1257,6 +1257,13 @@ body.sidebar-resizing .pr-sidebar {
     align-items: center;
 }
 
+/* header 自身是 z-index:sticky 的堆叠上下文；仅提高 dropdown 的 z-index 无法
+ * 越过挂在 body 下的 Toast。设置对话框打开期间提升整个 header 上下文，
+ * 确保通知仍被读屏宣读但不会遮挡正在编辑的表单。 */
+html[data-settings-panel-open='true'] .pr-header {
+    z-index: calc(var(--z-toast) + 1);
+}
+
 .pr-settings-panel-dropdown {
     position: absolute;
     top: calc(100% + var(--space-sm));
@@ -1273,14 +1280,24 @@ body.sidebar-resizing .pr-sidebar {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
-    background: rgb(var(--c-bg-surface));
+    /* 设置包含密钥、隐私与退出操作，首帧就必须完全可读。禁止复用普通
+     * 下拉菜单的透明淡入/缩放，也禁止让页面内容穿透到表单背后。 */
+    color: rgb(var(--c-text-primary));
+    background-color: #fffdf9;
+    background-color: rgb(var(--c-surface-elevated));
+    background-image: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    filter: none;
+    opacity: 1;
+    transform: none;
+    mix-blend-mode: normal;
+    isolation: isolate;
     border: 1px solid rgb(var(--c-border-primary) / 0.42);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-popover);
     z-index: var(--z-popover);
-    animation: pr-dropdown-in var(--dur-small) var(--ease-out) both;
+    animation: none;
 }
 
 .pr-settings-title {
@@ -1766,7 +1783,7 @@ body.sidebar-resizing .pr-sidebar {
     flex-direction: column;
     gap: var(--space-xs);
     padding: var(--space-sm);
-    background: rgb(var(--c-surface-secondary) / 0.72);
+    background: rgb(var(--c-surface-secondary));
     border-radius: var(--radius-sm);
 }
 
@@ -1793,7 +1810,7 @@ body.sidebar-resizing .pr-sidebar {
     padding: 6px 8px;
     border: 1px solid rgb(var(--c-text-primary) / 0.12);
     border-radius: var(--radius-xs);
-    background: rgb(var(--c-surface-primary) / 0.7);
+    background: rgb(var(--c-surface-primary));
     color: rgb(var(--c-text-primary));
     font: inherit;
     font-size: var(--text-2xs);
@@ -1938,7 +1955,7 @@ body.sidebar-resizing .pr-sidebar {
     flex-direction: column;
     gap: 5px;
     padding: var(--space-sm);
-    background: rgb(var(--c-surface-secondary) / 0.5);
+    background: rgb(var(--c-surface-secondary));
     border-radius: var(--radius-xs);
 }
 
@@ -1992,7 +2009,7 @@ body.sidebar-resizing .pr-sidebar {
     gap: var(--space-xs);
     padding: var(--space-md);
     border-radius: var(--radius-sm);
-    background: rgb(var(--c-surface-tertiary) / 0.42);
+    background: rgb(var(--c-surface-tertiary));
 }
 
 .pr-cred-item-head {

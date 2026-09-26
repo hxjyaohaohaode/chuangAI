@@ -62,20 +62,21 @@
     width: min(520px, calc(100% - 28px));
     max-width: none;
     margin-inline: auto;
-    padding: 6px;
-    border-radius: 15px;
-    border: 1px solid color-mix(in srgb, var(--text-primary) 13%, transparent);
-    background: var(--surface-primary);
-    box-shadow: 0 5px 14px color-mix(in srgb, var(--text-primary) 8%, transparent);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .pr-flying-posters__controls > button {
     min-width: 44px;
     min-height: 48px;
-    border: 0;
-    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
+    border-radius: 50%;
     color: var(--text-primary);
-    background: var(--surface-secondary);
+    background: color-mix(in srgb, var(--surface-primary) 94%, transparent);
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--text-primary) 8%, transparent);
     font: inherit;
     cursor: pointer;
 }
@@ -101,6 +102,11 @@
     justify-content: space-between;
     gap: 12px;
     padding-inline: 16px;
+    border: 0 !important;
+    border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 24%, transparent) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
     text-align: left;
 }
 
@@ -145,15 +151,21 @@
 
 @media (forced-colors: active) {
     .pr-flying-posters__controls {
-        border: 2px solid CanvasText;
-        background: Canvas;
-        forced-color-adjust: none;
+        border: 0;
+        background: transparent;
     }
 
     .pr-flying-posters__controls > button {
         border: 1px solid ButtonText;
         color: ButtonText;
         background: ButtonFace;
+        forced-color-adjust: none;
+    }
+
+    .pr-flying-posters__current {
+        border-bottom: 2px solid CanvasText !important;
+        color: CanvasText;
+        background: Canvas !important;
     }
 }
 

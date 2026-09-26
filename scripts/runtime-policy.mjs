@@ -1,10 +1,10 @@
 /** Runtime policy shared by deployment, local preflight and production-browser tests. */
-export const NODE_ENGINE = '>=24.0.0 <25'
+export const NODE_ENGINE = '>=24.11 <25'
 export const REFERENCE_NODE = '24.21.0'
 export const PNPM_VERSION = '10.34.5'
 export function isSupportedNode(version = process.versions.node) {
     const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version)
-    return Boolean(match && Number(match[1]) === 24)
+    return Boolean(match && Number(match[1]) === 24 && Number(match[2]) >= 11)
 }
 export function assertSupportedRuntime(context = '应用', version = process.versions.node) {
     if (!isSupportedNode(version)) {

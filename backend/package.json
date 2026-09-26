@@ -3,7 +3,7 @@
     "version": "5.0.0",
     "packageManager": "pnpm@10.34.5",
     "engines": {
-        "node": ">=20.19 <21"
+        "node": ">=24.11 <25"
     },
     "description": "诗脉·启明 PoeticRealm AI v5.0 后端 - 异构多智能体编排服务",
     "type": "module",
@@ -30,17 +30,17 @@
         "@fastify/websocket": "^11.3.0",
         "better-sqlite3": "12.11.1",
         "dotenv": "^16.4.5",
-        "fastify": "^5.10.0",
+        "fastify": "^5.12.5",
         "neo4j-driver": "^5.24.0",
         "openai": "^4.67.0",
         "pino": "^10.3.1",
         "pino-pretty": "^11.3.0",
-        "sharp": "^0.35.3",
+        "sharp": "^0.35.4",
         "zod": "^3.23.8"
     },
     "devDependencies": {
         "@types/better-sqlite3": "^7.6.11",
-        "@types/node": "^20.16.10",
+        "@types/node": "^24.19.0",
         "@types/ws": "^8.18.1",
         "@vitest/coverage-v8": "^4.1.10",
         "nodemon": "^3.1.7",

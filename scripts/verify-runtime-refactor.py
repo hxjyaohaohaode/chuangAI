@@ -32,6 +32,9 @@ run('backend-build', ['pnpm', '--dir', 'backend', 'build'])
 run('backend-tests', ['pnpm', '--dir', 'backend', 'test', '--reporter=json', '--outputFile=' + str(OUT / 'backend-vitest.json')])
 run('frontend-tests', ['pnpm', '--dir', 'frontend', 'test', '--reporter=json', '--outputFile=' + str(OUT / 'frontend-vitest.json')])
 run('frontend-build', ['pnpm', '--dir', 'frontend', 'build'])
+run('render-build', ['node', 'scripts/render-build.mjs'], 900)
+run('render-start-smoke', ['node', 'scripts/render-smoke.mjs'])
+run('release-boundary', ['node', 'scripts/audit-release-boundary.mjs'])
 run('http-routes', ['pnpm', '--dir', 'backend', 'test:routes'])
 run('teaching-loop', ['pnpm', '--dir', 'backend', 'test:closed-loop'])
 run('browser-install', ['pnpm', '--dir', 'frontend', 'exec', 'playwright', 'install', '--with-deps', 'chromium'])
@@ -63,7 +66,4 @@ result = {
 print('REGRESSION_SUMMARY ' + json.dumps(result, ensure_ascii=False), flush=True)
 if os.environ.get('GITHUB_STEP_SUMMARY'):
     with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream: stream.write('## Actual regression evidence\n```json\n' + json.dumps(result, ensure_ascii=False, indent=2) + '\n```\n')
-if result['allPassed']:
-    Path('docs').mkdir(exist_ok=True)
-    Path('docs/runtime-verification.json').write_text(json.dumps(result, ensure_ascii=False, indent=2))
 sys.exit(0 if result['allPassed'] else 1)

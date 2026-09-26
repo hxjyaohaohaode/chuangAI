@@ -52,7 +52,7 @@ async function acquireSession(baseUrl) {
     const response = await fetch(`${baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teacherId: 'teacher-001', name: '王雅琴' }),
+        body: JSON.stringify({ phone: '13177091153', password: 'Chy101713' }),
     })
     if (response.status !== 200) throw new Error(`认证会话建立失败：status=${response.status}`)
     const body = await response.json()
@@ -78,7 +78,7 @@ async function verifyAuthLifecycle(baseUrl) {
     const invalidLogin = await fetch(`${baseUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teacherId: 'teacher-not-allowed', name: '越权账号' }),
+        body: JSON.stringify({ phone: '13900000000', password: 'invalid-demo-password' }),
     })
     if (invalidLogin.status !== 401) throw new Error(`非白名单演示账号未被拒绝：${invalidLogin.status}`)
 

@@ -31,6 +31,7 @@ describe('EventBridge persistent evidence integration', () => {
 
         expect(broadcasts).toHaveLength(1)
         expect(broadcasts[0]?.sessionId).toBe('session-bridge')
+        expect(JSON.stringify(broadcasts[0])).not.toContain('学生隐私内容')
         const trace = traceStore.getTrace('session-bridge')
         expect(trace.events).toHaveLength(1)
         expect(trace.events[0]).toMatchObject({

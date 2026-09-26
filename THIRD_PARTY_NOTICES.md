@@ -1,6 +1,6 @@
 # Third-Party Notices / 第三方软件声明
 
-生成时间：2026-08-12T01:35:16.324Z
+生成时间：2026-09-26T19:50:52.959Z
 
 本项目原创部分采用根目录 `LICENSE` 中的 MIT License。该许可不覆盖下列第三方依赖、上游改编组件、字体、模型或外部服务；它们继续受各自条款约束。本文件由已安装且锁定的生产依赖树生成，不是法律意见。更换平台、依赖版本或发布形态后必须重新生成并复核。
 
@@ -13,18 +13,18 @@
 
 ## 受控前端回归证据
 
-- 证据：`docs/audit/production-e2e-latest.json`；生成时间 2026-08-12T01:34:20.576Z；路由/视口组合 32；warnings=0；failures=0。
+- 证据：`docs/audit/production-e2e-latest.json`；生成时间 2026-09-26T19:47:29.288Z；路由/视口组合 32；warnings=0；failures=0。
 - Radar、PixelSnow、TextSwitch、MagicBento、LessonPlan SphereGallery、StarMapDome 诗篇画廊及 SphereGallery 轻量资源边界的 checked 状态：{"radarDecoration":true,"pixelSnowDecoration":true,"classroomTextSwitch":true,"dashboardMagicBento":true,"lessonPlanImageGallery":true,"starMapPoetryGallery":true,"sphereGalleryLightweightResourceBoundary":true}。
 - 边界：This aggregate and its checked contracts prove only the controlled frontend behavior, accessibility, geometry, fallback and resource boundaries named in that evidence file. They do not prove image or knowledge-graph provenance, teaching outcomes, production backend availability, untested-browser GPU behavior or competition results.
 
 ## 生产依赖摘要
 
-- 唯一包版本：404
+- 唯一包版本：408
 - 直接依赖：31
 - 未发现 GPL/AGPL 生产包：是
 - 本地混合来源组件待人工闭合：0
 - 需人工复核的生产依赖条款：1
-- 安装包根目录含 LICENSE/COPYING/NOTICE 文本：375
+- 安装包根目录含 LICENSE/COPYING/NOTICE 文本：379
 - 安装包根目录未含上述文本、但保留 npm 元数据许可声明：29
 - npm 元数据未声明许可证：0
 
@@ -98,20 +98,18 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### @fastify/ajv-compiler@4.0.5
+### @fastify/ajv-compiler@4.0.6
 
 - License：MIT
 - 区域：backend；传递依赖
 - Author：Manuel Spigolon
 - Homepage：https://github.com/fastify/ajv-compiler#readme
-- 包内文件：LICENSE；SHA-256 `9107d3439217d1dc2db08b738d2da931cd8d911049ec187de50657df7ae69927`
+- 包内文件：LICENSE；SHA-256 `e2d09f74a77005e85e9f9bd501e3b7599ccae19d918538461196dde42f7f1b97`
 
 ```text
 MIT License
 
-Copyright (c) 2022-present The Fastify team
-
-The Fastify team members are listed at https://github.com/fastify/fastify#team.
+Copyright (c) 2022-present The Fastify team <https://github.com/fastify/fastify#team>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -297,21 +295,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @fastify/forwarded@3.0.1
+### @fastify/forwarded@3.0.2
 
 - License：MIT
 - 区域：backend；传递依赖
 - Author：Douglas Christopher Wilson
 - Homepage：https://github.com/fastify/forwarded#readme
-- 包内文件：LICENSE；SHA-256 `d68a3fa8f9d630e745cbdc7398691467fc11b2d4fe466f68692402461cf67781`
+- 包内文件：LICENSE；SHA-256 `9276503e39bdcaad7d26993fae17b1e82d7ef65cf0fe0ae54c361bbc6cbc33da`
 
 ```text
 MIT License
 
 Copyright (c) 2014-2017 Douglas Christopher Wilson
-Copyright (c) 2021-present The Fastify team
-
-The Fastify team members are listed at https://github.com/fastify/fastify#team.
+Copyright (c) 2021-present The Fastify team <https://github.com/fastify/fastify#team>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -453,21 +449,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @fastify/proxy-addr@5.1.0
+### @fastify/proxy-addr@5.1.1
 
 - License：MIT
 - 区域：backend；传递依赖
 - Author：Douglas Christopher Wilson
 - Homepage：https://github.com/fastify/proxy-addr#readme
-- 包内文件：LICENSE；SHA-256 `2b78f11c8624f013751e54a34d87e8b5be5dd525dff65c7cda86f5439ed8bf8e`
+- 包内文件：LICENSE；SHA-256 `4ffb54af38f35ca8005893c382e19f3c3e919c499d50804c00d3c124bc6508f4`
 
 ```text
 MIT License
 
 Copyright (c) 2014-2016 Douglas Christopher Wilson
-Copyright (c) 2021-present The Fastify team
-
-The Fastify team members are listed at https://github.com/fastify/fastify#team.
+Copyright (c) 2021-present The Fastify team <https://github.com/fastify/fastify#team>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -678,7 +672,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### @img/sharp-win32-x64@0.35.3
+### @img/sharp-win32-x64@0.35.4
 
 - License：Apache-2.0 AND LGPL-3.0-or-later
 - 区域：backend；传递依赖
@@ -1613,6 +1607,37 @@ MIT License
 ```
 
 ### @types/node@20.19.43
+
+- License：MIT
+- 区域：backend；传递依赖
+- Homepage：https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node
+- 包内文件：LICENSE；SHA-256 `c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383`
+
+```text
+MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+```
+
+### @types/node@24.19.0
 
 - License：MIT
 - 区域：backend；传递依赖
@@ -5226,7 +5251,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### fast-uri@3.1.5
+### fast-uri@3.1.6
 
 - License：BSD-3-Clause
 - 区域：backend；传递依赖
@@ -5267,7 +5292,7 @@ The complete list of contributors can be found at:
 - https://github.com/garycourt/uri-js/graphs/contributors
 ```
 
-### fastify@5.10.0
+### fastify@5.12.5
 
 - License：MIT
 - 区域：backend；直接依赖
@@ -5355,36 +5380,28 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
-### fflate@0.6.9
+### fastq@1.20.3
 
-- License：MIT
-- 区域：frontend；传递依赖
-- Author：Arjun Barrett
-- Homepage：https://101arrowz.github.io/fflate
-- 包内文件：LICENSE；SHA-256 `62249119bb7df6e54300f37a37145c26a6d4420410aac8881a119c5b427cf751`
+- License：ISC
+- 区域：backend；传递依赖
+- Author：Matteo Collina
+- Homepage：https://github.com/mcollina/fastq#readme
+- 包内文件：LICENSE；SHA-256 `c3367f6d01a79d368fc4fbb41b3615fcd92f243d6597ab96742f6f976f9325af`
 
 ```text
-MIT License
+Copyright (c) 2015-2020, Matteo Collina <matteo.collina@gmail.com>
 
-Copyright (c) 2020 Arjun Barrett
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
 ### fflate@0.8.3
@@ -5450,7 +5467,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### find-my-way@9.7.0
+### find-my-way@9.9.0
 
 - License：MIT
 - 区域：backend；传递依赖
@@ -6497,7 +6514,7 @@ TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 ```
 
-### ipaddr.js@2.4.0
+### ipaddr.js@2.5.0
 
 - License：MIT
 - 区域：backend；传递依赖
@@ -10010,6 +10027,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+### process-warning@5.1.0
+
+- License：MIT
+- 区域：backend；传递依赖
+- Author：Tomas Della Vedova
+- Homepage：https://github.com/fastify/fastify-warning#readme
+- 包内文件：LICENSE；SHA-256 `8d3c1dd501e056405ab56f4ad87b987070d55d1fe814616584ec2360045f9017`
+
+```text
+MIT License
+
+Copyright (c) 2020-present The Fastify team <https://github.com/fastify/fastify#team>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ### promise-worker-transferable@1.0.4
 
 - License：Apache-2.0
@@ -11769,7 +11818,7 @@ OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
-### sharp@0.35.3
+### sharp@0.35.4
 
 - License：Apache-2.0
 - 区域：backend；直接依赖
@@ -12730,6 +12779,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+### toad-cache@3.7.4
+
+- License：MIT
+- 区域：backend；传递依赖
+- Author：Igor Savin
+- Homepage：https://github.com/kibertoad/toad-cache
+- 包内文件：LICENSE；SHA-256 `644304c533dee96438937c0bdcbb49897d80fd8df3be4573f3c57b9c2ca22587`
+
+```text
+MIT License
+
+Copyright (c) 2023 Igor Savin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ### toidentifier@1.0.1
 
 - License：MIT
@@ -13056,6 +13137,37 @@ SOFTWARE.
 ```
 
 ### undici-types@6.21.0
+
+- License：MIT
+- 区域：backend；传递依赖
+- Homepage：https://undici.nodejs.org
+- 包内文件：LICENSE；SHA-256 `a6db8096b2707bc0102d256917d4d33f298ba36d8c3f25de067a2b5bb379db27`
+
+```text
+MIT License
+
+Copyright (c) Matteo Collina and Undici contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### undici-types@7.24.6
 
 - License：MIT
 - 区域：backend；传递依赖

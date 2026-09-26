@@ -23,6 +23,7 @@ import type { WSEvent, WSSubscriptionFilter } from '../types.js'
 interface ConnectionEntry {
     socket: WebSocket
     filter: WSSubscriptionFilter
+    ownerId?: string
     /** 注册时间戳，用于诊断 */
     registeredAt: number
     /** 最后活动时间戳（B6.2：用于空闲检测） */
@@ -55,7 +56,7 @@ export class WSBroadcaster {
     /** 空闲连接扫描定时器（B6.2） */
     private idleScanTimer: NodeJS.Timeout | null = null
 
-    constructor(fastify: FastifyInstance) {
+    constructor(fastify: FastifyInstance, private readonly sessionOwner?: (sessionId: string) => string | undefined) {
         this.fastify = fastify
         // B6.2: 启动空闲连接定期扫描
         this.idleScanTimer = setInterval(() => this.cleanupIdleConnections(), IDLE_SCAN_INTERVAL_MS)
@@ -71,7 +72,7 @@ export class WSBroadcaster {
      * @param socket 客户端 socket
      * @param filter 订阅过滤器（可选）
      */
-    registerConnection(socket: WebSocket, filter: WSSubscriptionFilter = {}): void {
+    registerConnection(socket: WebSocket, filter: WSSubscriptionFilter = {}, ownerId?: string): void {
         // B6.2: 最大连接数限制
         if (this.connections.size >= MAX_CONNECTIONS) {
             this.fastify.log.warn(
@@ -91,6 +92,7 @@ export class WSBroadcaster {
         const entry: ConnectionEntry = {
             socket,
             filter,
+            ownerId,
             registeredAt: now,
             lastActivityAt: now,
             connectionId: `ws_${connectionIdCounter}`,
@@ -153,7 +155,9 @@ export class WSBroadcaster {
      * 发送失败的连接会被清理。
      */
     broadcast(event: WSEvent): void {
+        const owner = event.sessionId ? this.sessionOwner?.(event.sessionId) : undefined
         for (const entry of this.connections) {
+            if (owner && entry.ownerId !== owner) continue
             if (!this.matchFilter(event, entry.filter)) continue
 
             try {

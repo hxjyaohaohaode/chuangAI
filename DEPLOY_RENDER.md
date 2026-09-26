@@ -2,9 +2,15 @@
 
 本手册对应仓库根目录的 `render.yaml`。它说明如何完成首次创建和验收；仓库中的蓝图与本地测试通过，不等于 Render 控制台已经创建服务，也不等于真实域名、供应商密钥和公网网络已经验收。
 
+## 当前部署故障的核查边界（2026-09-27）
+
+GitHub 已接收主分支提交，但 Render 对该提交的新部署报告失败；公开健康检查仍可能由上一版实例响应，不能据此宣称新版部署成功。PR #2 的 Codex Review 邮件是代码审查意见，并不是 Render 构建或启动日志。排障时必须打开 Render Dashboard 的对应 Deploy 日志，定位第一条真正的构建/启动错误；本地构建通过只能缩小原因范围。
+
+本次代码把 `AUTH_TEACHER_PHONE` 和 `AUTH_PASSWORD_SCRYPT` 设为 Blueprint 的无值输入。**已有 Render 服务不会因为修改 `render.yaml` 中的 `sync: false` 自动清除或轮换旧环境变量。** 对已经上线的服务，所有者须在 Dashboard 为 `AUTH_TEACHER_PHONE` 设置自己控制的手机号，在本地用 `pnpm --dir backend auth:hash-password` 为全新密码生成摘要并更新 `AUTH_PASSWORD_SCRYPT`，同时轮换 `AUTH_SESSION_SECRET` 使旧会话失效，然后重新部署并验证新版 Deploy 状态为成功。不要更改 `CREDENTIAL_VAULT_MASTER_KEY`，除非先完成保险柜迁移，否则已保存的模型凭据将无法解密。仓库公开历史中的演示摘要被正式模式的启动校验拒绝；用旧值继续部署会明确失败。
+
 ## 1. 已固化的部署契约
 
-- Render 原生 Node 运行时，Node `20.19.0`；应用自身再次校验 `>=20.19 <21`。
+- Render 原生 Node 运行时，Node `24.21.0`；应用自身再次校验 `>=24.11 <25`。
 - `scripts/render-build.mjs` 分别使用 `frontend/pnpm-lock.yaml` 与 `backend/pnpm-lock.yaml` 执行 `pnpm install --frozen-lockfile --prod=false`，不会制造或合并第三套锁文件。
 - 前端先构建到 `frontend/dist`，后端构建到 `backend/dist`；生产时由 Fastify 同源托管前端、API、SSE、WebSocket 和受保护媒体。
 - Web Service 监听 Render 注入的 `PORT`，并强制 `HOST=0.0.0.0`。
@@ -100,10 +106,8 @@ render blueprints validate render.yaml --workspace <WORKSPACE_ID>
 2. 确认 Blueprint 路径是仓库根的 `render.yaml`。
 3. 首次创建时填写 `sync: false` 的值：
    - `AUTH_PASSWORD_SCRYPT`：上一步生成的完整 scrypt 摘要；
-   - `AUTH_TEACHER_NAME`：部署主体显示名；
-   - `AUTH_TEACHER_PHONE`：系统所有者手机号。若比赛部署刻意复用内置演示手机号，
-     该手机号在 `AUTH_MODE=password` 下会优先按所有者摘要认证并获得所有者权限；
-     因此绝不能再把对应密码公开在登录页、仓库说明或答辩截图中。
+   - `AUTH_TEACHER_PHONE`：系统所有者控制的手机号，不要复用仓库公开的演示手机号和密码；
+   - 若需自定义显示名，在 Dashboard 单独修改 `AUTH_TEACHER_NAME`，蓝图默认值为“教师”。
 4. `AUTH_SESSION_SECRET` 与 `CREDENTIAL_VAULT_MASTER_KEY` 由 Blueprint 的 `generateValue: true` 分别生成；不要手工替换、复制到仓库或在应用界面展示。
 5. 确认实例为 `starter`、单实例、持久盘名 `poetic-realm-data`、挂载路径 `/var/data`、初始容量 `1 GB`。Starter 或更高付费实例（Starter+）是持久盘的最低部署边界；持久盘和实例会产生费用，容量可增加但不能缩小。
 6. 创建并等待 Build、Deploy 和 `/api/health` 三项均成功。

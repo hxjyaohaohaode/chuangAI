@@ -169,7 +169,7 @@ describe('integrated orchestrator execution', () => {
         const a = { invoke: vi.fn((_input: unknown, ctx: { signal: AbortSignal }) => new Promise((_resolve, reject) => ctx.signal.addEventListener('abort', () => reject(new Error('cancelled')), { once: true }))) }
         const { engine } = harness({ a })
         const running = engine.execute(plan(task('a')), { sessionId: 'paused-abort', teacherId: 't' })
-        await vi.waitFor(() => expect(a.invoke).toHaveBeenCalled()); engine.pause('a'); await tick(); engine.abortSession('paused-abort')
+        await vi.waitFor(() => expect(a.invoke).toHaveBeenCalled()); await engine.pause('paused-abort', 'a'); await tick(); engine.abortSession('paused-abort')
         const result = await running; expect(result.success).toBe(false); expect(result.results.size).toBe(0)
     })
 })

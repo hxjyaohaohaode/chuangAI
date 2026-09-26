@@ -25,7 +25,6 @@
 import { useEffect } from 'react'
 import '@/components/ui/icons-extended'
 import { Icon } from '@/components/ui'
-import { GradualBlur } from '@/components/ui/GradualBlur'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { useReportStore } from '@/stores/report'
 import { useWSSubscription } from '@/hooks/useWSSubscription'
@@ -161,19 +160,6 @@ export default function ReportPage() {
                         data-anchor-label="报告预览"
                     >
                         <ReportPreview />
-                        {/* GradualBlur 渐进模糊边界遮罩
-                         * 仅保留本项目独立实现的产品需求：
-                         * 卷轴意象的视觉延伸 —— 底部渐进模糊暗示"卷轴未尽"
-                         * 多层 backdrop-filter 叠加 + bezier 曲线分布，营造柔和的边缘渐隐
-                         * strength=2 + divCount=6 平衡视觉强度与性能 */}
-                        <GradualBlur
-                            position="bottom"
-                            height="6rem"
-                            strength={2}
-                            divCount={6}
-                            curve="bezier"
-                            opacity={0.9}
-                        />
                         <section
                             className="pr-rpt-page-action-board"
                             data-anchor

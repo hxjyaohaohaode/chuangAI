@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import { parseEnvironment } from './environment.js'
 import { assertSafeNetworkBoundary } from './security/network-boundary.js'
 import { isSupportedScryptHash } from './security/scrypt-password.js'
+import { DEMO_TEACHERS } from './security/auth.js'
 import { parseTrustedDeploymentOrigins } from './security/public-origin-policy.js'
 import { resolveRuntimePaths } from './runtime-paths.js'
 
@@ -126,6 +127,7 @@ export interface AuthConfigurationInput {
     mode: 'demo' | 'password'
     sessionSecret: string
     passwordScrypt: string
+    teacherPhone?: string
 }
 
 /** 纯校验入口便于验证所有危险配置分支，不依赖进程环境。 */
@@ -135,11 +137,18 @@ export function assertValidAuthConfiguration(auth: AuthConfigurationInput): void
     }
     if (auth.mode === 'demo') return
 
+    if (!auth.teacherPhone || !/^1[3-9]\d{9}$/u.test(auth.teacherPhone)) {
+        throw new Error('启动失败：AUTH_MODE=password 时必须显式配置 AUTH_TEACHER_PHONE。')
+    }
+
     if (Buffer.byteLength(auth.sessionSecret, 'utf8') < 32) {
         throw new Error('启动失败：AUTH_MODE=password 时必须配置至少 32 字节的 AUTH_SESSION_SECRET。')
     }
     if (!isSupportedScryptHash(auth.passwordScrypt)) {
         throw new Error('启动失败：AUTH_PASSWORD_SCRYPT 不是受支持且可执行的 scrypt 摘要。')
+    }
+    if (DEMO_TEACHERS.some((teacher) => teacher.passwordScrypt === auth.passwordScrypt)) {
+        throw new Error('启动失败：AUTH_PASSWORD_SCRYPT 使用了仓库公开的演示摘要，必须轮换。')
     }
 }
 

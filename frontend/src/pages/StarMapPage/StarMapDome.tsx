@@ -254,7 +254,7 @@ export function StarMapDome({
                     className="pr-sm-dome-gallery"
                     ariaLabel="3D 旋转诗境画廊"
                     activeIndex={safeActiveIndex}
-                    distortion={0}
+                    distortion={3}
                     planeWidth={440}
                     planeHeight={248}
                     onActivate={handleSelectIndex}

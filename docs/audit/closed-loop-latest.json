@@ -1,7 +1,7 @@
 {
-  "startedAt": "2026-08-10T07:18:14.330Z",
-  "finishedAt": "2026-08-10T07:18:14.480Z",
-  "baseUrl": "http://127.0.0.1:60791",
+  "startedAt": "2026-09-26T19:45:15.793Z",
+  "finishedAt": "2026-09-26T19:45:15.944Z",
+  "baseUrl": "http://127.0.0.1:64106",
   "status": "passed",
   "checks": {
     "health": true,
@@ -24,11 +24,11 @@
   },
   "entities": {
     "classId": "class-001",
-    "studentId": "class001-student-S01",
+    "studentId": "class-001-stu-38",
     "poemId": "tongbian-001",
-    "lessonId": "lesson-69229553-e2de-4c5f-b544-a92db6c9fd9d",
+    "lessonId": "lesson-a0c22189-26ec-410c-b8d9-5c747970a3a0",
     "questionId": "baseline-tongbian-001-1",
-    "joinCode": "BBXK62",
+    "joinCode": "R9F7TW",
     "questionCount": 6,
     "bloomCoverage": {
       "记忆": 1,

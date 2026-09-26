@@ -55,7 +55,13 @@ export const QuestHud = memo(function QuestHud() {
     const playable = levels.filter((l) => l.questionCount > 0).length
 
     return (
-        <section className="pr-quest-hud" aria-label="闯关进度">
+        <section
+            className="pr-quest-hud"
+            aria-label="闯关进度"
+            data-quest-renderer="authoritative"
+            data-quest-level={quest.currentLevel}
+            data-quest-power={classPower}
+        >
             {/* ── 通关横幅 ── */}
             {banner && (
                 <div className="pr-quest-banner" role="status">

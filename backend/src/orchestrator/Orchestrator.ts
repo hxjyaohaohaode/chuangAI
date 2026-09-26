@@ -37,6 +37,8 @@ import {
 import type { WSBroadcaster } from './websocket/broadcaster.js'
 import { evolutionEngine } from '../agents/base/evolution-engine.js'
 import { DAGScheduler } from './dag-scheduler.js'
+import { ExecutionLimiter } from './execution-limiter.js'
+import { resolveTaskInput } from './runtime-data.js'
 import { validateExecutablePlan } from './plan-validation.js'
 import {
     ORCH_EVENTS,
@@ -217,6 +219,7 @@ export class Orchestrator {
     private readonly agentRegistry: Map<string, BaseAgent>
     /** 活跃执行上下文：sessionId -> ActiveExecution */
     private readonly activeExecutions = new Map<string, ActiveExecution>()
+    private readonly limiter = new ExecutionLimiter(8, 256)
     constructor(
         private readonly router: LLMRouter,
         agents: Record<string, BaseAgent>,
@@ -358,51 +361,46 @@ export class Orchestrator {
         plan: ParsedInstruction,
         ctx: OrchestratorContext,
     ): Promise<ExecutionResult> {
+        ctx = { ...ctx }
+        if (this.activeExecutions.has(ctx.sessionId)) {
+            throw new Error(`会话 ${ctx.sessionId} 正在执行，拒绝重入或启动第二个调度循环`)
+        }
         if (this.activeExecutions.size >= MAX_ACTIVE_EXECUTIONS) {
             throw new Error(
                 `活跃执行数已达上限 ${MAX_ACTIVE_EXECUTIONS}，请等待现有会话完成`,
             )
         }
 
-        // 检查是否已有该 session 的执行（resume 场景）
-        let execution = this.activeExecutions.get(ctx.sessionId)
-        if (!execution) {
-            // 新执行：创建调度器
-            const scheduler = new DAGScheduler(plan.executionPlan)
-            execution = {
-                sessionId: ctx.sessionId,
-                scheduler,
-                ctx,
-                runningControllers: new Map(),
-                pausedTasks: new Set(),
-                sessionController: new AbortController(),
-                agentInvocations: [],
-                startedAt: Date.now(),
-            }
-            this.activeExecutions.set(ctx.sessionId, execution)
-        } else {
-            // resume 场景：复用已有调度器，更新 ctx
-            execution.ctx = ctx
+        for (const node of plan.executionPlan.nodes) resolveTaskInput(node.input, node.dependencies)
+        const execution: ActiveExecution = {
+            sessionId: ctx.sessionId,
+            scheduler: new DAGScheduler(plan.executionPlan),
+            ctx,
+            runningControllers: new Map(),
+            pausedTasks: new Set(),
+            sessionController: new AbortController(),
+            agentInvocations: [],
+            startedAt: Date.now(),
         }
+        this.activeExecutions.set(ctx.sessionId, execution)
 
-        const { scheduler, sessionController } = execution
+        const { sessionController } = execution
 
         // 若外部 abortSignal 触发，联动 sessionController
+        const onExternalAbort = () => sessionController.abort()
         if (ctx.abortSignal) {
             if (ctx.abortSignal.aborted) {
                 sessionController.abort()
             } else {
-                ctx.abortSignal.addEventListener('abort', () => sessionController.abort(), { once: true })
+                ctx.abortSignal.addEventListener('abort', onExternalAbort, { once: true })
             }
         }
 
         try {
             await this.runDAGLoop(execution)
         } finally {
-            // 若 DAG 已完成，清理执行上下文
-            if (scheduler.isComplete()) {
-                this.activeExecutions.delete(ctx.sessionId)
-            }
+            ctx.abortSignal?.removeEventListener('abort', onExternalAbort)
+            this.activeExecutions.delete(ctx.sessionId)
         }
 
         return this.buildExecutionResult(execution)
@@ -418,14 +416,15 @@ export class Orchestrator {
      * 触发该任务的 AbortController（reason: 'pause'），
      * executeNode 捕获后标记为 paused 而非 failed。
      */
-    pause(taskId: string): void {
-        for (const execution of this.activeExecutions.values()) {
-            const controller = execution.runningControllers.get(taskId)
-            if (controller) {
-                execution.pausedTasks.add(taskId)
-                controller.abort('pause')
-                return
-            }
+    async pause(sessionId: string, taskId: string): Promise<void> {
+        const execution = this.requireActiveTask(sessionId, taskId)
+        const controller = execution.runningControllers.get(taskId)
+        if (!controller) throw new Error(`任务 ${taskId} 当前未运行`)
+        execution.pausedTasks.add(taskId)
+        controller.abort('pause')
+        while (execution.runningControllers.has(taskId)) await sleep(10)
+        if (execution.scheduler.getNode(taskId)?.status !== 'paused') {
+            throw new Error(`任务 ${taskId} 未能进入暂停状态`)
         }
     }
 
@@ -435,18 +434,13 @@ export class Orchestrator {
      * 将 paused 状态的任务重置为 pending，
      * execute 循环会在下一轮 getReadyNodes 中拾取。
      */
-    resume(taskId: string): void {
-        for (const execution of this.activeExecutions.values()) {
-            if (execution.pausedTasks.has(taskId)) {
-                execution.pausedTasks.delete(taskId)
-                const node = execution.scheduler.getNode(taskId)
-                if (node && node.status === 'paused') {
-                    // 重置为 pending 以便重新调度
-                    execution.scheduler.modifyInput(taskId, node.input)
-                }
-                return
-            }
-        }
+    resume(sessionId: string, taskId: string): void {
+        const execution = this.requireActiveTask(sessionId, taskId)
+        const node = execution.scheduler.getNode(taskId)
+        if (node?.status !== 'paused') throw new Error(`任务 ${taskId} 当前未暂停`)
+        execution.pausedTasks.delete(taskId)
+        execution.scheduler.modifyInput(taskId, node.input)
+        this.notifyTaskUpdate(execution.ctx, execution.scheduler.getNode(taskId)!)
     }
 
     /**
@@ -455,14 +449,11 @@ export class Orchestrator {
      * 触发 AbortController（reason: 'abort'），
      * executeNode 捕获后标记为 failed。
      */
-    abort(taskId: string): void {
-        for (const execution of this.activeExecutions.values()) {
-            const controller = execution.runningControllers.get(taskId)
-            if (controller) {
-                controller.abort('abort')
-                return
-            }
-        }
+    abort(sessionId: string, taskId: string): void {
+        const execution = this.requireActiveTask(sessionId, taskId)
+        const controller = execution.runningControllers.get(taskId)
+        if (!controller) throw new Error(`任务 ${taskId} 当前未运行`)
+        controller.abort('abort')
     }
 
     /**
@@ -470,17 +461,26 @@ export class Orchestrator {
      *
      * 中止当前运行（若有）+ 修改输入 + 重置为 pending。
      */
-    modify(taskId: string, newInput: unknown): void {
-        for (const execution of this.activeExecutions.values()) {
-            // 若任务正在运行，先中止
-            const controller = execution.runningControllers.get(taskId)
-            if (controller) {
-                execution.pausedTasks.add(taskId) // 临时标记，避免被识别为 abort
-                controller.abort('modify')
-            }
-            // 修改输入并重置状态
-            execution.scheduler.modifyInput(taskId, newInput)
-            execution.pausedTasks.delete(taskId)
+    async modify(sessionId: string, taskId: string, newInput: unknown): Promise<void> {
+        const execution = this.requireActiveTask(sessionId, taskId)
+        const node = execution.scheduler.getNode(taskId)!
+        resolveTaskInput(newInput, node.dependencies)
+        const affected = execution.scheduler.getAffectedTaskIds(taskId)
+        if (affected.some((id) => id !== taskId && execution.scheduler.getNode(id)?.status === 'running')) {
+            throw new Error('下游仍在运行，请先暂停下游再修改上游')
+        }
+        const controller = execution.runningControllers.get(taskId)
+        if (controller) {
+            execution.pausedTasks.add(taskId)
+            controller.abort('modify')
+            while (execution.runningControllers.has(taskId)) await sleep(10)
+        }
+        if (execution.sessionController.signal.aborted) throw new Error('会话已中止')
+        execution.scheduler.modifyInput(taskId, newInput)
+        execution.pausedTasks.delete(taskId)
+        for (const id of affected) {
+            const changed = execution.scheduler.getNode(id)
+            if (changed) this.notifyTaskUpdate(execution.ctx, changed)
         }
     }
 
@@ -492,6 +492,13 @@ export class Orchestrator {
         if (execution) {
             execution.sessionController.abort()
         }
+    }
+
+    private requireActiveTask(sessionId: string, taskId: string): ActiveExecution {
+        const execution = this.activeExecutions.get(sessionId)
+        if (!execution) throw new Error(`会话 ${sessionId} 当前未执行`)
+        if (!execution.scheduler.getNode(taskId)) throw new Error(`会话 ${sessionId} 中不存在任务 ${taskId}`)
+        return execution
     }
 
     // ─────────────────────────────────────────────────────────
@@ -600,44 +607,40 @@ export class Orchestrator {
      */
     private async runDAGLoop(execution: ActiveExecution): Promise<void> {
         const { scheduler, sessionController } = execution
-
-        while (!scheduler.isComplete()) {
-            // 会话中止
-            if (sessionController.signal.aborted) {
-                this.abortAllRunning(execution)
-                break
-            }
-
-            // 评估条件分支
-            scheduler.evaluateConditions(scheduler.collectResults())
-
-            // 获取就绪节点
-            const ready = scheduler.getReadyNodes()
-
-            if (ready.length === 0) {
-                // 无就绪节点：检查是否有运行中任务
-                if (execution.runningControllers.size === 0) {
-                    // 无运行中任务也无就绪节点：可能全部暂停或死锁
-                    const snap = scheduler.snapshot()
-                    if (snap.paused > 0) {
-                        // 等待 resume（短暂让出事件循环）
-                        await sleep(100)
-                        continue
-                    }
-                    // 真正的死锁或完成
+        const inFlight = new Map<string, Promise<void>>()
+        try {
+            while (!scheduler.isComplete() || inFlight.size > 0) {
+                if (sessionController.signal.aborted) {
+                    this.abortAllRunning(execution)
+                    scheduler.cancel()
+                    for (const node of scheduler.getAllNodes()) this.notifyTaskUpdate(execution.ctx, node)
+                    await Promise.allSettled(inFlight.values())
                     break
                 }
-                // 等待运行中任务完成
-                await this.waitForRunningTasks(execution)
-                continue
+                scheduler.evaluateConditions(scheduler.collectResults())
+                for (const node of scheduler.getReadyNodes()) {
+                    if (inFlight.size >= 4) break
+                    if (inFlight.has(node.id)) continue
+                    const task = this.executeNode(node, execution).finally(() => { inFlight.delete(node.id) })
+                    inFlight.set(node.id, task)
+                }
+                if (inFlight.size > 0) {
+                    // 任一前驱完成即可立即调度其后继，不等待无关的慢任务。
+                    await Promise.race(inFlight.values())
+                    continue
+                }
+                if (scheduler.isComplete()) break
+                if (scheduler.snapshot().paused > 0) {
+                    await sleep(50)
+                    continue
+                }
+                throw new Error('执行图仍有未完成节点但不可调度')
             }
-
-            // 并行执行就绪节点
-            const batchPromises = ready.map((node) => this.executeNode(node, execution))
-            await Promise.allSettled(batchPromises)
-
-            // 批次完成后再次评估条件
-            scheduler.evaluateConditions(scheduler.collectResults())
+        } catch (error) {
+            this.abortAllRunning(execution)
+            scheduler.cancel('调度异常中止')
+            await Promise.allSettled(inFlight.values())
+            throw error
         }
     }
 
@@ -677,12 +680,13 @@ export class Orchestrator {
 
         // markRunning
         scheduler.markRunning(node.id)
+        const attemptRevision = scheduler.getRevision(node.id)
         this.emitTaskEvent(ORCH_EVENTS.TASK_START, ctx.sessionId, node.id, {
             agentId: node.agentId,
             inputPreview: this.previewInput(node.input),
         })
         const runningNode = scheduler.getNode(node.id)
-        if (runningNode) ctx.onTaskUpdate?.(runningNode)
+        if (runningNode) this.notifyTaskUpdate(ctx, runningNode)
 
         const startedAt = Date.now()
 
@@ -701,17 +705,21 @@ export class Orchestrator {
             // 若 A/B 测试进行中，getPromptOverride 会按流量分配返回候选或活跃版本。
             const agentCtx = evolutionEngine.injectPromptOverride(baseAgentCtx, node.agentId)
 
+            const resolvedInput = resolveTaskInput(node.input, node.dependencies, scheduler.collectResults())
             // 带超时调用
             const result = await this.invokeWithTimeout(
                 agent,
-                node.input,
+                node.agentId,
+                resolvedInput,
                 agentCtx,
                 DEFAULT_NODE_TIMEOUT_MS,
                 taskController,
             )
 
+            if (!scheduler.isCurrent(node.id, attemptRevision)) return
+            if (taskController.signal.aborted) throw new DOMException('Aborted', 'AbortError')
             // 成功
-            scheduler.markDone(node.id, result.output)
+            scheduler.markDone(node.id, result.output, attemptRevision)
             const latency = Date.now() - startedAt
             execution.agentInvocations.push({
                 agentId: node.agentId,
@@ -725,8 +733,9 @@ export class Orchestrator {
                 tokens: result.usage.promptTokens + result.usage.completionTokens,
             })
             const completedNode = scheduler.getNode(node.id)
-            if (completedNode) ctx.onTaskUpdate?.(completedNode)
+            if (completedNode) this.notifyTaskUpdate(ctx, completedNode)
         } catch (err) {
+            if (!scheduler.isCurrent(node.id, attemptRevision)) return
             const isPaused = execution.pausedTasks.has(node.id)
             const reason = this.getAbortReason(taskController.signal)
 
@@ -740,16 +749,16 @@ export class Orchestrator {
             } else {
                 // 真正失败
                 const errMsg = err instanceof Error ? err.message : String(err)
-                scheduler.markFailed(node.id, errMsg)
+                scheduler.markFailed(node.id, errMsg, attemptRevision)
                 this.emitTaskEvent(ORCH_EVENTS.TASK_FAILED, ctx.sessionId, node.id, {
                     agentId: node.agentId,
                     error: errMsg,
                 })
             }
             const settledNode = scheduler.getNode(node.id)
-            if (settledNode) ctx.onTaskUpdate?.(settledNode)
+            if (settledNode) this.notifyTaskUpdate(ctx, settledNode)
         } finally {
-            execution.runningControllers.delete(node.id)
+            if (execution.runningControllers.get(node.id) === taskController) execution.runningControllers.delete(node.id)
             sessionController.signal.removeEventListener('abort', onSessionAbort)
         }
     }
@@ -761,61 +770,35 @@ export class Orchestrator {
      */
     private async invokeWithTimeout(
         agent: BaseAgent,
+        agentId: string,
         input: unknown,
         ctx: AgentContext,
         timeoutMs: number,
         controller: AbortController,
     ): Promise<ReturnType<BaseAgent['invoke']>> {
         const signal = controller.signal
-        return new Promise((resolve, reject) => {
-            let timedOut = false
-            const timer = setTimeout(() => {
-                // 超时不仅结束等待 Promise，还中止传给 Agent/SDK 的信号，
-                // 避免模型调用在编排层已失败后继续占用连接、费用和副作用。
-                timedOut = true
-                signal.removeEventListener('abort', onAbort)
-                controller.abort('node-timeout')
+        const release = await this.limiter.acquire(agentId, signal)
+        // 超时/中止可以结束当前任务，但共享 Agent 的租约必须等底层调用真正
+        // 结束后才释放，避免忽略 AbortSignal 的 SDK 与下一次调用并发写状态。
+        const invocation = Promise.resolve().then(() => agent.invoke(input, ctx))
+        void invocation.finally(release).catch(() => {})
+        let timer: ReturnType<typeof setTimeout> | undefined
+        let onAbort: (() => void) | undefined
+        const cancelled = new Promise<never>((_, reject) => {
+            onAbort = () => reject(new DOMException('Aborted', 'AbortError'))
+            signal.addEventListener('abort', onAbort, { once: true })
+            timer = setTimeout(() => {
                 reject(new Error(`节点超时（${timeoutMs}ms）`))
+                controller.abort('node-timeout')
             }, timeoutMs)
             timer.unref?.()
-
-            const onAbort = () => {
-                clearTimeout(timer)
-                if (timedOut) return
-                reject(new DOMException('Aborted', 'AbortError'))
-            }
-
-            if (signal.aborted) {
-                onAbort()
-                return
-            }
-            signal.addEventListener('abort', onAbort, { once: true })
-
-            agent.invoke(input, ctx).then(
-                (result) => {
-                    clearTimeout(timer)
-                    signal.removeEventListener('abort', onAbort)
-                    resolve(result)
-                },
-                (err) => {
-                    clearTimeout(timer)
-                    signal.removeEventListener('abort', onAbort)
-                    reject(err)
-                },
-            )
+            if (signal.aborted) onAbort()
         })
-    }
-
-    /**
-     * 等待所有运行中任务完成
-     *
-     * 通过轮询 runningControllers 大小判断是否全部完成。
-     * 简单但可靠，轮询间隔 50ms。
-     */
-    private async waitForRunningTasks(execution: ActiveExecution): Promise<void> {
-        while (execution.runningControllers.size > 0) {
-            if (execution.sessionController.signal.aborted) return
-            await sleep(50)
+        try {
+            return await Promise.race([invocation, cancelled])
+        } finally {
+            if (timer) clearTimeout(timer)
+            if (onAbort) signal.removeEventListener('abort', onAbort)
         }
     }
 
@@ -823,11 +806,9 @@ export class Orchestrator {
      * 中止所有运行中任务（用于 session abort）
      */
     private abortAllRunning(execution: ActiveExecution): void {
-        for (const [taskId, controller] of execution.runningControllers) {
+        for (const controller of execution.runningControllers.values()) {
             controller.abort('session-abort')
-            execution.scheduler.markFailed(taskId, '会话已中止')
         }
-        execution.runningControllers.clear()
     }
 
     // ─────────────────────────────────────────────────────────
@@ -845,7 +826,8 @@ export class Orchestrator {
         const sessionBilling = this.billing.aggregateSession(ctx.sessionId)
         const totalCostYuan = sessionBilling.totalCostYuan
 
-        const success = failedTasks.length === 0 && scheduler.isComplete()
+        const success = !execution.sessionController.signal.aborted
+            && failedTasks.length === 0 && scheduler.isComplete()
 
         const result: ExecutionResult = {
             sessionId: ctx.sessionId,
@@ -990,12 +972,24 @@ ${contextBlock}
         taskId: string,
         payload: Record<string, unknown>,
     ): void {
-        this.broadcaster.broadcast({
-            type,
-            timestamp: Date.now(),
-            sessionId,
-            payload: { taskId, ...payload },
-        })
+        try {
+            this.broadcaster.broadcast({
+                type,
+                timestamp: Date.now(),
+                sessionId,
+                payload: { taskId, ...payload },
+            })
+        } catch (error) {
+            console.warn('[orchestrator] 事件订阅者异常', error)
+        }
+    }
+
+    private notifyTaskUpdate(ctx: OrchestratorContext, node: SubTask): void {
+        try {
+            ctx.onTaskUpdate?.(node)
+        } catch (error) {
+            console.warn('[orchestrator] 任务观察者异常', error)
+        }
     }
 
     private previewInput(input: unknown): string {
@@ -1061,5 +1055,3 @@ export function flattenAgents(agents: {
 
 /** 仅供单测/类型校验使用：导出能力清单 */
 export { AGENT_CAPABILITIES, CAPABILITY_INDEX }
-
-

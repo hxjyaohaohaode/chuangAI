@@ -105,6 +105,16 @@
     --c-accent-info: 69 111 148;
     /* #456F94 深雾蓝 —— 信息（加深以通过 WCAG AA：文字色 on surface 5.03:1；text-inverse on info 5.03:1） */
 
+    /* 旧组件兼容通道：统一回接现行语义 token。
+     * 未定义的自定义属性会让浏览器丢弃整条 background/border/font 声明，
+     * 这正是部分浮层首帧透明、边界和字体偶发缺失的根因。 */
+    --c-success: var(--c-accent-success);
+    --c-ink: var(--c-text-primary);
+    --c-focus: var(--c-accent-primary);
+    --c-accent-secondary: var(--c-accent-primary-hover);
+    --c-border-subtle: 221 214 204;
+    --c-border-default: 196 186 172;
+
     /* 极淡强调背景（用于 subtle 标签底色等）—— 自动跟随 accent-primary token */
     --accent-primary-subtle: rgb(var(--c-accent-primary) / 0.08);
     /* 等效 accent-primary 8% alpha */
@@ -159,7 +169,10 @@
     /* 强调色 alpha 集 —— 背景 10%、选中 20%、focus 40%（规范 2.4）
      * 使用 rgb(var(--c-accent-*) / alpha) 语法，alpha 值自动跟随 token 加深，永不再不同步 */
     --accent-primary-10: rgb(var(--c-accent-primary) / 0.10);
+    --accent-primary-08: rgb(var(--c-accent-primary) / 0.08);
+    --accent-primary-12: rgb(var(--c-accent-primary) / 0.12);
     --accent-primary-20: rgb(var(--c-accent-primary) / 0.20);
+    --accent-primary-30: rgb(var(--c-accent-primary) / 0.30);
     --accent-primary-40: rgb(var(--c-accent-primary) / 0.40);
     --accent-success-10: rgb(var(--c-accent-success) / 0.10);
     --accent-success-20: rgb(var(--c-accent-success) / 0.20);
@@ -371,6 +384,8 @@
     --font-sans: 'Noto Sans SC', 'Inter Variable', -apple-system, 'Microsoft YaHei UI', system-ui, sans-serif;
     --font-display: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
     --font-mono: 'JetBrains Mono Variable', 'SF Mono', 'Cascadia Code', Consolas, monospace;
+    --font-ui: var(--font-sans);
+    --font-size-xs: var(--text-xs);
 
     /* Inter Display 光学尺寸轴（Task 6.4.2 —— taste 品牌美学）
      * opsz ≥ 24 时大字号笔画收放更精致（规范 3.1 Inter Display 选型理由）
@@ -398,6 +413,9 @@
     --space-3xl: clamp(48px, 3rem + 1.14vw, 64px);
     /* Hero 区域（流体：64→96px） */
     --space-4xl: clamp(64px, 4rem + 1.71vw, 96px);
+    --space-3xs: 2px;
+    --space-2xs: 4px;
+    --space-2: 8px;
 
     /* 课堂交互尺寸：兼顾鼠标精度与触控操作，不再出现 28px 难点击控件 */
     --control-height-compact: 40px;
@@ -440,6 +458,8 @@
     --radius-xl: 16px;
     /* 模态、对话框 */
     --radius-full: 9999px;
+    --radius-2xl: 20px;
+    --radius-pill: var(--radius-full);
 
     /* ============================================================
      * 六、动效系统（规范第 6 章）
@@ -472,6 +492,8 @@
     /* 大型面板 modal/drawer */
     --dur-route: 350ms;
     /* 路由切换 */
+    --dur-base: var(--dur-medium);
+    --ease-spring-soft: var(--spring-soft);
 
     /* ============================================================
      * 七、阴影（规范 14.x）
@@ -480,6 +502,7 @@
     --shadow-card: 0 1px 3px rgba(44, 36, 26, 0.04);
     --shadow-card-hover: 0 4px 16px rgba(44, 36, 26, 0.06);
     --shadow-modal: 0 16px 48px rgba(44, 36, 26, 0.12);
+    --shadow-elevated: var(--shadow-modal);
     --shadow-popover: 0 8px 24px rgba(44, 36, 26, 0.10);
     --shadow-button: 0 2px 8px rgb(var(--c-accent-primary) / 0.15);
     --shadow-button-active: 0 1px 3px rgb(var(--c-accent-primary) / 0.10);

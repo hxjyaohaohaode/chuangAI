@@ -855,18 +855,6 @@
     border-radius: var(--radius-full);
 }
 
-.pr-rpt-skeleton-toc {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
-}
-
-.pr-rpt-skeleton-toc-item {
-    width: 80%;
-    height: 16px;
-}
-
 .pr-rpt-skeleton-body {
     display: flex;
     flex-direction: column;
@@ -1007,17 +995,9 @@
     color: rgb(var(--c-text-tertiary));
 }
 
-/* 主体：左侧目录 + 右侧内容 */
+/* 报告主体始终使用完整内容宽度；不重复占位展示章节目录。 */
 .pr-rpt-preview-body {
-    display: grid;
-    grid-template-columns: 180px minmax(0, 1fr);
-    gap: var(--space-xl);
-}
-
-@media (max-width: 900px) {
-    .pr-rpt-preview-body {
-        grid-template-columns: minmax(0, 1fr);
-    }
+    display: block;
 }
 
 .pr-rpt-preview-toc {

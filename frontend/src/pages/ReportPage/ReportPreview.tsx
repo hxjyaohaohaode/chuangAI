@@ -4,7 +4,6 @@
  * 渲染生成的教研报告，包含：
  * - 标题（含「（AI 生成）」后缀 —— 后端 brush.report 已添加）
  * - AI 生成徽标 + 脱敏标识
- * - 左侧目录（章节导航，点击滚动定位）
  * - Markdown 渲染章节内容
  * - 关键发现列表
  * - 教学建议列表
@@ -21,13 +20,13 @@
  *
  * 设计要点（规范第 9、14 章）：
  * - Markdown 排版级别渲染，对标 GitHub + Notion
- * - 左侧目录吸顶，点击平滑滚动到对应章节
+ * - 正文全宽呈现，不额外占用界面宽度重复展示章节导航
  * - AI 生成水印固定在右下角，半透明不干扰阅读
  * - 脱敏元数据以徽标形式展示在标题区域
  * - 零 emoji，所有图标使用 Phosphor SVG
  */
 
-import { memo, useState, useCallback, useEffect, useRef } from 'react'
+import { memo, useCallback } from 'react'
 import { Card, Icon, Badge, Button } from '@/components/ui'
 import { Markdown } from '@/components/ui/Markdown'
 import { useReportStore } from '@/stores/report'
@@ -52,44 +51,6 @@ export const ReportPreview = memo(function ReportPreview() {
     const streamActive = useReportStore((s) => s.streamActive)
     const streamMessage = useReportStore((s) => s.streamMessage)
     const abortStream = useReportStore((s) => s.abortStream)
-    const [activeSection, setActiveSection] = useState<string>('')
-
-    const contentRef = useRef<HTMLDivElement | null>(null)
-
-    /** 点击目录项，平滑滚动到对应章节 */
-    const handleTocClick = useCallback((key: string) => {
-        const el = document.getElementById(`${SECTION_ANCHOR_PREFIX}${key}`)
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            setActiveSection(key)
-        }
-    }, [])
-
-    /** 滚动时高亮当前章节 */
-    useEffect(() => {
-        if (!report || report.status !== 'completed' || !report.output) return
-        const container = contentRef.current
-        if (!container) return
-        // 提取到局部 const，避免 handler 闭包内类型窄化丢失（TS 限制）
-        const output = report.output
-
-        const handler = () => {
-            const sections = output.sections
-            for (const s of sections) {
-                const el = document.getElementById(`${SECTION_ANCHOR_PREFIX}${s.key}`)
-                if (el) {
-                    const rect = el.getBoundingClientRect()
-                    if (rect.top <= 120 && rect.bottom > 120) {
-                        setActiveSection(s.key)
-                        return
-                    }
-                }
-            }
-        }
-        container.addEventListener('scroll', handler, { passive: true })
-        return () => container.removeEventListener('scroll', handler)
-    }, [report])
-
     /** 打印当前报告 */
     const handlePrint = useCallback(() => {
         window.print()
@@ -151,12 +112,6 @@ export const ReportPreview = memo(function ReportPreview() {
                 <div className="pr-rpt-skeleton-header">
                     <div className="pr-skeleton pr-rpt-skeleton-title" />
                     <div className="pr-skeleton pr-rpt-skeleton-badge" />
-                </div>
-                <div className="pr-rpt-skeleton-toc">
-                    <div className="pr-skeleton pr-rpt-skeleton-toc-item" />
-                    <div className="pr-skeleton pr-rpt-skeleton-toc-item" />
-                    <div className="pr-skeleton pr-rpt-skeleton-toc-item" />
-                    <div className="pr-skeleton pr-rpt-skeleton-toc-item" />
                 </div>
                 <div className="pr-rpt-skeleton-body">
                     <div className="pr-skeleton pr-rpt-skeleton-line" />
@@ -221,7 +176,7 @@ export const ReportPreview = memo(function ReportPreview() {
         )
     }
 
-    const { output, exportedData, darkMatterReport, verification } = report
+    const { output, exportedData, darkMatterReport } = report
     const period = report.period
 
     return (
@@ -271,43 +226,9 @@ export const ReportPreview = memo(function ReportPreview() {
                     </div>
                 </header>
 
-                {/* 主体：左侧目录 + 右侧内容 */}
+                {/* 报告正文：不再重复挂载页内章节导航，完整宽度用于图表和正文。 */}
                 <div className="pr-rpt-preview-body">
-                    {/* 左侧目录 */}
-                    <aside className="pr-rpt-preview-toc no-print">
-                        <div className="pr-rpt-preview-toc-head">
-                            <Icon name="list" size={14} />
-                            <span>目录</span>
-                        </div>
-                        <nav className="pr-rpt-preview-toc-nav">
-                            {output.sections.map((s) => (
-                                <button
-                                    key={s.key}
-                                    type="button"
-                                    className={`pr-rpt-preview-toc-item${activeSection === s.key ? ' is-active' : ''}`}
-                                    onClick={() => handleTocClick(s.key)}
-                                >
-                                    {s.title}
-                                </button>
-                            ))}
-                        </nav>
-                        {/* 验收结果摘要 */}
-                        {verification && (
-                            <div className="pr-rpt-preview-verify">
-                                <div className="pr-rpt-preview-verify-head">
-                                    <Icon name="check-circle" size={14} />
-                                    <span>验收结果</span>
-                                </div>
-                                <Badge variant={verification.verdict === 'pass' ? 'success' : verification.verdict === 'revise' ? 'warning' : 'error'}>
-                                    {verification.verdict === 'pass' ? '通过' : verification.verdict === 'revise' ? '需修订' : '拒绝'}
-                                    {' · '}{verification.score}分
-                                </Badge>
-                            </div>
-                        )}
-                    </aside>
-
-                    {/* 右侧内容 */}
-                    <div className="pr-rpt-preview-content" ref={contentRef}>
+                    <div className="pr-rpt-preview-content">
                         {/* v5.0：图表区 —— 8 张图表分两组渲染
                          * 1. ReportChartsContainer：通过 useQuery 拉取 /api/report/:id/charts（4 张新图表）
                          * 2. 原 4 张图表：基于 ReportRecord.exportedData（保留向后兼容） */}

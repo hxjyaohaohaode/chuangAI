@@ -81,7 +81,7 @@ export const environmentSchema = z.object({
     AUTH_COOKIE_SECURE: z.enum(['auto', 'true', 'false']).default('auto'),
     AUTH_TEACHER_ID: z.string().trim().min(1).max(128).default('teacher-001'),
     AUTH_TEACHER_NAME: z.string().trim().min(1).max(80).default('曹老师'),
-    AUTH_TEACHER_PHONE: z.string().trim().regex(/^1[3-9]\d{9}$/u).default('13177091153'),
+    AUTH_TEACHER_PHONE: z.string().trim().regex(/^1[3-9]\d{9}$/u).optional(),
     AUTH_PASSWORD_SCRYPT: z.string().default(''),
 })
 

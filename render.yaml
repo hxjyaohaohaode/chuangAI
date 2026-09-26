@@ -46,6 +46,8 @@ services:
         generateValue: true
       - key: AUTH_PASSWORD_SCRYPT
         sync: false
+      - key: AUTH_TEACHER_PHONE
+        sync: false
       - key: AUTH_TEACHER_ID
         value: teacher-001
       - key: AUTH_TEACHER_NAME

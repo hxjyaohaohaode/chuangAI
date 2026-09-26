@@ -251,6 +251,7 @@ async function startServer() {
         prefix: '/ws',
         broadcaster: orch.broadcaster,
         intervention: orch.intervention,
+        sessionStore: orch.sessionStore,
     })
 
     // 课堂导播台路由（Task 11）—— 复用编排官的 WebSocket 广播器

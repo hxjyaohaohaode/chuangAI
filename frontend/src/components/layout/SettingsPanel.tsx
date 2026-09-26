@@ -101,6 +101,16 @@ export function SettingsPanel() {
         }
     }, [open])
 
+    // 设置面板挂在 sticky header 的堆叠上下文中，而 Toast 挂在 body 下。
+    // 用显式根状态提升 header，避免通知遮住表单；不用 :has()，兼容旧 WebView。
+    useEffect(() => {
+        if (!open) return
+        document.documentElement.dataset.settingsPanelOpen = 'true'
+        return () => {
+            delete document.documentElement.dataset.settingsPanelOpen
+        }
+    }, [open])
+
     // 初始焦点：打开时记录触发元素并聚焦到面板内首个可交互元素（规范 14.4）
     useEffect(() => {
         if (!open) return

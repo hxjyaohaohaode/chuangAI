@@ -178,7 +178,7 @@ export class LoginRejectedError extends Error {
 export class AuthService {
     readonly mode: AuthMode
     readonly ephemeralSecret: boolean
-    readonly demoTeachers = DEMO_TEACHERS
+    get demoTeachers() { return this.mode === 'demo' ? DEMO_TEACHERS : [] }
 
     private readonly secret: string
     private readonly now: () => number
@@ -197,6 +197,14 @@ export class AuthService {
         if (options.mode === 'password'
             && !isSupportedScryptHash(options.passwordScrypt)) {
             throw new Error('密码认证需要受支持的 scrypt 摘要')
+        }
+        if (options.mode === 'password'
+            && !options.teacherPhone?.match(/^1[3-9]\d{9}$/u)) {
+            throw new Error('密码认证必须显式配置所有者手机号')
+        }
+        if (options.mode === 'password'
+            && DEMO_TEACHERS.some((teacher) => teacher.passwordScrypt === options.passwordScrypt)) {
+            throw new Error('正式密码模式不得复用仓库公开的演示密码摘要；请在部署环境中轮换')
         }
         this.mode = options.mode
         this.ephemeralSecret = options.sessionSecret.length === 0
@@ -228,7 +236,10 @@ export class AuthService {
             }
         }
 
-        const demoAccount = DEMO_TEACHERS.find((item) => safeEqual(item.phone, input.phone))
+        // 正式密码模式只接受显式配置的所有者；内置演示凭据不可作为回退入口。
+        const demoAccount = this.mode === 'demo'
+            ? DEMO_TEACHERS.find((item) => safeEqual(item.phone, input.phone))
+            : undefined
         const demoMatches = demoAccount
             ? await verifyScryptPassword(input.password, demoAccount.passwordScrypt)
             : false
@@ -284,6 +295,7 @@ export class AuthService {
         const nowSeconds = Math.floor(this.now() / 1_000)
         if (payload.v !== 2 || payload.role !== 'teacher') return null
         if (payload.accountType !== 'owner' && payload.accountType !== 'demo') return null
+        if (this.mode === 'password' && (payload.accountType !== 'owner' || payload.sub !== this.options.teacherId)) return null
         if (!payload.sub || !payload.name || !payload.csrf || !payload.sid) return null
         if (!Number.isInteger(payload.iat) || !Number.isInteger(payload.exp)) return null
         if (payload.iat > nowSeconds + 60 || payload.exp <= nowSeconds || payload.exp <= payload.iat) return null

@@ -2,8 +2,10 @@ name: Runtime refactor verification
 on:
   push:
     branches: [refactor/verified-foundation-20260926]
+  pull_request:
+    branches: [main]
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: verified-foundation-${{ github.ref }}
   cancel-in-progress: true
@@ -25,32 +27,18 @@ jobs:
           corepack prepare pnpm@10.34.5 --activate
           node --version
           pnpm --version
-      - name: Integrate inspected runtime sources
+      - name: Confirm checkout contains the runtime under test
         run: |
-          python3 scripts/apply-runtime-refactor.py
-          python3 scripts/finalize-runtime-refactor.py
-          BEFORE="$(git diff --binary | sha256sum)"
-          python3 scripts/apply-runtime-refactor.py
-          python3 scripts/finalize-runtime-refactor.py
-          AFTER="$(git diff --binary | sha256sum)"
-          test "$BEFORE" = "$AFTER"
-          echo 'SOURCE_MIGRATION_IDEMPOTENT=true'
+          git diff --exit-code
+          git diff --cached --exit-code
+          node --check scripts/render-build.mjs
+          node --check scripts/render-start.mjs
       - name: Runtime entrypoint and deployment contracts
         run: |
           set -o pipefail
           node --test scripts/runtime-policy.test.mjs 2>&1 | tee "$RUNNER_TEMP/poetic-evidence/runtime-policy.log"
       - name: Execute all regression gates
         run: python3 scripts/verify-runtime-refactor.py
-      - name: Publish tested source integration to the same branch
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git add -- backend/src/orchestrator/Orchestrator.ts backend/src/orchestrator/dag-scheduler.ts backend/src/orchestrator/plan-validation.ts backend/src/orchestrator/session-store.ts backend/package.json frontend/package.json .node-version .nvmrc docs/runtime-verification.json scripts/render-build.mjs scripts/render-start.mjs scripts/competition-preflight.mjs frontend/scripts/run-e2e-isolated.mjs README.md INSTALL.md DEVELOPMENT.md DEPLOY_RENDER.md USAGE.md
-          if git diff --cached --quiet; then exit 0; fi
-          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'refactor: integrate runtime kernel after executed full-stack regression'
-          HEADER="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
-          git -c "http.extraheader=$HEADER" push origin HEAD:refs/heads/refactor/verified-foundation-20260926
-          echo "PUBLISHED_COMMIT=$(git rev-parse HEAD)"
       - name: Preserve raw verification evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

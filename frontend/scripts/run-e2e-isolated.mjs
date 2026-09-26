@@ -10,6 +10,8 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { createRequire } from 'node:module'
+import { assertSupportedRuntime } from '../../scripts/runtime-policy.mjs'
 
 const frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const projectRoot = path.resolve(frontendRoot, '..')
@@ -166,13 +168,7 @@ export async function assertProductionBuildFreshness({
 }
 
 function assertCompetitionNodeRuntime() {
-    const [major, minor] = process.versions.node.split('.').map(Number)
-    if (major !== 20 || minor < 19) {
-        throw new Error(
-            `生产同源 E2E 必须由锁定的 Node.js >=20.19 <21 启动；当前为 ${process.versions.node}。` +
-            '请先切换到比赛运行时后再运行，避免子进程与 better-sqlite3 原生模块发生 ABI 不匹配。',
-        )
-    }
+    assertSupportedRuntime('生产同源 E2E')
 }
 
 assertCompetitionNodeRuntime()
@@ -334,16 +330,12 @@ async function verifySecurityHeaders(baseUrl, session) {
 }
 
 async function verifyGeneratedMediaBoundary(baseUrl, session, runtimeRoot) {
-    const sourceDirectory = path.join(projectRoot, 'data', 'uploads', 'generated')
-    const entries = await fs.readdir(sourceDirectory, { withFileTypes: true })
-    const mediaFile = entries
-        .filter((entry) => entry.isFile() && !entry.isSymbolicLink() && entry.name.endsWith('.webp'))
-        .map((entry) => entry.name)
-        .sort()[0]
-    if (!mediaFile) throw new Error('生成媒体认证边界 E2E 缺少可验证的 WebP 夹具')
     const generatedDirectory = path.join(runtimeRoot, 'uploads', 'generated')
     await fs.mkdir(generatedDirectory, { recursive: true })
-    await fs.copyFile(path.join(sourceDirectory, mediaFile), path.join(generatedDirectory, mediaFile))
+    const mediaFile = 'security-fixture.webp'
+    const sharp = createRequire(path.join(backendRoot, 'package.json'))('sharp')
+    await sharp({ create: { width: 2, height: 2, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 1 } } })
+        .webp().toFile(path.join(generatedDirectory, mediaFile))
 
     const mediaUrl = `${baseUrl}/uploads/generated/${encodeURIComponent(mediaFile)}`
     const unauthenticated = await fetch(mediaUrl)
@@ -924,7 +916,7 @@ async function main() {
             throw new Error('思考宫殿未完成诗境图片控件、资源恢复、大图 Portal 全视口、焦点陷阱与滚动恢复回归')
         }
         if (results.starMapLightweightViewChecked !== true) {
-            throw new Error('诗脉星图未完成目录优先、教师主动开启33号受控OGL画廊、单Canvas与零Three资源回归')
+            throw new Error('诗脉星图未完成33号受控OGL画廊默认展示、减少动态静态化、目录往返、单Canvas与零Three资源回归')
         }
         if (results.evolutionEmptyEvidenceChecked !== true) {
             throw new Error('进化之眼未完成空谱系真实边界、证据刷新、模式说明与无意义 Three.js 延迟加载回归')
@@ -1529,13 +1521,15 @@ async function main() {
             },
             starMapLightweightView: {
                 checked: true,
-                testDataBoundary: 'authenticated production route, navigation-drawer DOM and browser resource timing; verifies directory and opted-in reference-33 OGL rendering boundaries only, not graph truth, image provenance or learning outcomes',
+                testDataBoundary: 'authenticated production route, navigation-drawer DOM and browser resource timing; verifies the default reference-33 OGL view, optional directory and resource boundaries only, not graph truth, image provenance or learning outcomes',
                 verifies: [
-                    'reduced-motion-defaults-to-accessible-starmap-directory',
+                    'reference-33-ogl-gallery-is-the-default-view-even-under-reduced-motion',
+                    'reduced-motion-stops-animation-without-replacing-layout-or-images',
                     'closed-observatory-drawer-is-aria-hidden-and-inert-open-focuses-search-and-close-restores-trigger',
                     'directory-category-tablist-controls-panel-and-supports-arrow-home-end-navigation',
-                    'three-vendor-is-not-downloaded-before-or-after-starmap-teacher-opt-in',
-                    'teacher-opt-in-renders-the-reference-33-bounded-ogl-gallery-with-exactly-one-canvas',
+                    'optional-directory-round-trip-restores-reference-33-gallery',
+                    'three-vendor-is-not-downloaded-before-or-after-directory-round-trip',
+                    'reference-33-bounded-ogl-gallery-uses-exactly-one-canvas',
                 ],
             },
             evolutionEmptyEvidence: {

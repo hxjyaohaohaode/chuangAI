@@ -173,6 +173,7 @@ describe('server authentication boundary', () => {
 
         const demoFallback = await login(app)
         expect(demoFallback.response.statusCode).toBe(401)
+        expect((await app.inject({ url: '/api/auth/status' })).json().demoTeachers).toEqual([])
 
         const owner = await login(app, DEMO_PHONE, { password: 'owner-only-password' })
         expect(owner.response.statusCode).toBe(200)

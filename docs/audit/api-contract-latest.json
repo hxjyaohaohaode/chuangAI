@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-08-10T07:17:09.476Z",
+  "generatedAt": "2026-09-26T19:50:52.022Z",
   "summary": {
-    "frontendCalls": 210,
-    "backendEndpoints": 219,
-    "matched": 210,
+    "frontendCalls": 211,
+    "backendEndpoints": 220,
+    "matched": 211,
     "missingPaths": 0,
     "methodMismatches": 0,
     "backendNotCalled": 17
@@ -17,14 +17,14 @@
         "path": "/api/ai/tts",
         "canonicalPath": "/api/ai/tts",
         "file": "frontend/src/lib/api.ts",
-        "line": 511,
+        "line": 525,
         "call": "fetch"
       },
       "endpoint": {
         "file": "backend/src/routes/ai.ts",
         "method": "POST",
         "path": "/tts",
-        "line": 263,
+        "line": 358,
         "prefix": "/api/ai",
         "fullPath": "/api/ai/tts",
         "canonicalPath": "/api/ai/tts"
@@ -36,14 +36,14 @@
         "path": "/api/agents/orchestrate",
         "canonicalPath": "/api/agents/orchestrate",
         "file": "frontend/src/lib/api.ts",
-        "line": 631,
+        "line": 645,
         "call": "fetchStreamResponse"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/orchestrate",
-        "line": 1316,
+        "line": 1362,
         "prefix": "/api/agents",
         "fullPath": "/api/agents/orchestrate",
         "canonicalPath": "/api/agents/orchestrate"
@@ -55,7 +55,7 @@
         "path": "/api/knowledge-graph/full",
         "canonicalPath": "/api/knowledge-graph/full",
         "file": "frontend/src/lib/api.ts",
-        "line": 1400,
+        "line": 1441,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -74,7 +74,7 @@
         "path": "/api/knowledge-graph/mastery-colored",
         "canonicalPath": "/api/knowledge-graph/mastery-colored",
         "file": "frontend/src/lib/api.ts",
-        "line": 1411,
+        "line": 1452,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -93,7 +93,7 @@
         "path": "/api/knowledge-graph/dark-matter/:param",
         "canonicalPath": "/api/knowledge-graph/dark-matter/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 1427,
+        "line": 1468,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -112,7 +112,7 @@
         "path": "/api/knowledge-graph/student/:param/gaps",
         "canonicalPath": "/api/knowledge-graph/student/:param/gaps",
         "file": "frontend/src/lib/api.ts",
-        "line": 1431,
+        "line": 1472,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -131,7 +131,7 @@
         "path": "/api/knowledge-graph/poem/:param/related",
         "canonicalPath": "/api/knowledge-graph/poem/:param/related",
         "file": "frontend/src/lib/api.ts",
-        "line": 1435,
+        "line": 1476,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -150,14 +150,14 @@
         "path": "/api/dashboard/stats",
         "canonicalPath": "/api/dashboard/stats",
         "file": "frontend/src/lib/api.ts",
-        "line": 1441,
+        "line": 1482,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/stats",
-        "line": 337,
+        "line": 349,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/stats",
         "canonicalPath": "/api/dashboard/stats"
@@ -169,14 +169,14 @@
         "path": "/api/dashboard/bloom-radar",
         "canonicalPath": "/api/dashboard/bloom-radar",
         "file": "frontend/src/lib/api.ts",
-        "line": 1457,
+        "line": 1498,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/bloom-radar",
-        "line": 376,
+        "line": 388,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/bloom-radar",
         "canonicalPath": "/api/dashboard/bloom-radar"
@@ -188,14 +188,14 @@
         "path": "/api/dashboard/alerts",
         "canonicalPath": "/api/dashboard/alerts",
         "file": "frontend/src/lib/api.ts",
-        "line": 1463,
+        "line": 1504,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/alerts",
-        "line": 410,
+        "line": 422,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/alerts",
         "canonicalPath": "/api/dashboard/alerts"
@@ -207,14 +207,14 @@
         "path": "/api/dashboard/weekly-progress",
         "canonicalPath": "/api/dashboard/weekly-progress",
         "file": "frontend/src/lib/api.ts",
-        "line": 1469,
+        "line": 1510,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/weekly-progress",
-        "line": 429,
+        "line": 441,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/weekly-progress",
         "canonicalPath": "/api/dashboard/weekly-progress"
@@ -226,14 +226,14 @@
         "path": "/api/classroom/classes",
         "canonicalPath": "/api/classroom/classes",
         "file": "frontend/src/lib/api.ts",
-        "line": 1477,
+        "line": 1518,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/classes",
-        "line": 567,
+        "line": 625,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/classes",
         "canonicalPath": "/api/classroom/classes"
@@ -245,14 +245,14 @@
         "path": "/api/classroom/readiness",
         "canonicalPath": "/api/classroom/readiness",
         "file": "frontend/src/lib/api.ts",
-        "line": 1483,
+        "line": 1524,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/readiness",
-        "line": 576,
+        "line": 634,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/readiness",
         "canonicalPath": "/api/classroom/readiness"
@@ -264,14 +264,14 @@
         "path": "/api/classroom/start",
         "canonicalPath": "/api/classroom/start",
         "file": "frontend/src/lib/api.ts",
-        "line": 1489,
+        "line": 1530,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/start",
-        "line": 601,
+        "line": 659,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/start",
         "canonicalPath": "/api/classroom/start"
@@ -283,14 +283,14 @@
         "path": "/api/classroom/:param/status",
         "canonicalPath": "/api/classroom/:param/status",
         "file": "frontend/src/lib/api.ts",
-        "line": 1496,
+        "line": 1537,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/:lessonId/status",
-        "line": 722,
+        "line": 780,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/status",
         "canonicalPath": "/api/classroom/:param/status"
@@ -302,14 +302,14 @@
         "path": "/api/classroom/:param/question/replace",
         "canonicalPath": "/api/classroom/:param/question/replace",
         "file": "frontend/src/lib/api.ts",
-        "line": 1504,
+        "line": 1545,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/question/replace",
-        "line": 1341,
+        "line": 1403,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/question/replace",
         "canonicalPath": "/api/classroom/:param/question/replace"
@@ -321,14 +321,14 @@
         "path": "/api/classroom/:param/question/flag",
         "canonicalPath": "/api/classroom/:param/question/flag",
         "file": "frontend/src/lib/api.ts",
-        "line": 1521,
+        "line": 1562,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/question/flag",
-        "line": 1310,
+        "line": 1372,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/question/flag",
         "canonicalPath": "/api/classroom/:param/question/flag"
@@ -340,14 +340,14 @@
         "path": "/api/classroom/:param/mode",
         "canonicalPath": "/api/classroom/:param/mode",
         "file": "frontend/src/lib/api.ts",
-        "line": 1528,
+        "line": 1569,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "PATCH",
         "path": "/:lessonId/mode",
-        "line": 768,
+        "line": 826,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/mode",
         "canonicalPath": "/api/classroom/:param/mode"
@@ -359,14 +359,14 @@
         "path": "/api/classroom/:param/next",
         "canonicalPath": "/api/classroom/:param/next",
         "file": "frontend/src/lib/api.ts",
-        "line": 1535,
+        "line": 1576,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/next",
-        "line": 805,
+        "line": 863,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/next",
         "canonicalPath": "/api/classroom/:param/next"
@@ -378,14 +378,14 @@
         "path": "/api/classroom/:param/submit",
         "canonicalPath": "/api/classroom/:param/submit",
         "file": "frontend/src/lib/api.ts",
-        "line": 1549,
+        "line": 1590,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/submit",
-        "line": 846,
+        "line": 907,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/submit",
         "canonicalPath": "/api/classroom/:param/submit"
@@ -397,14 +397,14 @@
         "path": "/api/classroom/:param/hint",
         "canonicalPath": "/api/classroom/:param/hint",
         "file": "frontend/src/lib/api.ts",
-        "line": 1559,
+        "line": 1600,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/hint",
-        "line": 1109,
+        "line": 1171,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/hint",
         "canonicalPath": "/api/classroom/:param/hint"
@@ -416,14 +416,14 @@
         "path": "/api/classroom/:param/discuss",
         "canonicalPath": "/api/classroom/:param/discuss",
         "file": "frontend/src/lib/api.ts",
-        "line": 1569,
+        "line": 1610,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/discuss",
-        "line": 1159,
+        "line": 1221,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/discuss",
         "canonicalPath": "/api/classroom/:param/discuss"
@@ -435,14 +435,14 @@
         "path": "/api/classroom/:param/end",
         "canonicalPath": "/api/classroom/:param/end",
         "file": "frontend/src/lib/api.ts",
-        "line": 1579,
+        "line": 1620,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/end",
-        "line": 1391,
+        "line": 1453,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/end",
         "canonicalPath": "/api/classroom/:param/end"
@@ -454,14 +454,14 @@
         "path": "/api/classroom/:param/report",
         "canonicalPath": "/api/classroom/:param/report",
         "file": "frontend/src/lib/api.ts",
-        "line": 1586,
+        "line": 1627,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/:lessonId/report",
-        "line": 1483,
+        "line": 1545,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/report",
         "canonicalPath": "/api/classroom/:param/report"
@@ -473,14 +473,14 @@
         "path": "/api/classroom/join/:param",
         "canonicalPath": "/api/classroom/join/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 1592,
+        "line": 1633,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/join/:joinCode",
-        "line": 1522,
+        "line": 1584,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/join/:joinCode",
         "canonicalPath": "/api/classroom/join/:param"
@@ -492,14 +492,14 @@
         "path": "/api/classroom/explain/:param",
         "canonicalPath": "/api/classroom/explain/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 1598,
+        "line": 1639,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/explain/:poemId",
-        "line": 1551,
+        "line": 1613,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/explain/:poemId",
         "canonicalPath": "/api/classroom/explain/:param"
@@ -511,14 +511,14 @@
         "path": "/api/classroom/:param/dance/start",
         "canonicalPath": "/api/classroom/:param/dance/start",
         "file": "frontend/src/lib/api.ts",
-        "line": 1607,
+        "line": 1648,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/dance/start",
-        "line": 2121,
+        "line": 2184,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/dance/start",
         "canonicalPath": "/api/classroom/:param/dance/start"
@@ -530,14 +530,14 @@
         "path": "/api/classroom/:param/dance/timeline",
         "canonicalPath": "/api/classroom/:param/dance/timeline",
         "file": "frontend/src/lib/api.ts",
-        "line": 1614,
+        "line": 1655,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/:lessonId/dance/timeline",
-        "line": 2153,
+        "line": 2218,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/dance/timeline",
         "canonicalPath": "/api/classroom/:param/dance/timeline"
@@ -549,14 +549,14 @@
         "path": "/api/classroom/:param/dance/event",
         "canonicalPath": "/api/classroom/:param/dance/event",
         "file": "frontend/src/lib/api.ts",
-        "line": 1632,
+        "line": 1673,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/dance/event",
-        "line": 2176,
+        "line": 2241,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/dance/event",
         "canonicalPath": "/api/classroom/:param/dance/event"
@@ -568,14 +568,14 @@
         "path": "/api/classroom/:param/schedule/next",
         "canonicalPath": "/api/classroom/:param/schedule/next",
         "file": "frontend/src/lib/api.ts",
-        "line": 1641,
+        "line": 1682,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/schedule/next",
-        "line": 1612,
+        "line": 1674,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/schedule/next",
         "canonicalPath": "/api/classroom/:param/schedule/next"
@@ -587,14 +587,14 @@
         "path": "/api/classroom/:param/schedule/override",
         "canonicalPath": "/api/classroom/:param/schedule/override",
         "file": "frontend/src/lib/api.ts",
-        "line": 1651,
+        "line": 1692,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/schedule/override",
-        "line": 1648,
+        "line": 1710,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/schedule/override",
         "canonicalPath": "/api/classroom/:param/schedule/override"
@@ -606,14 +606,14 @@
         "path": "/api/classroom/:param/schedule/status",
         "canonicalPath": "/api/classroom/:param/schedule/status",
         "file": "frontend/src/lib/api.ts",
-        "line": 1661,
+        "line": 1702,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/:lessonId/schedule/status",
-        "line": 1681,
+        "line": 1743,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/schedule/status",
         "canonicalPath": "/api/classroom/:param/schedule/status"
@@ -625,14 +625,14 @@
         "path": "/api/classroom/:param/ai/suggest",
         "canonicalPath": "/api/classroom/:param/ai/suggest",
         "file": "frontend/src/lib/api.ts",
-        "line": 1684,
+        "line": 1725,
         "call": "fetchStreamResponse"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/ai/suggest",
-        "line": 1703,
+        "line": 1765,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/ai/suggest",
         "canonicalPath": "/api/classroom/:param/ai/suggest"
@@ -644,14 +644,14 @@
         "path": "/api/classroom/:param/ai/supplement",
         "canonicalPath": "/api/classroom/:param/ai/supplement",
         "file": "frontend/src/lib/api.ts",
-        "line": 1773,
+        "line": 1816,
         "call": "fetchStreamResponse"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/ai/supplement",
-        "line": 1790,
+        "line": 1852,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/ai/supplement",
         "canonicalPath": "/api/classroom/:param/ai/supplement"
@@ -663,14 +663,14 @@
         "path": "/api/classroom/:param/ai/followup",
         "canonicalPath": "/api/classroom/:param/ai/followup",
         "file": "frontend/src/lib/api.ts",
-        "line": 1863,
+        "line": 1908,
         "call": "fetchStreamResponse"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/ai/followup",
-        "line": 1863,
+        "line": 1925,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/ai/followup",
         "canonicalPath": "/api/classroom/:param/ai/followup"
@@ -682,14 +682,14 @@
         "path": "/api/classroom/:param/ai/intervention",
         "canonicalPath": "/api/classroom/:param/ai/intervention",
         "file": "frontend/src/lib/api.ts",
-        "line": 1939,
+        "line": 1986,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/ai/intervention",
-        "line": 1945,
+        "line": 2007,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/ai/intervention",
         "canonicalPath": "/api/classroom/:param/ai/intervention"
@@ -701,14 +701,14 @@
         "path": "/api/classroom/:param/ai/mark-adopted",
         "canonicalPath": "/api/classroom/:param/ai/mark-adopted",
         "file": "frontend/src/lib/api.ts",
-        "line": 1948,
+        "line": 1995,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/ai/mark-adopted",
-        "line": 2092,
+        "line": 2155,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/ai/mark-adopted",
         "canonicalPath": "/api/classroom/:param/ai/mark-adopted"
@@ -720,14 +720,14 @@
         "path": "/api/classroom/:param/after-action-report/generate",
         "canonicalPath": "/api/classroom/:param/after-action-report/generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 1960,
+        "line": 2007,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/after-action-report/generate",
-        "line": 1985,
+        "line": 2048,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/after-action-report/generate",
         "canonicalPath": "/api/classroom/:param/after-action-report/generate"
@@ -739,14 +739,14 @@
         "path": "/api/classroom/:param/after-action-report",
         "canonicalPath": "/api/classroom/:param/after-action-report",
         "file": "frontend/src/lib/api.ts",
-        "line": 1967,
+        "line": 2014,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/:lessonId/after-action-report",
-        "line": 2049,
+        "line": 2112,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/after-action-report",
         "canonicalPath": "/api/classroom/:param/after-action-report"
@@ -758,14 +758,14 @@
         "path": "/api/classroom/sessions/:param/smart-score",
         "canonicalPath": "/api/classroom/sessions/:param/smart-score",
         "file": "frontend/src/lib/api.ts",
-        "line": 1975,
+        "line": 2022,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/sessions/:sessionId/smart-score",
-        "line": 2453,
+        "line": 2518,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/sessions/:sessionId/smart-score",
         "canonicalPath": "/api/classroom/sessions/:param/smart-score"
@@ -777,14 +777,14 @@
         "path": "/api/classroom/sessions/:param/comment",
         "canonicalPath": "/api/classroom/sessions/:param/comment",
         "file": "frontend/src/lib/api.ts",
-        "line": 2005,
+        "line": 2052,
         "call": "fetchStreamResponse"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/sessions/:sessionId/comment",
-        "line": 2672,
+        "line": 2749,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/sessions/:sessionId/comment",
         "canonicalPath": "/api/classroom/sessions/:param/comment"
@@ -796,14 +796,14 @@
         "path": "/api/classroom/sessions/:param/virtual-opponent",
         "canonicalPath": "/api/classroom/sessions/:param/virtual-opponent",
         "file": "frontend/src/lib/api.ts",
-        "line": 2136,
+        "line": 2185,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/sessions/:sessionId/virtual-opponent",
-        "line": 2794,
+        "line": 2868,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/sessions/:sessionId/virtual-opponent",
         "canonicalPath": "/api/classroom/sessions/:param/virtual-opponent"
@@ -815,14 +815,14 @@
         "path": "/api/appreciation/:param",
         "canonicalPath": "/api/appreciation/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2155,
+        "line": 2204,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/appreciation.ts",
         "method": "GET",
         "path": "/:poemId",
-        "line": 244,
+        "line": 251,
         "prefix": "/api/appreciation",
         "fullPath": "/api/appreciation/:poemId",
         "canonicalPath": "/api/appreciation/:param"
@@ -834,14 +834,14 @@
         "path": "/api/grading/upload",
         "canonicalPath": "/api/grading/upload",
         "file": "frontend/src/lib/api.ts",
-        "line": 2188,
+        "line": 2237,
         "call": "fetch"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/upload",
-        "line": 628,
+        "line": 721,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/upload",
         "canonicalPath": "/api/grading/upload"
@@ -853,14 +853,14 @@
         "path": "/api/grading/students",
         "canonicalPath": "/api/grading/students",
         "file": "frontend/src/lib/api.ts",
-        "line": 2217,
+        "line": 2266,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "GET",
         "path": "/students",
-        "line": 578,
+        "line": 653,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/students",
         "canonicalPath": "/api/grading/students"
@@ -872,14 +872,14 @@
         "path": "/api/grading/questions",
         "canonicalPath": "/api/grading/questions",
         "file": "frontend/src/lib/api.ts",
-        "line": 2222,
+        "line": 2271,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "GET",
         "path": "/questions",
-        "line": 591,
+        "line": 668,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/questions",
         "canonicalPath": "/api/grading/questions"
@@ -891,14 +891,14 @@
         "path": "/api/grading/history",
         "canonicalPath": "/api/grading/history",
         "file": "frontend/src/lib/api.ts",
-        "line": 2227,
+        "line": 2276,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "GET",
         "path": "/history",
-        "line": 606,
+        "line": 689,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/history",
         "canonicalPath": "/api/grading/history"
@@ -910,14 +910,14 @@
         "path": "/api/grading/recognize",
         "canonicalPath": "/api/grading/recognize",
         "file": "frontend/src/lib/api.ts",
-        "line": 2233,
+        "line": 2282,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/recognize",
-        "line": 777,
+        "line": 876,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/recognize",
         "canonicalPath": "/api/grading/recognize"
@@ -929,14 +929,14 @@
         "path": "/api/grading/grade",
         "canonicalPath": "/api/grading/grade",
         "file": "frontend/src/lib/api.ts",
-        "line": 2240,
+        "line": 2289,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/grade",
-        "line": 863,
+        "line": 979,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/grade",
         "canonicalPath": "/api/grading/grade"
@@ -948,14 +948,14 @@
         "path": "/api/grading/review",
         "canonicalPath": "/api/grading/review",
         "file": "frontend/src/lib/api.ts",
-        "line": 2247,
+        "line": 2296,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/review",
-        "line": 1036,
+        "line": 1174,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/review",
         "canonicalPath": "/api/grading/review"
@@ -967,14 +967,14 @@
         "path": "/api/grading/batch/:param",
         "canonicalPath": "/api/grading/batch/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2254,
+        "line": 2303,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "GET",
         "path": "/batch/:batchId",
-        "line": 1175,
+        "line": 1322,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/batch/:batchId",
         "canonicalPath": "/api/grading/batch/:param"
@@ -986,14 +986,14 @@
         "path": "/api/grading/batch/:param",
         "canonicalPath": "/api/grading/batch/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2258,
+        "line": 2307,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "DELETE",
         "path": "/batch/:batchId",
-        "line": 1246,
+        "line": 1401,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/batch/:batchId",
         "canonicalPath": "/api/grading/batch/:param"
@@ -1005,14 +1005,14 @@
         "path": "/api/grading/:param/score-multi-dim",
         "canonicalPath": "/api/grading/:param/score-multi-dim",
         "file": "frontend/src/lib/api.ts",
-        "line": 2267,
+        "line": 2316,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/:id/score-multi-dim",
-        "line": 1280,
+        "line": 1436,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/:id/score-multi-dim",
         "canonicalPath": "/api/grading/:param/score-multi-dim"
@@ -1024,14 +1024,14 @@
         "path": "/api/grading/batch-score",
         "canonicalPath": "/api/grading/batch-score",
         "file": "frontend/src/lib/api.ts",
-        "line": 2281,
+        "line": 2330,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/batch-score",
-        "line": 1328,
+        "line": 1484,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/batch-score",
         "canonicalPath": "/api/grading/batch-score"
@@ -1043,14 +1043,14 @@
         "path": "/api/grading/ocr",
         "canonicalPath": "/api/grading/ocr",
         "file": "frontend/src/lib/api.ts",
-        "line": 2293,
+        "line": 2342,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/ocr",
-        "line": 1377,
+        "line": 1534,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/ocr",
         "canonicalPath": "/api/grading/ocr"
@@ -1062,14 +1062,14 @@
         "path": "/api/grading/ocr-batch",
         "canonicalPath": "/api/grading/ocr-batch",
         "file": "frontend/src/lib/api.ts",
-        "line": 2303,
+        "line": 2352,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/ocr-batch",
-        "line": 1407,
+        "line": 1564,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/ocr-batch",
         "canonicalPath": "/api/grading/ocr-batch"
@@ -1081,14 +1081,14 @@
         "path": "/api/grading/:param/attribute",
         "canonicalPath": "/api/grading/:param/attribute",
         "file": "frontend/src/lib/api.ts",
-        "line": 2315,
+        "line": 2364,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/grading.ts",
         "method": "POST",
         "path": "/:id/attribute",
-        "line": 1435,
+        "line": 1592,
         "prefix": "/api/grading",
         "fullPath": "/api/grading/:id/attribute",
         "canonicalPath": "/api/grading/:param/attribute"
@@ -1100,14 +1100,14 @@
         "path": "/api/workbench/poems",
         "canonicalPath": "/api/workbench/poems",
         "file": "frontend/src/lib/api.ts",
-        "line": 2330,
+        "line": 2379,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "GET",
         "path": "/poems",
-        "line": 314,
+        "line": 352,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/poems",
         "canonicalPath": "/api/workbench/poems"
@@ -1119,14 +1119,14 @@
         "path": "/api/workbench/generate",
         "canonicalPath": "/api/workbench/generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 2336,
+        "line": 2385,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/generate",
-        "line": 339,
+        "line": 377,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/generate",
         "canonicalPath": "/api/workbench/generate"
@@ -1138,14 +1138,14 @@
         "path": "/api/workbench/refine",
         "canonicalPath": "/api/workbench/refine",
         "file": "frontend/src/lib/api.ts",
-        "line": 2343,
+        "line": 2392,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/refine",
-        "line": 408,
+        "line": 446,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/refine",
         "canonicalPath": "/api/workbench/refine"
@@ -1157,14 +1157,14 @@
         "path": "/api/workbench/questions",
         "canonicalPath": "/api/workbench/questions",
         "file": "frontend/src/lib/api.ts",
-        "line": 2350,
+        "line": 2399,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "GET",
         "path": "/questions",
-        "line": 537,
+        "line": 575,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/questions",
         "canonicalPath": "/api/workbench/questions"
@@ -1176,14 +1176,14 @@
         "path": "/api/workbench/export",
         "canonicalPath": "/api/workbench/export",
         "file": "frontend/src/lib/api.ts",
-        "line": 2356,
+        "line": 2405,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/export",
-        "line": 966,
+        "line": 1012,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/export",
         "canonicalPath": "/api/workbench/export"
@@ -1195,14 +1195,14 @@
         "path": "/api/workbench/publish",
         "canonicalPath": "/api/workbench/publish",
         "file": "frontend/src/lib/api.ts",
-        "line": 2364,
+        "line": 2413,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/publish",
-        "line": 1020,
+        "line": 1066,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/publish",
         "canonicalPath": "/api/workbench/publish"
@@ -1214,14 +1214,14 @@
         "path": "/api/workbench/questions",
         "canonicalPath": "/api/workbench/questions",
         "file": "frontend/src/lib/api.ts",
-        "line": 2408,
+        "line": 2457,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "GET",
         "path": "/questions",
-        "line": 537,
+        "line": 575,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/questions",
         "canonicalPath": "/api/workbench/questions"
@@ -1233,14 +1233,14 @@
         "path": "/api/workbench/questions/:param/favorite",
         "canonicalPath": "/api/workbench/questions/:param/favorite",
         "file": "frontend/src/lib/api.ts",
-        "line": 2420,
+        "line": 2469,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/questions/:id/favorite",
-        "line": 638,
+        "line": 676,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/questions/:id/favorite",
         "canonicalPath": "/api/workbench/questions/:param/favorite"
@@ -1252,14 +1252,14 @@
         "path": "/api/workbench/questions/:param/duplicate",
         "canonicalPath": "/api/workbench/questions/:param/duplicate",
         "file": "frontend/src/lib/api.ts",
-        "line": 2432,
+        "line": 2484,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/questions/:id/duplicate",
-        "line": 664,
+        "line": 711,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/questions/:id/duplicate",
         "canonicalPath": "/api/workbench/questions/:param/duplicate"
@@ -1271,14 +1271,14 @@
         "path": "/api/workbench/questions/:param",
         "canonicalPath": "/api/workbench/questions/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2443,
+        "line": 2495,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "DELETE",
         "path": "/questions/:id",
-        "line": 747,
+        "line": 794,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/questions/:id",
         "canonicalPath": "/api/workbench/questions/:param"
@@ -1290,14 +1290,14 @@
         "path": "/api/workbench/questions/:param",
         "canonicalPath": "/api/workbench/questions/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2454,
+        "line": 2506,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "PATCH",
         "path": "/questions/:id",
-        "line": 703,
+        "line": 750,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/questions/:id",
         "canonicalPath": "/api/workbench/questions/:param"
@@ -1309,14 +1309,14 @@
         "path": "/api/workbench/questions/:param/verification",
         "canonicalPath": "/api/workbench/questions/:param/verification",
         "file": "frontend/src/lib/api.ts",
-        "line": 2466,
+        "line": 2518,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "GET",
         "path": "/questions/:id/verification",
-        "line": 778,
+        "line": 825,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/questions/:id/verification",
         "canonicalPath": "/api/workbench/questions/:param/verification"
@@ -1328,14 +1328,14 @@
         "path": "/api/workbench/export",
         "canonicalPath": "/api/workbench/export",
         "file": "frontend/src/lib/api.ts",
-        "line": 2477,
+        "line": 2529,
         "call": "fetchBlob"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/export",
-        "line": 966,
+        "line": 1012,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/export",
         "canonicalPath": "/api/workbench/export"
@@ -1347,14 +1347,14 @@
         "path": "/api/workbench/smart-compose",
         "canonicalPath": "/api/workbench/smart-compose",
         "file": "frontend/src/lib/api.ts",
-        "line": 2501,
+        "line": 2553,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/workbench.ts",
         "method": "POST",
         "path": "/smart-compose",
-        "line": 859,
+        "line": 906,
         "prefix": "/api/agents",
         "fullPath": "/api/workbench/smart-compose",
         "canonicalPath": "/api/workbench/smart-compose"
@@ -1366,7 +1366,7 @@
         "path": "/api/students",
         "canonicalPath": "/api/students",
         "file": "frontend/src/lib/api.ts",
-        "line": 2518,
+        "line": 2570,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1385,14 +1385,14 @@
         "path": "/api/students/:param/weak-points",
         "canonicalPath": "/api/students/:param/weak-points",
         "file": "frontend/src/lib/api.ts",
-        "line": 2530,
+        "line": 2582,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/students.ts",
         "method": "GET",
         "path": "/:id/weak-points",
-        "line": 97,
+        "line": 98,
         "prefix": "/api/students",
         "fullPath": "/api/students/:id/weak-points",
         "canonicalPath": "/api/students/:param/weak-points"
@@ -1404,7 +1404,7 @@
         "path": "/api/memory",
         "canonicalPath": "/api/memory",
         "file": "frontend/src/lib/api.ts",
-        "line": 2551,
+        "line": 2603,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1423,7 +1423,7 @@
         "path": "/api/memory",
         "canonicalPath": "/api/memory",
         "file": "frontend/src/lib/api.ts",
-        "line": 2556,
+        "line": 2608,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1442,7 +1442,7 @@
         "path": "/api/memory/:param",
         "canonicalPath": "/api/memory/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2562,
+        "line": 2614,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1461,7 +1461,7 @@
         "path": "/api/memory/:param",
         "canonicalPath": "/api/memory/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2568,
+        "line": 2620,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1480,7 +1480,7 @@
         "path": "/api/memory",
         "canonicalPath": "/api/memory",
         "file": "frontend/src/lib/api.ts",
-        "line": 2583,
+        "line": 2635,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1499,7 +1499,7 @@
         "path": "/api/copilot/chat",
         "canonicalPath": "/api/copilot/chat",
         "file": "frontend/src/lib/api.ts",
-        "line": 2592,
+        "line": 2644,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1518,7 +1518,7 @@
         "path": "/api/copilot/sessions",
         "canonicalPath": "/api/copilot/sessions",
         "file": "frontend/src/lib/api.ts",
-        "line": 2602,
+        "line": 2654,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1537,7 +1537,7 @@
         "path": "/api/copilot/sessions/:param",
         "canonicalPath": "/api/copilot/sessions/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2608,
+        "line": 2660,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1556,7 +1556,7 @@
         "path": "/api/copilot/sessions/:param",
         "canonicalPath": "/api/copilot/sessions/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2612,
+        "line": 2664,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1575,7 +1575,7 @@
         "path": "/api/copilot/quick-action",
         "canonicalPath": "/api/copilot/quick-action",
         "file": "frontend/src/lib/api.ts",
-        "line": 2619,
+        "line": 2671,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1594,7 +1594,7 @@
         "path": "/api/copilot/feedback",
         "canonicalPath": "/api/copilot/feedback",
         "file": "frontend/src/lib/api.ts",
-        "line": 2626,
+        "line": 2678,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1613,7 +1613,7 @@
         "path": "/api/copilot/agent-labels",
         "canonicalPath": "/api/copilot/agent-labels",
         "file": "frontend/src/lib/api.ts",
-        "line": 2636,
+        "line": 2688,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -1632,14 +1632,14 @@
         "path": "/api/copilot/thinking-mode",
         "canonicalPath": "/api/copilot/thinking-mode",
         "file": "frontend/src/lib/api.ts",
-        "line": 2641,
+        "line": 2693,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/copilot.ts",
         "method": "GET",
         "path": "/thinking-mode",
-        "line": 879,
+        "line": 880,
         "prefix": "/api/copilot",
         "fullPath": "/api/copilot/thinking-mode",
         "canonicalPath": "/api/copilot/thinking-mode"
@@ -1651,14 +1651,14 @@
         "path": "/api/copilot/thinking-mode",
         "canonicalPath": "/api/copilot/thinking-mode",
         "file": "frontend/src/lib/api.ts",
-        "line": 2647,
+        "line": 2699,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/copilot.ts",
         "method": "POST",
         "path": "/thinking-mode",
-        "line": 889,
+        "line": 890,
         "prefix": "/api/copilot",
         "fullPath": "/api/copilot/thinking-mode",
         "canonicalPath": "/api/copilot/thinking-mode"
@@ -1670,7 +1670,7 @@
         "path": "/api/copilot/stream-chat",
         "canonicalPath": "/api/copilot/stream-chat",
         "file": "frontend/src/lib/api.ts",
-        "line": 2689,
+        "line": 2741,
         "call": "fetchStreamResponse"
       },
       "endpoint": {
@@ -1689,14 +1689,14 @@
         "path": "/api/orchestrator/execute",
         "canonicalPath": "/api/orchestrator/execute",
         "file": "frontend/src/lib/api.ts",
-        "line": 2820,
+        "line": 2876,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/orchestrator/routes.ts",
         "method": "POST",
         "path": "/execute",
-        "line": 153,
+        "line": 185,
         "prefix": "/api/orchestrator",
         "fullPath": "/api/orchestrator/execute",
         "canonicalPath": "/api/orchestrator/execute"
@@ -1708,14 +1708,14 @@
         "path": "/api/orchestrator/pause",
         "canonicalPath": "/api/orchestrator/pause",
         "file": "frontend/src/lib/api.ts",
-        "line": 2827,
+        "line": 2883,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/orchestrator/routes.ts",
         "method": "POST",
         "path": "/pause",
-        "line": 239,
+        "line": 285,
         "prefix": "/api/orchestrator",
         "fullPath": "/api/orchestrator/pause",
         "canonicalPath": "/api/orchestrator/pause"
@@ -1727,14 +1727,14 @@
         "path": "/api/orchestrator/resume",
         "canonicalPath": "/api/orchestrator/resume",
         "file": "frontend/src/lib/api.ts",
-        "line": 2834,
+        "line": 2890,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/orchestrator/routes.ts",
         "method": "POST",
         "path": "/resume",
-        "line": 264,
+        "line": 306,
         "prefix": "/api/orchestrator",
         "fullPath": "/api/orchestrator/resume",
         "canonicalPath": "/api/orchestrator/resume"
@@ -1746,14 +1746,14 @@
         "path": "/api/orchestrator/abort",
         "canonicalPath": "/api/orchestrator/abort",
         "file": "frontend/src/lib/api.ts",
-        "line": 2841,
+        "line": 2897,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/orchestrator/routes.ts",
         "method": "POST",
         "path": "/abort",
-        "line": 289,
+        "line": 327,
         "prefix": "/api/orchestrator",
         "fullPath": "/api/orchestrator/abort",
         "canonicalPath": "/api/orchestrator/abort"
@@ -1765,14 +1765,14 @@
         "path": "/api/orchestrator/modify",
         "canonicalPath": "/api/orchestrator/modify",
         "file": "frontend/src/lib/api.ts",
-        "line": 2848,
+        "line": 2904,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/orchestrator/routes.ts",
         "method": "POST",
         "path": "/modify",
-        "line": 314,
+        "line": 348,
         "prefix": "/api/orchestrator",
         "fullPath": "/api/orchestrator/modify",
         "canonicalPath": "/api/orchestrator/modify"
@@ -1784,14 +1784,14 @@
         "path": "/api/orchestrator/sessions/:param",
         "canonicalPath": "/api/orchestrator/sessions/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2855,
+        "line": 2911,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/orchestrator/routes.ts",
         "method": "GET",
         "path": "/sessions/:id",
-        "line": 344,
+        "line": 374,
         "prefix": "/api/orchestrator",
         "fullPath": "/api/orchestrator/sessions/:id",
         "canonicalPath": "/api/orchestrator/sessions/:param"
@@ -1803,14 +1803,14 @@
         "path": "/api/orchestrator/sessions/:param/trace",
         "canonicalPath": "/api/orchestrator/sessions/:param/trace",
         "file": "frontend/src/lib/api.ts",
-        "line": 2859,
+        "line": 2915,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/orchestrator/routes.ts",
         "method": "GET",
         "path": "/sessions/:id/trace",
-        "line": 381,
+        "line": 411,
         "prefix": "/api/orchestrator",
         "fullPath": "/api/orchestrator/sessions/:id/trace",
         "canonicalPath": "/api/orchestrator/sessions/:param/trace"
@@ -1822,14 +1822,14 @@
         "path": "/api/report/templates",
         "canonicalPath": "/api/report/templates",
         "file": "frontend/src/lib/api.ts",
-        "line": 2867,
+        "line": 2923,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/templates",
-        "line": 452,
+        "line": 432,
         "prefix": "/api/report",
         "fullPath": "/api/report/templates",
         "canonicalPath": "/api/report/templates"
@@ -1841,14 +1841,14 @@
         "path": "/api/report/generate",
         "canonicalPath": "/api/report/generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 2871,
+        "line": 2927,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/generate",
-        "line": 471,
+        "line": 451,
         "prefix": "/api/report",
         "fullPath": "/api/report/generate",
         "canonicalPath": "/api/report/generate"
@@ -1860,14 +1860,14 @@
         "path": "/api/report/:param",
         "canonicalPath": "/api/report/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2878,
+        "line": 2934,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/:reportId",
-        "line": 704,
+        "line": 684,
         "prefix": "/api/report",
         "fullPath": "/api/report/:reportId",
         "canonicalPath": "/api/report/:param"
@@ -1879,14 +1879,14 @@
         "path": "/api/report",
         "canonicalPath": "/api/report",
         "file": "frontend/src/lib/api.ts",
-        "line": 2897,
+        "line": 2954,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/",
-        "line": 975,
+        "line": 955,
         "prefix": "/api/report",
         "fullPath": "/api/report",
         "canonicalPath": "/api/report"
@@ -1898,14 +1898,14 @@
         "path": "/api/report/:param",
         "canonicalPath": "/api/report/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2905,
+        "line": 2962,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "DELETE",
         "path": "/:reportId",
-        "line": 1046,
+        "line": 1026,
         "prefix": "/api/report",
         "fullPath": "/api/report/:reportId",
         "canonicalPath": "/api/report/:param"
@@ -1917,14 +1917,14 @@
         "path": "/api/report/:param/export",
         "canonicalPath": "/api/report/:param/export",
         "file": "frontend/src/lib/api.ts",
-        "line": 2917,
+        "line": 2974,
         "call": "fetchBlob"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/:reportId/export",
-        "line": 734,
+        "line": 714,
         "prefix": "/api/report",
         "fullPath": "/api/report/:reportId/export",
         "canonicalPath": "/api/report/:param/export"
@@ -1936,14 +1936,14 @@
         "path": "/api/report/:param/charts",
         "canonicalPath": "/api/report/:param/charts",
         "file": "frontend/src/lib/api.ts",
-        "line": 2942,
+        "line": 2999,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/:reportId/charts",
-        "line": 798,
+        "line": 778,
         "prefix": "/api/report",
         "fullPath": "/api/report/:reportId/charts",
         "canonicalPath": "/api/report/:param/charts"
@@ -1955,14 +1955,14 @@
         "path": "/api/report/:param/preview",
         "canonicalPath": "/api/report/:param/preview",
         "file": "frontend/src/lib/api.ts",
-        "line": 2948,
+        "line": 3005,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/:reportId/preview",
-        "line": 847,
+        "line": 827,
         "prefix": "/api/report",
         "fullPath": "/api/report/:reportId/preview",
         "canonicalPath": "/api/report/:param/preview"
@@ -1974,14 +1974,14 @@
         "path": "/api/report/export/:param",
         "canonicalPath": "/api/report/export/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 2963,
+        "line": 3020,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/export/:reportId",
-        "line": 1088,
+        "line": 1068,
         "prefix": "/api/report",
         "fullPath": "/api/report/export/:reportId",
         "canonicalPath": "/api/report/export/:param"
@@ -1993,14 +1993,14 @@
         "path": "/api/report/history",
         "canonicalPath": "/api/report/history",
         "file": "frontend/src/lib/api.ts",
-        "line": 3013,
+        "line": 3070,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/history",
-        "line": 633,
+        "line": 613,
         "prefix": "/api/report",
         "fullPath": "/api/report/history",
         "canonicalPath": "/api/report/history"
@@ -2012,14 +2012,14 @@
         "path": "/api/diagnosis/classes/:param/bloom-distribution",
         "canonicalPath": "/api/diagnosis/classes/:param/bloom-distribution",
         "file": "frontend/src/lib/api.ts",
-        "line": 3069,
+        "line": 3126,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/classes/:classId/bloom-distribution",
-        "line": 396,
+        "line": 413,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/classes/:classId/bloom-distribution",
         "canonicalPath": "/api/diagnosis/classes/:param/bloom-distribution"
@@ -2031,14 +2031,14 @@
         "path": "/api/diagnosis/classes/:param/heatmap",
         "canonicalPath": "/api/diagnosis/classes/:param/heatmap",
         "file": "frontend/src/lib/api.ts",
-        "line": 3075,
+        "line": 3132,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/classes/:classId/heatmap",
-        "line": 427,
+        "line": 447,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/classes/:classId/heatmap",
         "canonicalPath": "/api/diagnosis/classes/:param/heatmap"
@@ -2050,14 +2050,14 @@
         "path": "/api/diagnosis/students/:param/profile",
         "canonicalPath": "/api/diagnosis/students/:param/profile",
         "file": "frontend/src/lib/api.ts",
-        "line": 3081,
+        "line": 3138,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/students/:studentId/profile",
-        "line": 457,
+        "line": 480,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/students/:studentId/profile",
         "canonicalPath": "/api/diagnosis/students/:param/profile"
@@ -2069,14 +2069,14 @@
         "path": "/api/diagnosis/classes/:param/dark-matter",
         "canonicalPath": "/api/diagnosis/classes/:param/dark-matter",
         "file": "frontend/src/lib/api.ts",
-        "line": 3087,
+        "line": 3144,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/classes/:classId/dark-matter",
-        "line": 488,
+        "line": 515,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/classes/:classId/dark-matter",
         "canonicalPath": "/api/diagnosis/classes/:param/dark-matter"
@@ -2088,14 +2088,14 @@
         "path": "/api/diagnosis/classes/:param/dark-matter/report",
         "canonicalPath": "/api/diagnosis/classes/:param/dark-matter/report",
         "file": "frontend/src/lib/api.ts",
-        "line": 3093,
+        "line": 3150,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/classes/:classId/dark-matter/report",
-        "line": 519,
+        "line": 549,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/classes/:classId/dark-matter/report",
         "canonicalPath": "/api/diagnosis/classes/:param/dark-matter/report"
@@ -2107,14 +2107,14 @@
         "path": "/api/diagnosis/students/:param/gaps",
         "canonicalPath": "/api/diagnosis/students/:param/gaps",
         "file": "frontend/src/lib/api.ts",
-        "line": 3099,
+        "line": 3156,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/students/:studentId/gaps",
-        "line": 560,
+        "line": 593,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/students/:studentId/gaps",
         "canonicalPath": "/api/diagnosis/students/:param/gaps"
@@ -2126,14 +2126,14 @@
         "path": "/api/diagnosis/students/:param/learning-path",
         "canonicalPath": "/api/diagnosis/students/:param/learning-path",
         "file": "frontend/src/lib/api.ts",
-        "line": 3105,
+        "line": 3162,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/students/:studentId/learning-path",
-        "line": 595,
+        "line": 632,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/students/:studentId/learning-path",
         "canonicalPath": "/api/diagnosis/students/:param/learning-path"
@@ -2145,14 +2145,14 @@
         "path": "/api/diagnosis/classes/:param/prescription/:param",
         "canonicalPath": "/api/diagnosis/classes/:param/prescription/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3111,
+        "line": 3168,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/classes/:classId/prescription/:patternId",
-        "line": 625,
+        "line": 666,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/classes/:classId/prescription/:patternId",
         "canonicalPath": "/api/diagnosis/classes/:param/prescription/:param"
@@ -2164,14 +2164,14 @@
         "path": "/api/diagnosis/classes/:param/suggestions",
         "canonicalPath": "/api/diagnosis/classes/:param/suggestions",
         "file": "frontend/src/lib/api.ts",
-        "line": 3120,
+        "line": 3177,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/classes/:classId/suggestions",
-        "line": 656,
+        "line": 700,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/classes/:classId/suggestions",
         "canonicalPath": "/api/diagnosis/classes/:param/suggestions"
@@ -2183,14 +2183,14 @@
         "path": "/api/diagnosis/students/:param/learning-path",
         "canonicalPath": "/api/diagnosis/students/:param/learning-path",
         "file": "frontend/src/lib/api.ts",
-        "line": 3129,
+        "line": 3186,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/students/:studentId/learning-path",
-        "line": 595,
+        "line": 632,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/students/:studentId/learning-path",
         "canonicalPath": "/api/diagnosis/students/:param/learning-path"
@@ -2202,14 +2202,14 @@
         "path": "/api/diagnosis/students/:param/prescription",
         "canonicalPath": "/api/diagnosis/students/:param/prescription",
         "file": "frontend/src/lib/api.ts",
-        "line": 3150,
+        "line": 3207,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/students/:studentId/prescription",
-        "line": 860,
+        "line": 918,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/students/:studentId/prescription",
         "canonicalPath": "/api/diagnosis/students/:param/prescription"
@@ -2221,14 +2221,14 @@
         "path": "/api/recitation/poems",
         "canonicalPath": "/api/recitation/poems",
         "file": "frontend/src/lib/api.ts",
-        "line": 3179,
+        "line": 3236,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/recitation.ts",
         "method": "GET",
         "path": "/poems",
-        "line": 317,
+        "line": 360,
         "prefix": "/api/recitation",
         "fullPath": "/api/recitation/poems",
         "canonicalPath": "/api/recitation/poems"
@@ -2240,14 +2240,14 @@
         "path": "/api/recitation/tts/generate",
         "canonicalPath": "/api/recitation/tts/generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 3190,
+        "line": 3247,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/recitation.ts",
         "method": "POST",
         "path": "/tts/generate",
-        "line": 371,
+        "line": 414,
         "prefix": "/api/recitation",
         "fullPath": "/api/recitation/tts/generate",
         "canonicalPath": "/api/recitation/tts/generate"
@@ -2259,14 +2259,14 @@
         "path": "/api/recitation/asr/transcribe",
         "canonicalPath": "/api/recitation/asr/transcribe",
         "file": "frontend/src/lib/api.ts",
-        "line": 3224,
+        "line": 3281,
         "call": "fetch"
       },
       "endpoint": {
         "file": "backend/src/routes/recitation.ts",
         "method": "POST",
         "path": "/asr/transcribe",
-        "line": 450,
+        "line": 493,
         "prefix": "/api/recitation",
         "fullPath": "/api/recitation/asr/transcribe",
         "canonicalPath": "/api/recitation/asr/transcribe"
@@ -2278,14 +2278,14 @@
         "path": "/api/recitation/evaluate",
         "canonicalPath": "/api/recitation/evaluate",
         "file": "frontend/src/lib/api.ts",
-        "line": 3258,
+        "line": 3315,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/recitation.ts",
         "method": "POST",
         "path": "/evaluate",
-        "line": 587,
+        "line": 712,
         "prefix": "/api/recitation",
         "fullPath": "/api/recitation/evaluate",
         "canonicalPath": "/api/recitation/evaluate"
@@ -2297,14 +2297,14 @@
         "path": "/api/recitation/history/:param",
         "canonicalPath": "/api/recitation/history/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3270,
+        "line": 3327,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/recitation.ts",
         "method": "GET",
         "path": "/history/:studentId",
-        "line": 737,
+        "line": 913,
         "prefix": "/api/recitation",
         "fullPath": "/api/recitation/history/:studentId",
         "canonicalPath": "/api/recitation/history/:param"
@@ -2316,14 +2316,14 @@
         "path": "/api/recitation/leaderboard/:param",
         "canonicalPath": "/api/recitation/leaderboard/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3281,
+        "line": 3338,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/recitation.ts",
         "method": "GET",
         "path": "/leaderboard/:classId",
-        "line": 757,
+        "line": 933,
         "prefix": "/api/recitation",
         "fullPath": "/api/recitation/leaderboard/:classId",
         "canonicalPath": "/api/recitation/leaderboard/:param"
@@ -2335,14 +2335,14 @@
         "path": "/api/recitation/audio/:param",
         "canonicalPath": "/api/recitation/audio/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3292,
+        "line": 3349,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/recitation.ts",
         "method": "GET",
         "path": "/audio/:recitationId",
-        "line": 836,
+        "line": 1012,
         "prefix": "/api/recitation",
         "fullPath": "/api/recitation/audio/:recitationId",
         "canonicalPath": "/api/recitation/audio/:param"
@@ -2354,14 +2354,14 @@
         "path": "/api/recitation/:param",
         "canonicalPath": "/api/recitation/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3303,
+        "line": 3360,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/recitation.ts",
         "method": "DELETE",
         "path": "/:recitationId",
-        "line": 866,
+        "line": 1042,
         "prefix": "/api/recitation",
         "fullPath": "/api/recitation/:recitationId",
         "canonicalPath": "/api/recitation/:param"
@@ -2373,7 +2373,7 @@
         "path": "/api/poem-content/:param",
         "canonicalPath": "/api/poem-content/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3330,
+        "line": 3387,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -2392,14 +2392,14 @@
         "path": "/api/settings/credentials",
         "canonicalPath": "/api/settings/credentials",
         "file": "frontend/src/lib/api.ts",
-        "line": 3345,
+        "line": 3402,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/settings.ts",
         "method": "GET",
         "path": "/credentials",
-        "line": 217,
+        "line": 246,
         "prefix": "/api/settings",
         "fullPath": "/api/settings/credentials",
         "canonicalPath": "/api/settings/credentials"
@@ -2411,14 +2411,14 @@
         "path": "/api/settings/credentials/:param",
         "canonicalPath": "/api/settings/credentials/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3351,
+        "line": 3408,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/settings.ts",
         "method": "PUT",
         "path": "/credentials/:id",
-        "line": 222,
+        "line": 259,
         "prefix": "/api/settings",
         "fullPath": "/api/settings/credentials/:id",
         "canonicalPath": "/api/settings/credentials/:param"
@@ -2430,14 +2430,14 @@
         "path": "/api/settings/credentials/:param/test",
         "canonicalPath": "/api/settings/credentials/:param/test",
         "file": "frontend/src/lib/api.ts",
-        "line": 3358,
+        "line": 3415,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/settings.ts",
         "method": "POST",
         "path": "/credentials/:id/test",
-        "line": 249,
+        "line": 300,
         "prefix": "/api/settings",
         "fullPath": "/api/settings/credentials/:id/test",
         "canonicalPath": "/api/settings/credentials/:param/test"
@@ -2449,7 +2449,7 @@
         "path": "/api/illustration/scene/:param",
         "canonicalPath": "/api/illustration/scene/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3383,
+        "line": 3440,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -2468,14 +2468,14 @@
         "path": "/api/lesson-plan/:param/export",
         "canonicalPath": "/api/lesson-plan/:param/export",
         "file": "frontend/src/lib/api.ts",
-        "line": 3414,
+        "line": 3471,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "POST",
         "path": "/:id/export",
-        "line": 900,
+        "line": 922,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/:id/export",
         "canonicalPath": "/api/lesson-plan/:param/export"
@@ -2487,14 +2487,14 @@
         "path": "/api/lesson-plan/list",
         "canonicalPath": "/api/lesson-plan/list",
         "file": "frontend/src/lib/api.ts",
-        "line": 3438,
+        "line": 3495,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "GET",
         "path": "/list",
-        "line": 457,
+        "line": 479,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/list",
         "canonicalPath": "/api/lesson-plan/list"
@@ -2506,14 +2506,14 @@
         "path": "/api/lesson-plan/:param",
         "canonicalPath": "/api/lesson-plan/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3449,
+        "line": 3506,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "GET",
         "path": "/:id",
-        "line": 493,
+        "line": 515,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/:id",
         "canonicalPath": "/api/lesson-plan/:param"
@@ -2525,14 +2525,14 @@
         "path": "/api/lesson-plan/generate",
         "canonicalPath": "/api/lesson-plan/generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 3468,
+        "line": 3525,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "POST",
         "path": "/generate",
-        "line": 514,
+        "line": 536,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/generate",
         "canonicalPath": "/api/lesson-plan/generate"
@@ -2544,14 +2544,14 @@
         "path": "/api/lesson-plan/save",
         "canonicalPath": "/api/lesson-plan/save",
         "file": "frontend/src/lib/api.ts",
-        "line": 3482,
+        "line": 3539,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "POST",
         "path": "/save",
-        "line": 603,
+        "line": 625,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/save",
         "canonicalPath": "/api/lesson-plan/save"
@@ -2563,14 +2563,14 @@
         "path": "/api/lesson-plan/poems/search",
         "canonicalPath": "/api/lesson-plan/poems/search",
         "file": "frontend/src/lib/api.ts",
-        "line": 3507,
+        "line": 3564,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "GET",
         "path": "/poems/search",
-        "line": 642,
+        "line": 664,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/poems/search",
         "canonicalPath": "/api/lesson-plan/poems/search"
@@ -2582,14 +2582,14 @@
         "path": "/api/lesson-plan/poems/:param/detail",
         "canonicalPath": "/api/lesson-plan/poems/:param/detail",
         "file": "frontend/src/lib/api.ts",
-        "line": 3514,
+        "line": 3571,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "GET",
         "path": "/poems/:id/detail",
-        "line": 672,
+        "line": 694,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/poems/:id/detail",
         "canonicalPath": "/api/lesson-plan/poems/:param/detail"
@@ -2601,14 +2601,14 @@
         "path": "/api/lesson-plan/objectives/generate",
         "canonicalPath": "/api/lesson-plan/objectives/generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 3521,
+        "line": 3578,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "POST",
         "path": "/objectives/generate",
-        "line": 690,
+        "line": 712,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/objectives/generate",
         "canonicalPath": "/api/lesson-plan/objectives/generate"
@@ -2620,14 +2620,14 @@
         "path": "/api/lesson-plan/layered-design/generate",
         "canonicalPath": "/api/lesson-plan/layered-design/generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 3532,
+        "line": 3589,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "POST",
         "path": "/layered-design/generate",
-        "line": 718,
+        "line": 740,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/layered-design/generate",
         "canonicalPath": "/api/lesson-plan/layered-design/generate"
@@ -2639,14 +2639,14 @@
         "path": "/api/lesson-plan/lessons/generate",
         "canonicalPath": "/api/lesson-plan/lessons/generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 3543,
+        "line": 3600,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "POST",
         "path": "/lessons/generate",
-        "line": 745,
+        "line": 767,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/lessons/generate",
         "canonicalPath": "/api/lesson-plan/lessons/generate"
@@ -2658,14 +2658,14 @@
         "path": "/api/lesson-plan/lessons/:param/refine",
         "canonicalPath": "/api/lesson-plan/lessons/:param/refine",
         "file": "frontend/src/lib/api.ts",
-        "line": 3566,
+        "line": 3623,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "POST",
         "path": "/lessons/:id/refine",
-        "line": 820,
+        "line": 842,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/lessons/:id/refine",
         "canonicalPath": "/api/lesson-plan/lessons/:param/refine"
@@ -2677,14 +2677,14 @@
         "path": "/api/lesson-plan/lessons/:param/resources",
         "canonicalPath": "/api/lesson-plan/lessons/:param/resources",
         "file": "frontend/src/lib/api.ts",
-        "line": 3590,
+        "line": 3647,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/lesson-plan.ts",
         "method": "GET",
         "path": "/lessons/:id/resources",
-        "line": 881,
+        "line": 903,
         "prefix": "/api/lesson-plan",
         "fullPath": "/api/lesson-plan/lessons/:id/resources",
         "canonicalPath": "/api/lesson-plan/lessons/:param/resources"
@@ -2696,7 +2696,7 @@
         "path": "/api/lesson-plans/templates",
         "canonicalPath": "/api/lesson-plans/templates",
         "file": "frontend/src/lib/api.ts",
-        "line": 3616,
+        "line": 3673,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -2715,7 +2715,7 @@
         "path": "/api/lesson-plans/templates/:param",
         "canonicalPath": "/api/lesson-plans/templates/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3632,
+        "line": 3689,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -2734,7 +2734,7 @@
         "path": "/api/error-notebook/list",
         "canonicalPath": "/api/error-notebook/list",
         "file": "frontend/src/lib/api.ts",
-        "line": 3716,
+        "line": 3773,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -2753,7 +2753,7 @@
         "path": "/api/error-notebook/:param",
         "canonicalPath": "/api/error-notebook/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3728,
+        "line": 3785,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -2772,7 +2772,7 @@
         "path": "/api/error-notebook/review",
         "canonicalPath": "/api/error-notebook/review",
         "file": "frontend/src/lib/api.ts",
-        "line": 3738,
+        "line": 3795,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -2791,7 +2791,7 @@
         "path": "/api/error-notebook/stats",
         "canonicalPath": "/api/error-notebook/stats",
         "file": "frontend/src/lib/api.ts",
-        "line": 3752,
+        "line": 3809,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -2810,14 +2810,14 @@
         "path": "/api/creation/tasks",
         "canonicalPath": "/api/creation/tasks",
         "file": "frontend/src/lib/api.ts",
-        "line": 3766,
+        "line": 3823,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "GET",
         "path": "/tasks",
-        "line": 430,
+        "line": 431,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/tasks",
         "canonicalPath": "/api/creation/tasks"
@@ -2829,14 +2829,14 @@
         "path": "/api/creation/tasks/create",
         "canonicalPath": "/api/creation/tasks/create",
         "file": "frontend/src/lib/api.ts",
-        "line": 3773,
+        "line": 3830,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/tasks/create",
-        "line": 450,
+        "line": 451,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/tasks/create",
         "canonicalPath": "/api/creation/tasks/create"
@@ -2848,14 +2848,14 @@
         "path": "/api/creation/collaborate/start",
         "canonicalPath": "/api/creation/collaborate/start",
         "file": "frontend/src/lib/api.ts",
-        "line": 3780,
+        "line": 3837,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/collaborate/start",
-        "line": 484,
+        "line": 485,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/collaborate/start",
         "canonicalPath": "/api/creation/collaborate/start"
@@ -2867,14 +2867,14 @@
         "path": "/api/creation/collaborate/iterate",
         "canonicalPath": "/api/creation/collaborate/iterate",
         "file": "frontend/src/lib/api.ts",
-        "line": 3787,
+        "line": 3844,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/collaborate/iterate",
-        "line": 559,
+        "line": 560,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/collaborate/iterate",
         "canonicalPath": "/api/creation/collaborate/iterate"
@@ -2886,14 +2886,14 @@
         "path": "/api/creation/vision-describe",
         "canonicalPath": "/api/creation/vision-describe",
         "file": "frontend/src/lib/api.ts",
-        "line": 3794,
+        "line": 3851,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/vision-describe",
-        "line": 642,
+        "line": 643,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/vision-describe",
         "canonicalPath": "/api/creation/vision-describe"
@@ -2905,14 +2905,14 @@
         "path": "/api/creation/rewrite",
         "canonicalPath": "/api/creation/rewrite",
         "file": "frontend/src/lib/api.ts",
-        "line": 3801,
+        "line": 3858,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/rewrite",
-        "line": 688,
+        "line": 689,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/rewrite",
         "canonicalPath": "/api/creation/rewrite"
@@ -2924,14 +2924,14 @@
         "path": "/api/creation/works",
         "canonicalPath": "/api/creation/works",
         "file": "frontend/src/lib/api.ts",
-        "line": 3823,
+        "line": 3880,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "GET",
         "path": "/works",
-        "line": 734,
+        "line": 735,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/works",
         "canonicalPath": "/api/creation/works"
@@ -2943,14 +2943,14 @@
         "path": "/api/creation/works/submit",
         "canonicalPath": "/api/creation/works/submit",
         "file": "frontend/src/lib/api.ts",
-        "line": 3830,
+        "line": 3887,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/works/submit",
-        "line": 754,
+        "line": 755,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/works/submit",
         "canonicalPath": "/api/creation/works/submit"
@@ -2962,14 +2962,14 @@
         "path": "/api/creation/works/:param/like",
         "canonicalPath": "/api/creation/works/:param/like",
         "file": "frontend/src/lib/api.ts",
-        "line": 3837,
+        "line": 3894,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/works/:id/like",
-        "line": 832,
+        "line": 852,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/works/:id/like",
         "canonicalPath": "/api/creation/works/:param/like"
@@ -2981,14 +2981,14 @@
         "path": "/api/creation/works/:param/grade",
         "canonicalPath": "/api/creation/works/:param/grade",
         "file": "frontend/src/lib/api.ts",
-        "line": 3844,
+        "line": 3901,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/works/:id/grade",
-        "line": 892,
+        "line": 912,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/works/:id/grade",
         "canonicalPath": "/api/creation/works/:param/grade"
@@ -3000,14 +3000,14 @@
         "path": "/api/creation/works/:param/recreate",
         "canonicalPath": "/api/creation/works/:param/recreate",
         "file": "frontend/src/lib/api.ts",
-        "line": 3851,
+        "line": 3908,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "POST",
         "path": "/works/:id/recreate",
-        "line": 1011,
+        "line": 1031,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/works/:id/recreate",
         "canonicalPath": "/api/creation/works/:param/recreate"
@@ -3019,14 +3019,14 @@
         "path": "/api/creation/works/wall",
         "canonicalPath": "/api/creation/works/wall",
         "file": "frontend/src/lib/api.ts",
-        "line": 3871,
+        "line": 3928,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/creation.ts",
         "method": "GET",
         "path": "/works/wall",
-        "line": 860,
+        "line": 880,
         "prefix": "/api/creation",
         "fullPath": "/api/creation/works/wall",
         "canonicalPath": "/api/creation/works/wall"
@@ -3038,7 +3038,7 @@
         "path": "/api/culture/poems/:param/background",
         "canonicalPath": "/api/culture/poems/:param/background",
         "file": "frontend/src/lib/api.ts",
-        "line": 3883,
+        "line": 3940,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -3057,7 +3057,7 @@
         "path": "/api/culture/poems/:param/images",
         "canonicalPath": "/api/culture/poems/:param/images",
         "file": "frontend/src/lib/api.ts",
-        "line": 3893,
+        "line": 3950,
         "call": "fetchJSON"
       },
       "endpoint": {
@@ -3076,14 +3076,14 @@
         "path": "/api/culture/images/:param",
         "canonicalPath": "/api/culture/images/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3903,
+        "line": 3960,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/culture.ts",
         "method": "GET",
         "path": "/images/:imageId",
-        "line": 341,
+        "line": 339,
         "prefix": "/api/culture",
         "fullPath": "/api/culture/images/:imageId",
         "canonicalPath": "/api/culture/images/:param"
@@ -3095,14 +3095,14 @@
         "path": "/api/culture/imagery/:param",
         "canonicalPath": "/api/culture/imagery/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 3913,
+        "line": 3970,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/culture.ts",
         "method": "GET",
         "path": "/imagery/:imageName",
-        "line": 363,
+        "line": 361,
         "prefix": "/api/culture",
         "fullPath": "/api/culture/imagery/:imageName",
         "canonicalPath": "/api/culture/imagery/:param"
@@ -3114,14 +3114,14 @@
         "path": "/api/culture/imagery/:param/refresh",
         "canonicalPath": "/api/culture/imagery/:param/refresh",
         "file": "frontend/src/lib/api.ts",
-        "line": 3920,
+        "line": 3977,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/culture.ts",
         "method": "POST",
         "path": "/imagery/:imageName/refresh",
-        "line": 391,
+        "line": 389,
         "prefix": "/api/culture",
         "fullPath": "/api/culture/imagery/:imageName/refresh",
         "canonicalPath": "/api/culture/imagery/:param/refresh"
@@ -3133,14 +3133,14 @@
         "path": "/api/culture/immersive/start",
         "canonicalPath": "/api/culture/immersive/start",
         "file": "frontend/src/lib/api.ts",
-        "line": 3930,
+        "line": 3987,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/culture.ts",
         "method": "POST",
         "path": "/immersive/start",
-        "line": 445,
+        "line": 443,
         "prefix": "/api/culture",
         "fullPath": "/api/culture/immersive/start",
         "canonicalPath": "/api/culture/immersive/start"
@@ -3152,14 +3152,14 @@
         "path": "/api/culture/immersive/:param/status",
         "canonicalPath": "/api/culture/immersive/:param/status",
         "file": "frontend/src/lib/api.ts",
-        "line": 3941,
+        "line": 3998,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/culture.ts",
         "method": "GET",
         "path": "/immersive/:poemId/status",
-        "line": 473,
+        "line": 471,
         "prefix": "/api/culture",
         "fullPath": "/api/culture/immersive/:poemId/status",
         "canonicalPath": "/api/culture/immersive/:param/status"
@@ -3171,14 +3171,14 @@
         "path": "/api/culture/immersive/stop",
         "canonicalPath": "/api/culture/immersive/stop",
         "file": "frontend/src/lib/api.ts",
-        "line": 3951,
+        "line": 4009,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/culture.ts",
         "method": "POST",
         "path": "/immersive/stop",
-        "line": 497,
+        "line": 495,
         "prefix": "/api/culture",
         "fullPath": "/api/culture/immersive/stop",
         "canonicalPath": "/api/culture/immersive/stop"
@@ -3190,14 +3190,14 @@
         "path": "/api/evolution/genealogy",
         "canonicalPath": "/api/evolution/genealogy",
         "file": "frontend/src/lib/api.ts",
-        "line": 3965,
+        "line": 4023,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/evolution.ts",
         "method": "GET",
         "path": "/genealogy",
-        "line": 143,
+        "line": 178,
         "prefix": "/api/evolution",
         "fullPath": "/api/evolution/genealogy",
         "canonicalPath": "/api/evolution/genealogy"
@@ -3209,14 +3209,14 @@
         "path": "/api/evolution/patterns",
         "canonicalPath": "/api/evolution/patterns",
         "file": "frontend/src/lib/api.ts",
-        "line": 3978,
+        "line": 4036,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/evolution.ts",
         "method": "GET",
         "path": "/patterns",
-        "line": 163,
+        "line": 198,
         "prefix": "/api/evolution",
         "fullPath": "/api/evolution/patterns",
         "canonicalPath": "/api/evolution/patterns"
@@ -3228,14 +3228,14 @@
         "path": "/api/evolution/ab-tests",
         "canonicalPath": "/api/evolution/ab-tests",
         "file": "frontend/src/lib/api.ts",
-        "line": 3987,
+        "line": 4045,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/evolution.ts",
         "method": "GET",
         "path": "/ab-tests",
-        "line": 185,
+        "line": 220,
         "prefix": "/api/evolution",
         "fullPath": "/api/evolution/ab-tests",
         "canonicalPath": "/api/evolution/ab-tests"
@@ -3247,14 +3247,14 @@
         "path": "/api/evolution/predict",
         "canonicalPath": "/api/evolution/predict",
         "file": "frontend/src/lib/api.ts",
-        "line": 4025,
+        "line": 4081,
         "call": "fetchStreamResponse"
       },
       "endpoint": {
         "file": "backend/src/routes/evolution.ts",
         "method": "POST",
         "path": "/predict",
-        "line": 367,
+        "line": 402,
         "prefix": "/api/evolution",
         "fullPath": "/api/evolution/predict",
         "canonicalPath": "/api/evolution/predict"
@@ -3266,14 +3266,14 @@
         "path": "/api/evolution/predict",
         "canonicalPath": "/api/evolution/predict",
         "file": "frontend/src/lib/api.ts",
-        "line": 4187,
+        "line": 4160,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/evolution.ts",
         "method": "GET",
         "path": "/predict",
-        "line": 239,
+        "line": 274,
         "prefix": "/api/evolution",
         "fullPath": "/api/evolution/predict",
         "canonicalPath": "/api/evolution/predict"
@@ -3285,14 +3285,14 @@
         "path": "/api/copilot/thinking-chains",
         "canonicalPath": "/api/copilot/thinking-chains",
         "file": "frontend/src/lib/api.ts",
-        "line": 4219,
+        "line": 4192,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/copilot.ts",
         "method": "GET",
         "path": "/thinking-chains",
-        "line": 804,
+        "line": 805,
         "prefix": "/api/copilot",
         "fullPath": "/api/copilot/thinking-chains",
         "canonicalPath": "/api/copilot/thinking-chains"
@@ -3304,14 +3304,14 @@
         "path": "/api/copilot/thinking-chains/:param",
         "canonicalPath": "/api/copilot/thinking-chains/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 4233,
+        "line": 4206,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/copilot.ts",
         "method": "GET",
         "path": "/thinking-chains/:id",
-        "line": 834,
+        "line": 835,
         "prefix": "/api/copilot",
         "fullPath": "/api/copilot/thinking-chains/:id",
         "canonicalPath": "/api/copilot/thinking-chains/:param"
@@ -3323,14 +3323,14 @@
         "path": "/api/diagnosis/students/:param/profile-3d",
         "canonicalPath": "/api/diagnosis/students/:param/profile-3d",
         "file": "frontend/src/lib/api.ts",
-        "line": 4252,
+        "line": 4225,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "GET",
         "path": "/students/:studentId/profile-3d",
-        "line": 686,
+        "line": 733,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/students/:studentId/profile-3d",
         "canonicalPath": "/api/diagnosis/students/:param/profile-3d"
@@ -3342,14 +3342,14 @@
         "path": "/api/diagnosis/students/:param/profile-3d/refresh",
         "canonicalPath": "/api/diagnosis/students/:param/profile-3d/refresh",
         "file": "frontend/src/lib/api.ts",
-        "line": 4259,
+        "line": 4232,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/diagnosis.ts",
         "method": "POST",
         "path": "/students/:studentId/profile-3d/refresh",
-        "line": 723,
+        "line": 776,
         "prefix": "/api/diagnosis",
         "fullPath": "/api/diagnosis/students/:studentId/profile-3d/refresh",
         "canonicalPath": "/api/diagnosis/students/:param/profile-3d/refresh"
@@ -3361,14 +3361,14 @@
         "path": "/api/dashboard/class/:param/hotspot",
         "canonicalPath": "/api/dashboard/class/:param/hotspot",
         "file": "frontend/src/lib/api.ts",
-        "line": 4270,
+        "line": 4243,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/class/:classId/hotspot",
-        "line": 612,
+        "line": 627,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/class/:classId/hotspot",
         "canonicalPath": "/api/dashboard/class/:param/hotspot"
@@ -3380,14 +3380,14 @@
         "path": "/api/dashboard/class/:param/hotspot/refresh",
         "canonicalPath": "/api/dashboard/class/:param/hotspot/refresh",
         "file": "frontend/src/lib/api.ts",
-        "line": 4277,
+        "line": 4250,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "POST",
         "path": "/class/:classId/hotspot/refresh",
-        "line": 632,
+        "line": 650,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/class/:classId/hotspot/refresh",
         "canonicalPath": "/api/dashboard/class/:param/hotspot/refresh"
@@ -3399,14 +3399,14 @@
         "path": "/api/dashboard/alerts/trend",
         "canonicalPath": "/api/dashboard/alerts/trend",
         "file": "frontend/src/lib/api.ts",
-        "line": 4300,
+        "line": 4273,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/alerts/trend",
-        "line": 462,
+        "line": 474,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/alerts/trend",
         "canonicalPath": "/api/dashboard/alerts/trend"
@@ -3418,14 +3418,14 @@
         "path": "/api/dashboard/alerts/:param/resolve",
         "canonicalPath": "/api/dashboard/alerts/:param/resolve",
         "file": "frontend/src/lib/api.ts",
-        "line": 4307,
+        "line": 4280,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "POST",
         "path": "/alerts/:alertId/resolve",
-        "line": 518,
+        "line": 530,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/alerts/:alertId/resolve",
         "canonicalPath": "/api/dashboard/alerts/:param/resolve"
@@ -3437,14 +3437,14 @@
         "path": "/api/dashboard/alerts/batch-resolve",
         "canonicalPath": "/api/dashboard/alerts/batch-resolve",
         "file": "frontend/src/lib/api.ts",
-        "line": 4315,
+        "line": 4288,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "POST",
         "path": "/alerts/batch-resolve",
-        "line": 544,
+        "line": 556,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/alerts/batch-resolve",
         "canonicalPath": "/api/dashboard/alerts/batch-resolve"
@@ -3456,14 +3456,14 @@
         "path": "/api/report/export/:param",
         "canonicalPath": "/api/report/export/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 4326,
+        "line": 4299,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/export/:reportId",
-        "line": 1088,
+        "line": 1068,
         "prefix": "/api/report",
         "fullPath": "/api/report/export/:reportId",
         "canonicalPath": "/api/report/export/:param"
@@ -3472,17 +3472,36 @@
     {
       "call": {
         "method": "POST",
-        "path": "/api/report/share",
-        "canonicalPath": "/api/report/share",
+        "path": "/api/report/share/preview",
+        "canonicalPath": "/api/report/share/preview",
         "file": "frontend/src/lib/api.ts",
-        "line": 4345,
+        "line": 4318,
         "call": "fetchJSON"
       },
       "endpoint": {
-        "file": "backend/src/routes/report.ts",
+        "file": "backend/src/routes/report-sharing.ts",
+        "method": "POST",
+        "path": "/share/preview",
+        "line": 84,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/share/preview",
+        "canonicalPath": "/api/report/share/preview"
+      }
+    },
+    {
+      "call": {
+        "method": "POST",
+        "path": "/api/report/share",
+        "canonicalPath": "/api/report/share",
+        "file": "frontend/src/lib/api.ts",
+        "line": 4329,
+        "call": "fetchJSON"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report-sharing.ts",
         "method": "POST",
         "path": "/share",
-        "line": 1160,
+        "line": 130,
         "prefix": "/api/report",
         "fullPath": "/api/report/share",
         "canonicalPath": "/api/report/share"
@@ -3491,36 +3510,17 @@
     {
       "call": {
         "method": "GET",
-        "path": "/api/report/shared/:param",
-        "canonicalPath": "/api/report/shared/:param",
-        "file": "frontend/src/lib/api.ts",
-        "line": 4356,
-        "call": "fetchJSON"
-      },
-      "endpoint": {
-        "file": "backend/src/routes/report.ts",
-        "method": "GET",
-        "path": "/shared/:token",
-        "line": 1204,
-        "prefix": "/api/report",
-        "fullPath": "/api/report/shared/:token",
-        "canonicalPath": "/api/report/shared/:param"
-      }
-    },
-    {
-      "call": {
-        "method": "GET",
         "path": "/api/report/shared",
         "canonicalPath": "/api/report/shared",
         "file": "frontend/src/lib/api.ts",
-        "line": 4363,
+        "line": 4345,
         "call": "fetchJSON"
       },
       "endpoint": {
-        "file": "backend/src/routes/report.ts",
+        "file": "backend/src/routes/report-sharing.ts",
         "method": "GET",
         "path": "/shared",
-        "line": 1228,
+        "line": 212,
         "prefix": "/api/report",
         "fullPath": "/api/report/shared",
         "canonicalPath": "/api/report/shared"
@@ -3532,14 +3532,14 @@
         "path": "/api/report/shared/:param",
         "canonicalPath": "/api/report/shared/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 4370,
+        "line": 4352,
         "call": "fetchJSON"
       },
       "endpoint": {
-        "file": "backend/src/routes/report.ts",
+        "file": "backend/src/routes/report-sharing.ts",
         "method": "DELETE",
         "path": "/shared/:token",
-        "line": 1244,
+        "line": 224,
         "prefix": "/api/report",
         "fullPath": "/api/report/shared/:token",
         "canonicalPath": "/api/report/shared/:param"
@@ -3551,14 +3551,14 @@
         "path": "/api/classroom/:param/quest",
         "canonicalPath": "/api/classroom/:param/quest",
         "file": "frontend/src/lib/api.ts",
-        "line": 4386,
+        "line": 4368,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "GET",
         "path": "/:lessonId/quest",
-        "line": 1218,
+        "line": 1280,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/quest",
         "canonicalPath": "/api/classroom/:param/quest"
@@ -3570,14 +3570,14 @@
         "path": "/api/classroom/:param/quest/teams",
         "canonicalPath": "/api/classroom/:param/quest/teams",
         "file": "frontend/src/lib/api.ts",
-        "line": 4395,
+        "line": 4377,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/quest/teams",
-        "line": 1232,
+        "line": 1294,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/quest/teams",
         "canonicalPath": "/api/classroom/:param/quest/teams"
@@ -3589,14 +3589,14 @@
         "path": "/api/classroom/:param/quest/ai-turn",
         "canonicalPath": "/api/classroom/:param/quest/ai-turn",
         "file": "frontend/src/lib/api.ts",
-        "line": 4410,
+        "line": 4392,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/classroom.ts",
         "method": "POST",
         "path": "/:lessonId/quest/ai-turn",
-        "line": 1271,
+        "line": 1333,
         "prefix": "/api/classroom",
         "fullPath": "/api/classroom/:lessonId/quest/ai-turn",
         "canonicalPath": "/api/classroom/:param/quest/ai-turn"
@@ -3608,14 +3608,14 @@
         "path": "/api/report/home-school/weekly",
         "canonicalPath": "/api/report/home-school/weekly",
         "file": "frontend/src/lib/api.ts",
-        "line": 4422,
+        "line": 4404,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/home-school/weekly",
-        "line": 1305,
+        "line": 1183,
         "prefix": "/api/report",
         "fullPath": "/api/report/home-school/weekly",
         "canonicalPath": "/api/report/home-school/weekly"
@@ -3627,14 +3627,14 @@
         "path": "/api/report/home-school/:param/latest",
         "canonicalPath": "/api/report/home-school/:param/latest",
         "file": "frontend/src/lib/api.ts",
-        "line": 4433,
+        "line": 4415,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/home-school/:studentId/latest",
-        "line": 1336,
+        "line": 1235,
         "prefix": "/api/report",
         "fullPath": "/api/report/home-school/:studentId/latest",
         "canonicalPath": "/api/report/home-school/:param/latest"
@@ -3646,14 +3646,14 @@
         "path": "/api/report/home-school/:param/feedback",
         "canonicalPath": "/api/report/home-school/:param/feedback",
         "file": "frontend/src/lib/api.ts",
-        "line": 4443,
+        "line": 4425,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/home-school/:reportId/feedback",
-        "line": 1360,
+        "line": 1259,
         "prefix": "/api/report",
         "fullPath": "/api/report/home-school/:reportId/feedback",
         "canonicalPath": "/api/report/home-school/:param/feedback"
@@ -3665,14 +3665,14 @@
         "path": "/api/report/home-school/:param/note",
         "canonicalPath": "/api/report/home-school/:param/note",
         "file": "frontend/src/lib/api.ts",
-        "line": 4457,
+        "line": 4439,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/home-school/:reportId/note",
-        "line": 1391,
+        "line": 1290,
         "prefix": "/api/report",
         "fullPath": "/api/report/home-school/:reportId/note",
         "canonicalPath": "/api/report/home-school/:param/note"
@@ -3684,14 +3684,14 @@
         "path": "/api/report/home-school/class/:param",
         "canonicalPath": "/api/report/home-school/class/:param",
         "file": "frontend/src/lib/api.ts",
-        "line": 4473,
+        "line": 4455,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "GET",
         "path": "/home-school/class/:classId",
-        "line": 1276,
+        "line": 1154,
         "prefix": "/api/report",
         "fullPath": "/api/report/home-school/class/:classId",
         "canonicalPath": "/api/report/home-school/class/:param"
@@ -3703,14 +3703,14 @@
         "path": "/api/report/home-school/:param/publish",
         "canonicalPath": "/api/report/home-school/:param/publish",
         "file": "frontend/src/lib/api.ts",
-        "line": 4479,
+        "line": 4461,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/home-school/:reportId/publish",
-        "line": 1423,
+        "line": 1322,
         "prefix": "/api/report",
         "fullPath": "/api/report/home-school/:reportId/publish",
         "canonicalPath": "/api/report/home-school/:param/publish"
@@ -3722,14 +3722,14 @@
         "path": "/api/report/home-school/:param/feedback/read",
         "canonicalPath": "/api/report/home-school/:param/feedback/read",
         "file": "frontend/src/lib/api.ts",
-        "line": 4486,
+        "line": 4468,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/home-school/:reportId/feedback/read",
-        "line": 1446,
+        "line": 1345,
         "prefix": "/api/report",
         "fullPath": "/api/report/home-school/:reportId/feedback/read",
         "canonicalPath": "/api/report/home-school/:param/feedback/read"
@@ -3741,14 +3741,14 @@
         "path": "/api/report/home-school/:param/activity/:param/complete",
         "canonicalPath": "/api/report/home-school/:param/activity/:param/complete",
         "file": "frontend/src/lib/api.ts",
-        "line": 4496,
+        "line": 4478,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/report.ts",
         "method": "POST",
         "path": "/home-school/:reportId/activity/:activityId/complete",
-        "line": 1469,
+        "line": 1368,
         "prefix": "/api/report",
         "fullPath": "/api/report/home-school/:reportId/activity/:activityId/complete",
         "canonicalPath": "/api/report/home-school/:param/activity/:param/complete"
@@ -3760,14 +3760,14 @@
         "path": "/api/dashboard/stats",
         "canonicalPath": "/api/dashboard/stats",
         "file": "frontend/src/lib/api.ts",
-        "line": 4515,
+        "line": 4497,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/stats",
-        "line": 337,
+        "line": 349,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/stats",
         "canonicalPath": "/api/dashboard/stats"
@@ -3779,14 +3779,14 @@
         "path": "/api/dashboard/alerts",
         "canonicalPath": "/api/dashboard/alerts",
         "file": "frontend/src/lib/api.ts",
-        "line": 4523,
+        "line": 4505,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/alerts",
-        "line": 410,
+        "line": 422,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/alerts",
         "canonicalPath": "/api/dashboard/alerts"
@@ -3798,14 +3798,14 @@
         "path": "/api/dashboard/bloom-radar",
         "canonicalPath": "/api/dashboard/bloom-radar",
         "file": "frontend/src/lib/api.ts",
-        "line": 4533,
+        "line": 4515,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/bloom-radar",
-        "line": 376,
+        "line": 388,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/bloom-radar",
         "canonicalPath": "/api/dashboard/bloom-radar"
@@ -3817,14 +3817,14 @@
         "path": "/api/dashboard/class-hotspot",
         "canonicalPath": "/api/dashboard/class-hotspot",
         "file": "frontend/src/lib/api.ts",
-        "line": 4541,
+        "line": 4523,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/class-hotspot",
-        "line": 569,
+        "line": 581,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/class-hotspot",
         "canonicalPath": "/api/dashboard/class-hotspot"
@@ -3836,14 +3836,14 @@
         "path": "/api/dashboard/innovation",
         "canonicalPath": "/api/dashboard/innovation",
         "file": "frontend/src/lib/api.ts",
-        "line": 4549,
+        "line": 4531,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/innovation",
-        "line": 654,
+        "line": 676,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/innovation",
         "canonicalPath": "/api/dashboard/innovation"
@@ -3855,14 +3855,14 @@
         "path": "/api/dashboard/weekly-progress",
         "canonicalPath": "/api/dashboard/weekly-progress",
         "file": "frontend/src/lib/api.ts",
-        "line": 4557,
+        "line": 4539,
         "call": "fetchJSON"
       },
       "endpoint": {
         "file": "backend/src/routes/dashboard.ts",
         "method": "GET",
         "path": "/weekly-progress",
-        "line": 429,
+        "line": 441,
         "prefix": "/api/dashboard",
         "fullPath": "/api/dashboard/weekly-progress",
         "canonicalPath": "/api/dashboard/weekly-progress"
@@ -3874,14 +3874,14 @@
         "path": "/api/ai/chat",
         "canonicalPath": "/api/ai/chat",
         "file": "frontend/src/lib/api.ts",
-        "line": 4630,
+        "line": 4611,
         "call": "fetchStreamResponse"
       },
       "endpoint": {
         "file": "backend/src/routes/ai.ts",
         "method": "POST",
         "path": "/chat",
-        "line": 376,
+        "line": 566,
         "prefix": "/api/ai",
         "fullPath": "/api/ai/chat",
         "canonicalPath": "/api/ai/chat"
@@ -3893,14 +3893,14 @@
         "path": "/api/ai/image-generate",
         "canonicalPath": "/api/ai/image-generate",
         "file": "frontend/src/lib/api.ts",
-        "line": 4823,
+        "line": 4778,
         "call": "fetch"
       },
       "endpoint": {
         "file": "backend/src/routes/ai.ts",
         "method": "POST",
         "path": "/image-generate",
-        "line": 217,
+        "line": 276,
         "prefix": "/api/ai",
         "fullPath": "/api/ai/image-generate",
         "canonicalPath": "/api/ai/image-generate"
@@ -3912,14 +3912,14 @@
         "path": "/api/ai/asr",
         "canonicalPath": "/api/ai/asr",
         "file": "frontend/src/lib/api.ts",
-        "line": 4922,
+        "line": 4885,
         "call": "fetch"
       },
       "endpoint": {
         "file": "backend/src/routes/ai.ts",
         "method": "POST",
         "path": "/asr",
-        "line": 304,
+        "line": 399,
         "prefix": "/api/ai",
         "fullPath": "/api/ai/asr",
         "canonicalPath": "/api/ai/asr"
@@ -3931,14 +3931,14 @@
         "path": "/api/auth/status",
         "canonicalPath": "/api/auth/status",
         "file": "frontend/src/lib/auth-session.ts",
-        "line": 146,
+        "line": 148,
         "call": "authenticatedFetch"
       },
       "endpoint": {
         "file": "backend/src/security/auth.ts",
         "method": "GET",
         "path": "/status",
-        "line": 452,
+        "line": 516,
         "prefix": "/api/auth",
         "fullPath": "/api/auth/status",
         "canonicalPath": "/api/auth/status"
@@ -3950,14 +3950,14 @@
         "path": "/api/auth/login",
         "canonicalPath": "/api/auth/login",
         "file": "frontend/src/lib/auth-session.ts",
-        "line": 157,
+        "line": 158,
         "call": "authenticatedFetch"
       },
       "endpoint": {
         "file": "backend/src/security/auth.ts",
         "method": "POST",
         "path": "/login",
-        "line": 467,
+        "line": 531,
         "prefix": "/api/auth",
         "fullPath": "/api/auth/login",
         "canonicalPath": "/api/auth/login"
@@ -3969,14 +3969,14 @@
         "path": "/api/auth/logout",
         "canonicalPath": "/api/auth/logout",
         "file": "frontend/src/lib/auth-session.ts",
-        "line": 169,
+        "line": 170,
         "call": "authenticatedFetch"
       },
       "endpoint": {
         "file": "backend/src/security/auth.ts",
         "method": "POST",
         "path": "/logout",
-        "line": 502,
+        "line": 566,
         "prefix": "/api/auth",
         "fullPath": "/api/auth/logout",
         "canonicalPath": "/api/auth/logout"
@@ -3988,7 +3988,7 @@
         "path": "/api/health",
         "canonicalPath": "/api/health",
         "file": "frontend/src/lib/demo-mode.ts",
-        "line": 163,
+        "line": 196,
         "call": "fetch"
       },
       "endpoint": {
@@ -4000,6 +4000,25 @@
         "fullPath": "/api/health",
         "canonicalPath": "/api/health"
       }
+    },
+    {
+      "call": {
+        "method": "GET",
+        "path": "/api/report/shared/:param",
+        "canonicalPath": "/api/report/shared/:param",
+        "file": "frontend/src/lib/public-report-client.ts",
+        "line": 97,
+        "call": "fetch"
+      },
+      "endpoint": {
+        "file": "backend/src/routes/report-sharing.ts",
+        "method": "GET",
+        "path": "/shared/:token",
+        "line": 195,
+        "prefix": "/api/report",
+        "fullPath": "/api/report/shared/:token",
+        "canonicalPath": "/api/report/shared/:param"
+      }
     }
   ],
   "backendNotCalled": [
@@ -4007,7 +4026,7 @@
       "file": "backend/src/orchestrator/routes.ts",
       "method": "POST",
       "path": "/parse",
-      "line": 111,
+      "line": 147,
       "prefix": "/api/orchestrator",
       "fullPath": "/api/orchestrator/parse",
       "canonicalPath": "/api/orchestrator/parse"
@@ -4016,7 +4035,7 @@
       "file": "backend/src/orchestrator/routes.ts",
       "method": "GET",
       "path": "/sessions",
-      "line": 402,
+      "line": 432,
       "prefix": "/api/orchestrator",
       "fullPath": "/api/orchestrator/sessions",
       "canonicalPath": "/api/orchestrator/sessions"
@@ -4025,7 +4044,7 @@
       "file": "backend/src/orchestrator/websocket/handlers.ts",
       "method": "GET",
       "path": "/orchestrator",
-      "line": 63,
+      "line": 66,
       "prefix": "/ws",
       "fullPath": "/ws/orchestrator",
       "canonicalPath": "/ws/orchestrator"
@@ -4034,7 +4053,7 @@
       "file": "backend/src/routes/classroom.ts",
       "method": "POST",
       "path": "/sessions",
-      "line": 2221,
+      "line": 2286,
       "prefix": "/api/classroom",
       "fullPath": "/api/classroom/sessions",
       "canonicalPath": "/api/classroom/sessions"
@@ -4043,7 +4062,7 @@
       "file": "backend/src/routes/classroom.ts",
       "method": "GET",
       "path": "/sessions/:sessionId",
-      "line": 2334,
+      "line": 2399,
       "prefix": "/api/classroom",
       "fullPath": "/api/classroom/sessions/:sessionId",
       "canonicalPath": "/api/classroom/sessions/:param"
@@ -4052,7 +4071,7 @@
       "file": "backend/src/routes/classroom.ts",
       "method": "POST",
       "path": "/sessions/:sessionId/score",
-      "line": 2376,
+      "line": 2441,
       "prefix": "/api/classroom",
       "fullPath": "/api/classroom/sessions/:sessionId/score",
       "canonicalPath": "/api/classroom/sessions/:param/score"
@@ -4061,7 +4080,7 @@
       "file": "backend/src/routes/dashboard.ts",
       "method": "POST",
       "path": "/alerts/trend/refresh",
-      "line": 496,
+      "line": 508,
       "prefix": "/api/dashboard",
       "fullPath": "/api/dashboard/alerts/trend/refresh",
       "canonicalPath": "/api/dashboard/alerts/trend/refresh"
@@ -4070,7 +4089,7 @@
       "file": "backend/src/routes/diagnosis.ts",
       "method": "POST",
       "path": "/students/:studentId/learning-path",
-      "line": 763,
+      "line": 821,
       "prefix": "/api/diagnosis",
       "fullPath": "/api/diagnosis/students/:studentId/learning-path",
       "canonicalPath": "/api/diagnosis/students/:param/learning-path"
@@ -4079,7 +4098,7 @@
       "file": "backend/src/routes/diagnosis.ts",
       "method": "POST",
       "path": "/students/:studentId/prescription",
-      "line": 907,
+      "line": 965,
       "prefix": "/api/diagnosis",
       "fullPath": "/api/diagnosis/students/:studentId/prescription",
       "canonicalPath": "/api/diagnosis/students/:param/prescription"
@@ -4088,7 +4107,7 @@
       "file": "backend/src/routes/diagnosis.ts",
       "method": "GET",
       "path": "/students/:studentId/radar",
-      "line": 1000,
+      "line": 1058,
       "prefix": "/api/diagnosis",
       "fullPath": "/api/diagnosis/students/:studentId/radar",
       "canonicalPath": "/api/diagnosis/students/:param/radar"
@@ -4097,7 +4116,7 @@
       "file": "backend/src/routes/diagnosis.ts",
       "method": "GET",
       "path": "/classes/:classId/radar",
-      "line": 1040,
+      "line": 1099,
       "prefix": "/api/diagnosis",
       "fullPath": "/api/diagnosis/classes/:classId/radar",
       "canonicalPath": "/api/diagnosis/classes/:param/radar"
@@ -4106,7 +4125,7 @@
       "file": "backend/src/routes/evolution.ts",
       "method": "GET",
       "path": "/ab-test",
-      "line": 206,
+      "line": 241,
       "prefix": "/api/evolution",
       "fullPath": "/api/evolution/ab-test",
       "canonicalPath": "/api/evolution/ab-test"
@@ -4115,7 +4134,7 @@
       "file": "backend/src/routes/grading.ts",
       "method": "GET",
       "path": "/files/:fileId",
-      "line": 1203,
+      "line": 1357,
       "prefix": "/api/grading",
       "fullPath": "/api/grading/files/:fileId",
       "canonicalPath": "/api/grading/files/:param"
@@ -4142,7 +4161,7 @@
       "file": "backend/src/routes/lesson-plan.ts",
       "method": "GET",
       "path": "/templates",
-      "line": 428,
+      "line": 450,
       "prefix": "/api/lesson-plan",
       "fullPath": "/api/lesson-plan/templates",
       "canonicalPath": "/api/lesson-plan/templates"
@@ -4151,7 +4170,7 @@
       "file": "backend/src/routes/recitation.ts",
       "method": "GET",
       "path": "/audio/*",
-      "line": 915,
+      "line": 1091,
       "prefix": "/api/recitation",
       "fullPath": "/api/recitation/audio/*",
       "canonicalPath": "/api/recitation/audio/*"

@@ -273,6 +273,42 @@ async function checkMemoryGovernance(page) {
     await trigger.click()
     const dialog = page.getByRole('dialog', { name: '系统设置' })
     await dialog.waitFor({ state: 'visible', timeout: 10_000 })
+    const visualContract = await dialog.evaluate((node) => {
+        const style = getComputedStyle(node)
+        const rect = node.getBoundingClientRect()
+        return {
+            opacity: style.opacity,
+            backgroundColor: style.backgroundColor,
+            backgroundImage: style.backgroundImage,
+            filter: style.filter,
+            backdropFilter: style.backdropFilter,
+            animationName: style.animationName,
+            transform: style.transform,
+            mixBlendMode: style.mixBlendMode,
+            rect: { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left },
+            viewport: { width: innerWidth, height: innerHeight },
+            pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+        }
+    })
+    if (visualContract.opacity !== '1'
+        || !/^rgb\(\d+(?:,?\s+)\d+(?:,?\s+)\d+\)$/u.test(visualContract.backgroundColor)
+        || visualContract.backgroundImage !== 'none'
+        || visualContract.filter !== 'none'
+        || visualContract.backdropFilter !== 'none'
+        || visualContract.animationName !== 'none'
+        || visualContract.transform !== 'none'
+        || visualContract.mixBlendMode !== 'normal'
+        || visualContract.rect.top < 0
+        || visualContract.rect.left < 0
+        || visualContract.rect.right > visualContract.viewport.width + 1
+        || visualContract.rect.bottom > visualContract.viewport.height + 1
+        || visualContract.pageOverflow) {
+        fail(`设置面板实色与视口稳定契约不合格：${JSON.stringify(visualContract)}`)
+    }
+    await page.screenshot({
+        path: path.join(OUTPUT_DIR, 'desktop-settings-panel-opaque.png'),
+        fullPage: false,
+    })
     if (await dialog.getAttribute('tabindex') !== '-1') {
         fail('设置对话框未提供可编程焦点目标')
     }
@@ -388,6 +424,57 @@ async function checkMemoryGovernance(page) {
     } catch {
         fail('设置对话框关闭后焦点未返回触发按钮')
     }
+
+    // 窄屏设置面板不是把桌面弹层机械缩小：必须在安全区内完整铺开、保持
+    // 实色且仅面板自身纵向滚动。完成后恢复桌面视口，避免污染后续路由证据。
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.getByRole('button', { name: '打开设置面板' }).click()
+    const mobileDialog = page.getByRole('dialog', { name: '系统设置' })
+    await mobileDialog.waitFor({ state: 'visible', timeout: 5_000 })
+    const mobileVisualContract = await mobileDialog.evaluate((node) => {
+        const style = getComputedStyle(node)
+        const rect = node.getBoundingClientRect()
+        const centerElement = document.elementFromPoint(
+            Math.min(innerWidth - 1, Math.max(0, rect.left + rect.width / 2)),
+            Math.min(innerHeight - 1, Math.max(0, rect.top + 72)),
+        )
+        return {
+            opacity: style.opacity,
+            backgroundColor: style.backgroundColor,
+            backdropFilter: style.backdropFilter,
+            filter: style.filter,
+            animationName: style.animationName,
+            transform: style.transform,
+            overflowY: style.overflowY,
+            rect: { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left, width: rect.width },
+            viewport: { width: innerWidth, height: innerHeight },
+            pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+            panelOwnsHitTarget: centerElement === node || node.contains(centerElement),
+        }
+    })
+    if (mobileVisualContract.opacity !== '1'
+        || !/^rgb\(\d+(?:,?\s+)\d+(?:,?\s+)\d+\)$/u.test(mobileVisualContract.backgroundColor)
+        || mobileVisualContract.backdropFilter !== 'none'
+        || mobileVisualContract.filter !== 'none'
+        || mobileVisualContract.animationName !== 'none'
+        || mobileVisualContract.transform !== 'none'
+        || !['auto', 'scroll'].includes(mobileVisualContract.overflowY)
+        || mobileVisualContract.rect.top < 60
+        || mobileVisualContract.rect.left < 11
+        || mobileVisualContract.rect.right > mobileVisualContract.viewport.width - 11
+        || mobileVisualContract.rect.bottom > mobileVisualContract.viewport.height + 1
+        || mobileVisualContract.rect.width < 360
+        || mobileVisualContract.pageOverflow
+        || !mobileVisualContract.panelOwnsHitTarget) {
+        fail(`移动设置面板实色与安全区契约不合格：${JSON.stringify(mobileVisualContract)}`)
+    }
+    await page.screenshot({
+        path: path.join(OUTPUT_DIR, 'mobile-settings-panel-opaque.png'),
+        fullPage: false,
+    })
+    await page.keyboard.press('Escape')
+    await mobileDialog.waitFor({ state: 'hidden', timeout: 5_000 })
+    await page.setViewportSize({ width: 1440, height: 900 })
 
     // 通知层位于模态框之后：先完成模态内焦点闭环并关闭模态，才按照真实教师
     // 路径验证刚刚产生的治理回执。测试结束时逐条关闭，以免回执遮挡后续页面截图。
@@ -2347,6 +2434,18 @@ async function checkDashboardNavigationPrimitives(context) {
             || removedNavigationContract.persistedState !== null
             || removedNavigationContract.pageHasHorizontalOverflow) {
             fail(`右侧章节导航或其持久化残留仍存在：${JSON.stringify(removedNavigationContract)}`)
+        }
+        const [reportPageSource, reportPreviewSource] = await Promise.all([
+            fs.readFile(path.resolve('src/pages/ReportPage/ReportPage.tsx'), 'utf8'),
+            fs.readFile(path.resolve('src/pages/ReportPage/ReportPreview.tsx'), 'utf8'),
+        ])
+        const removedReportChromeContract = {
+            gradualBlurImportOrRender: /GradualBlur|pr-gradual-blur/u.test(reportPageSource),
+            reportTocDom: /pr-rpt-preview-toc|handleTocClick|activeSection/u.test(reportPreviewSource),
+        }
+        if (removedReportChromeContract.gradualBlurImportOrRender
+            || removedReportChromeContract.reportTocDom) {
+            fail(`报告页重新引入底部虚化或章节目录：${JSON.stringify(removedReportChromeContract)}`)
         }
 
         await page.evaluate(() => window.scrollTo({ top: 640, behavior: 'instant' }))
@@ -5787,12 +5886,13 @@ async function checkPoemImageCardAccessibility(context) {
 }
 
 /**
- * 星图在受限环境中优先保留完整、可访问的目录模式；教师主动进入诗境穹顶后，
- * 必须使用 33 号参考对应的受控 OGL 旋转画廊，但不能下载 Three.js、创建多个
- * Canvas 或在未主动进入时提前启动。该检查同时覆盖导航抽屉与主动切换资源边界。
+ * 诗脉星图的默认主界面必须始终是 33 号参考对应的受控 OGL 旋转画廊。
+ * 减少动态效果只允许停止自动动画，不能擅自把产品切成目录、替换布局或更换图片。
+ * 可访问目录仍作为教师主动选择的辅助视图保留；该检查同时覆盖导航抽屉、
+ * 观星舱隔离、单 Canvas、零 Three.js 与目录往返不丢失主界面的资源边界。
  */
 async function checkStarMapLightweightView(context) {
-    activeRoute = 'starmap-lightweight-view'
+    activeRoute = 'starmap-default-reference-33-view'
     const page = await context.newPage()
     try {
         await page.setViewportSize({ width: 1440, height: 900 })
@@ -5868,8 +5968,34 @@ async function checkStarMapLightweightView(context) {
         await page.setViewportSize({ width: 1440, height: 900 })
         immersiveDrawerAccessibilityChecked = true
 
-        const note = page.getByTestId('starmap-lightweight-view-note')
-        await note.waitFor({ state: 'visible', timeout: 10_000 })
+        const flyingPosters = page.locator(
+            '.pr-sm-dome .pr-flying-posters[data-flying-posters="ogl"]',
+        )
+        await flyingPosters.waitFor({ state: 'visible', timeout: 10_000 })
+        await page.waitForFunction(() => {
+            const root = document.querySelector('.pr-sm-dome .pr-flying-posters[data-flying-posters="ogl"]')
+            return ['ready', 'fallback'].includes(root?.getAttribute('data-renderer-state') ?? '')
+        }, undefined, { timeout: 10_000 })
+        const defaultViewAction = page.getByTestId('starmap-toggle-immersive-view')
+        await defaultViewAction.waitFor({ state: 'visible', timeout: 10_000 })
+        const defaultGalleryContract = await flyingPosters.evaluate((root) => ({
+            reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+            actionLabel: document.querySelector('[data-testid="starmap-toggle-immersive-view"]')
+                ?.getAttribute('aria-label') ?? null,
+            canvasCount: root.querySelectorAll('canvas').length,
+            renderer: root.getAttribute('data-renderer-state'),
+            runningAnimations: root.getAnimations({ subtree: true })
+                .filter((animation) => animation.playState === 'running').length,
+            lightweightNoteCount: document.querySelectorAll('[data-testid="starmap-lightweight-view-note"]').length,
+        }))
+        if (!defaultGalleryContract.reducedMotion
+            || defaultGalleryContract.actionLabel !== '打开星体目录'
+            || defaultGalleryContract.canvasCount !== 1
+            || !['ready', 'fallback'].includes(defaultGalleryContract.renderer)
+            || defaultGalleryContract.runningAnimations !== 0
+            || defaultGalleryContract.lightweightNoteCount !== 0) {
+            fail(`33号诗脉星图没有作为减少动态环境的稳定默认主界面：${JSON.stringify(defaultGalleryContract)}`)
+        }
         // 观星舱在桌面和移动端都采用按需抽屉，避免覆盖 33 号画廊。关闭态必须
         // aria-hidden + inert，打开后才可见可聚焦，关闭后焦点回到原触发按钮。
         const openSidebar = page.getByRole('button', { name: '打开观星舱', exact: true })
@@ -5921,42 +6047,44 @@ async function checkStarMapLightweightView(context) {
             && document.activeElement?.getAttribute('aria-label') === '打开观星舱'
         ), undefined, { timeout: 5_000 })
         if (await page.locator('.scene3d-container').count() !== 0) {
-            fail('减少动态效果时星图仍渲染沉浸式画布')
+            fail('33号诗脉星图重新引入了旧 Three.js 场景容器')
         }
-        const loadedThreeBeforeOptIn = await page.evaluate(() => performance
+        const loadedThreeOnDefaultView = await page.evaluate(() => performance
             .getEntriesByType('resource')
             .some((entry) => entry.name.includes('three-vendor-')))
-        if (loadedThreeBeforeOptIn) {
-            fail('星图轻量目录在教师主动开启前仍下载了 Three.js 包')
-        }
-        const enableImmersive = page.getByTestId('starmap-toggle-immersive-view')
-        await enableImmersive.waitFor({ state: 'visible', timeout: 10_000 })
-        if ((await enableImmersive.textContent())?.includes('开启沉浸星图') !== true) {
-            fail('受限环境下星图没有提供明确的沉浸视图主动开启入口')
+        if (loadedThreeOnDefaultView) {
+            fail('33号诗脉星图默认主界面下载了 Three.js 包')
         }
         await page.screenshot({
-            path: path.join(OUTPUT_DIR, 'desktop-starmap-lightweight-view.png'),
+            path: path.join(OUTPUT_DIR, 'desktop-starmap-default-reference-33.png'),
             fullPage: false,
         })
-        await enableImmersive.click()
-        await note.waitFor({ state: 'hidden', timeout: 10_000 })
-        const flyingPosters = page.locator(
-            '.pr-sm-dome .pr-flying-posters[data-flying-posters="ogl"]',
-        )
+
+        await defaultViewAction.click()
+        const listView = page.locator('.pr-sm-universe .pr-sm-list')
+        await listView.waitFor({ state: 'visible', timeout: 10_000 })
+        await flyingPosters.waitFor({ state: 'hidden', timeout: 10_000 })
+        if (await defaultViewAction.getAttribute('aria-label') !== '返回诗境穹顶') {
+            fail('星体目录没有提供返回 33 号诗境穹顶的明确入口')
+        }
+        await defaultViewAction.click()
         await flyingPosters.waitFor({ state: 'visible', timeout: 10_000 })
         await page.waitForTimeout(300)
-        const immersiveResourceBoundary = await page.evaluate(() => ({
+        const restoredResourceBoundary = await page.evaluate(() => ({
             loadedThree: performance
                 .getEntriesByType('resource')
                 .some((entry) => entry.name.includes('three-vendor-')),
             canvasCount: document.querySelectorAll('.pr-sm-dome canvas').length,
             renderer: document.querySelector('.pr-sm-dome .pr-flying-posters')
                 ?.getAttribute('data-renderer-state') ?? null,
+            actionLabel: document.querySelector('[data-testid="starmap-toggle-immersive-view"]')
+                ?.getAttribute('aria-label') ?? null,
         }))
-        if (immersiveResourceBoundary.loadedThree
-            || immersiveResourceBoundary.canvasCount !== 1
-            || !['ready', 'fallback'].includes(immersiveResourceBoundary.renderer)) {
-            fail(`星图主动进入诗境穹顶后重新引入重图形运行时：${JSON.stringify(immersiveResourceBoundary)}`)
+        if (restoredResourceBoundary.loadedThree
+            || restoredResourceBoundary.canvasCount !== 1
+            || !['ready', 'fallback'].includes(restoredResourceBoundary.renderer)
+            || restoredResourceBoundary.actionLabel !== '打开星体目录') {
+            fail(`星图目录往返后没有稳定恢复 33 号主界面：${JSON.stringify(restoredResourceBoundary)}`)
         }
         starMapLightweightViewChecked = true
     } finally {
@@ -8014,8 +8142,8 @@ async function installStarMapGalleryFixture(page) {
 }
 
 /**
- * 诗脉星图的目标形态来自 33 号“3D 旋转展示图像”参考：默认保留可访问目录，
- * 教师主动开启后使用一个有边界的 OGL 画布承载同诗位图。这里明确拒绝旧版
+ * 诗脉星图的目标形态来自 33 号“3D 旋转展示图像”参考：桌面、移动端和
+ * 减少动态环境都默认使用一个有边界的 OGL 画布承载同诗位图。这里明确拒绝旧版
  * SphereGallery 契约、Three.js、SVG 占位、边缘模糊和无休止的自动轮播。
  */
 async function checkStarMapFlyingPostersContract(context) {
@@ -8056,9 +8184,19 @@ async function checkStarMapFlyingPostersContract(context) {
             const canvas = root.querySelector('.pr-flying-posters__canvas')
             const controls = root.querySelector('.pr-flying-posters__controls')
             const current = root.querySelector('.pr-flying-posters__current')
+            const galleryRegion = root.closest('.pr-sm-dome-gallery-region')
+            const relationLens = document.querySelector('.pr-sm-universe-lens > .pr-sm-relation-lens')
+            const inactiveRelationChip = document.querySelector('.pr-sm-universe-lens .pr-sm-relation-chip:not(.is-active)')
             const resources = performance.getEntriesByType('resource').map((entry) => entry.name.toLowerCase())
             const rootStyle = getComputedStyle(root)
             const canvasStyle = canvas instanceof HTMLElement ? getComputedStyle(canvas) : null
+            const controlsStyle = controls instanceof HTMLElement ? getComputedStyle(controls) : null
+            const currentStyle = current instanceof HTMLElement ? getComputedStyle(current) : null
+            const galleryRegionStyle = galleryRegion instanceof HTMLElement ? getComputedStyle(galleryRegion) : null
+            const relationLensStyle = relationLens instanceof HTMLElement ? getComputedStyle(relationLens) : null
+            const inactiveRelationChipStyle = inactiveRelationChip instanceof HTMLElement
+                ? getComputedStyle(inactiveRelationChip)
+                : null
             const rect = root.getBoundingClientRect()
             return {
                 renderer: root.getAttribute('data-renderer-state'),
@@ -8074,6 +8212,18 @@ async function checkStarMapFlyingPostersContract(context) {
                 rootBackdrop: rootStyle.backdropFilter,
                 canvasFilter: canvasStyle?.filter ?? null,
                 canvasBackdrop: canvasStyle?.backdropFilter ?? null,
+                galleryRegionBorderWidth: galleryRegionStyle?.borderTopWidth ?? null,
+                galleryRegionBorderRadius: galleryRegionStyle?.borderTopLeftRadius ?? null,
+                galleryRegionBackground: galleryRegionStyle?.backgroundColor ?? null,
+                galleryRegionShadow: galleryRegionStyle?.boxShadow ?? null,
+                controlsBorderWidth: controlsStyle?.borderTopWidth ?? null,
+                controlsBackground: controlsStyle?.backgroundColor ?? null,
+                controlsShadow: controlsStyle?.boxShadow ?? null,
+                currentBorderRadius: currentStyle?.borderTopLeftRadius ?? null,
+                relationLensBackground: relationLensStyle?.backgroundColor ?? null,
+                relationLensShadow: relationLensStyle?.boxShadow ?? null,
+                inactiveRelationChipBackground: inactiveRelationChipStyle?.backgroundColor ?? null,
+                inactiveRelationChipBorderRadius: inactiveRelationChipStyle?.borderTopLeftRadius ?? null,
                 threeResources: resources.filter((name) => name.includes('three-vendor')).length,
                 svgImageResources: resources.filter((name) => /\/images\/.*\.svg(?:\?|$)/u.test(name)).length,
                 pageOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -8093,6 +8243,18 @@ async function checkStarMapFlyingPostersContract(context) {
             || initial.rootBackdrop !== 'none'
             || initial.canvasFilter !== 'none'
             || initial.canvasBackdrop !== 'none'
+            || initial.galleryRegionBorderWidth !== '0px'
+            || initial.galleryRegionBorderRadius !== '0px'
+            || initial.galleryRegionBackground !== 'rgba(0, 0, 0, 0)'
+            || initial.galleryRegionShadow !== 'none'
+            || initial.controlsBorderWidth !== '0px'
+            || initial.controlsBackground !== 'rgba(0, 0, 0, 0)'
+            || initial.controlsShadow !== 'none'
+            || initial.currentBorderRadius !== '0px'
+            || initial.relationLensBackground !== 'rgba(0, 0, 0, 0)'
+            || initial.relationLensShadow !== 'none'
+            || initial.inactiveRelationChipBackground !== 'rgba(0, 0, 0, 0)'
+            || initial.inactiveRelationChipBorderRadius !== '0px'
             || initial.threeResources !== 0
             || initial.svgImageResources !== 0
             || initial.pageOverflow
@@ -8148,6 +8310,9 @@ async function checkStarMapFlyingPostersContract(context) {
             /\.svg(?:['"`?])/u,
             /setInterval\s*\(/u,
         ].filter((pattern) => pattern.test(sourceContents[index])).map((pattern) => `${file}:${pattern}`))
+        if (!/distortion=\{3\}/u.test(sourceContents[1])) {
+            sourceViolations.push('src/pages/StarMapPage/StarMapDome.tsx:distortion-must-match-reference-3')
+        }
         const cssContents = await Promise.all([
             fs.readFile(path.resolve('src/components/ui/FlyingPosters.css'), 'utf8'),
             fs.readFile(path.resolve('src/pages/StarMapPage/StarMapDome.css'), 'utf8'),
@@ -8219,12 +8384,13 @@ async function checkStarMapFlyingPostersContract(context) {
             document.querySelector('.pr-sm-dome .pr-flying-posters__current strong')
                 ?.textContent?.includes('春晓') === true
         ), undefined, { timeout: 5_000 })
+        await touchPage.screenshot({ path: path.join(OUTPUT_DIR, 'mobile-starmap-33-flying-posters.png'), fullPage: false })
         await current.click()
         await touchPage.waitForFunction(() => (
             document.querySelector('.pr-sm-floating-panel')?.getAttribute('aria-hidden') === 'false'
             && document.querySelector('.pr-sm-floating-panel .pr-sm-panel-title')?.textContent?.trim() === '春晓'
         ), undefined, { timeout: 10_000 })
-        await touchPage.screenshot({ path: path.join(OUTPUT_DIR, 'mobile-starmap-33-flying-posters.png'), fullPage: false })
+        await touchPage.screenshot({ path: path.join(OUTPUT_DIR, 'mobile-starmap-detail-panel.png'), fullPage: false })
     } finally {
         await touchContext.close()
     }
@@ -8455,14 +8621,16 @@ async function checkRoute(page, route, viewportName) {
     })
     await waitForSettledPage(page)
 
-    // 星图包含按需加载的 3D 组件与图谱接口。骨架屏本身有少量可见文案，
-    // 仅凭通用 root 文本长度会在桌面端把“仍在加载”误判为已稳定，造成竞态
-    // 假失败。等待业务统计标记，既不放宽后续文本门禁，也不依赖固定 sleep。
+    // 星图包含按需加载的 33 号 OGL 画廊与图谱接口。画廊是视觉主界面，尤其
+    // 移动端不应为了满足任意“正文长度”而堆叠文案；因此用业务统计与真实 renderer
+    // 终态判断加载完成，不能再以旧目录模式的文字量替代产品可用性证据。
     if (route.path === '/starmap') {
         await page.waitForFunction(() => {
             const marker = document.querySelector('[data-testid="starmap-library-nodes"] strong')
-            const bodyTextLength = (document.body.innerText ?? '').trim().length
-            return Boolean(marker?.textContent?.trim()) && bodyTextLength >= 120
+            const gallery = document.querySelector('.pr-sm-dome .pr-flying-posters[data-flying-posters="ogl"]')
+            return Number(marker?.textContent?.trim()) > 0
+                && ['ready', 'fallback'].includes(gallery?.getAttribute('data-renderer-state') ?? '')
+                && gallery?.querySelectorAll('canvas').length === 1
         }, undefined, { timeout: 30_000 })
     }
 
@@ -8475,12 +8643,16 @@ async function checkRoute(page, route, viewportName) {
     // 客户端重定向（例如 /diagnosis -> /dashboard）可能已改变 pathname，
     // 但标题和页面主体仍在从壳文本切换到业务内容。统一等待目标标题、
     // 业务标记与原有文本下限同时成立，避免把过渡态误判为最终页面。
-    await page.waitForFunction(({ title, marker }) => {
+    await page.waitForFunction(({ title, marker, visualRoute }) => {
         const text = (document.body.innerText ?? '').trim()
         return (!title || document.title.includes(title)) &&
             (!marker || text.includes(marker)) &&
-            text.length >= 120
-    }, { title: route.title ?? '', marker: route.marker ?? '' }, { timeout: 30_000 })
+            (visualRoute || text.length >= 120)
+    }, {
+        title: route.title ?? '',
+        marker: route.marker ?? '',
+        visualRoute: route.path === '/starmap',
+    }, { timeout: 30_000 })
 
     const title = await page.title()
     if (route.title && !title.includes(route.title)) {
@@ -8491,7 +8663,7 @@ async function checkRoute(page, route, viewportName) {
     if (!bodyText.includes(route.marker)) {
         fail(`页面未出现业务标记“${route.marker}”`)
     }
-    if (bodyText.trim().length < 120) {
+    if (route.path !== '/starmap' && bodyText.trim().length < 120) {
         fail(`页面文本过少（${bodyText.trim().length} 字符），疑似空壳或加载失败`)
     }
     const fatalVisibleMarkers = [
@@ -8512,6 +8684,50 @@ async function checkRoute(page, route, viewportName) {
 
     if (await page.locator('.pr-perf-monitor:visible, .pr-performance-monitor:visible').count() > 0) {
         fail('生产页面泄露了开发性能监控器')
+    }
+
+    // 可读内容绝不能依赖 CSS filter 模糊。装饰光晕可以在自己的无语义兄弟层上
+    // 使用 blur，但任何可见文本或交互控件自身及其祖先一旦被模糊，就会同时损害
+    // 可读性、命中感知与滚动合成性能。这里按真实 computed style 审计全部路由，
+    // 避免把已被全局禁用的陈旧 backdrop 声明误报为运行时问题。
+    const blurredReadableContent = await page.evaluate(() => {
+        const candidates = new Set()
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+        while (walker.nextNode()) {
+            const text = walker.currentNode.textContent?.trim() ?? ''
+            const parent = walker.currentNode.parentElement
+            if (text && parent) candidates.add(parent)
+        }
+        document.querySelectorAll('button, a[href], input, select, textarea, [role="dialog"]')
+            .forEach((element) => candidates.add(element))
+        const violations = []
+        for (const candidate of candidates) {
+            const rect = candidate.getBoundingClientRect()
+            const ownStyle = getComputedStyle(candidate)
+            if (rect.width <= 0 || rect.height <= 0
+                || ownStyle.display === 'none'
+                || ownStyle.visibility === 'hidden'
+                || Number.parseFloat(ownStyle.opacity) <= 0) continue
+            let current = candidate
+            while (current && current !== document.documentElement) {
+                const filter = getComputedStyle(current).filter
+                if (/blur\(/u.test(filter)) {
+                    violations.push({
+                        candidate: `${candidate.tagName.toLowerCase()}${candidate.id ? `#${candidate.id}` : ''}${candidate.classList.length ? `.${[...candidate.classList].slice(0, 2).join('.')}` : ''}`,
+                        blurredAncestor: `${current.tagName.toLowerCase()}${current.id ? `#${current.id}` : ''}${current.classList.length ? `.${[...current.classList].slice(0, 2).join('.')}` : ''}`,
+                        filter,
+                        text: candidate.textContent?.replace(/\s+/gu, ' ').trim().slice(0, 80) ?? '',
+                    })
+                    break
+                }
+                current = current.parentElement
+            }
+            if (violations.length >= 12) break
+        }
+        return violations
+    })
+    if (blurredReadableContent.length > 0) {
+        fail(`可读内容或交互控件仍被 CSS filter 模糊：${JSON.stringify(blurredReadableContent)}`)
     }
 
     if (route.path === '/forbidden' || route.path === '/route-that-must-not-exist') {

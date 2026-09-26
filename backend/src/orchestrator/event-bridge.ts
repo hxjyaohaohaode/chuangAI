@@ -24,6 +24,41 @@ import type { WSBroadcaster } from './websocket/broadcaster.js'
 import type { WSEvent } from './types.js'
 import type { TraceStore } from '../observability/trace-store.js'
 
+const LIVE_TEXT_FIELDS = [
+    'sessionId', 'agentId', 'agent', 'taskId', 'task', 'targetAgentId',
+    'domain', 'function', 'bloomLevel', 'promptVersion', 'provider', 'model',
+    'thinking', 'errorName', 'errorType', 'verdict',
+] as const
+const LIVE_NUMBER_FIELDS = ['timestamp', 'latencyMs', 'costYuan', 'score'] as const
+
+/** 实时观测也只传元数据；原始模型片段和教学输入走各自受控业务通道。 */
+function projectLivePayload(type: string, value: unknown): Record<string, unknown> {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+    const source = value as Record<string, unknown>
+    const projected: Record<string, unknown> = {}
+    for (const key of LIVE_TEXT_FIELDS) {
+        const field = source[key]
+        if (typeof field === 'string' && field.length <= 128) projected[key] = field
+    }
+    for (const key of LIVE_NUMBER_FIELDS) {
+        const field = source[key]
+        if (typeof field === 'number' && Number.isFinite(field) && field >= 0) projected[key] = field
+    }
+    if (typeof source.fallback === 'boolean') projected.fallback = source.fallback
+    if (source.usage && typeof source.usage === 'object') {
+        const usage = source.usage as Record<string, unknown>
+        projected.usage = Object.fromEntries(
+            ['promptTokens', 'completionTokens', 'cachedTokens']
+                .filter((key) => typeof usage[key] === 'number' && Number.isFinite(usage[key]) && (usage[key] as number) >= 0)
+                .map((key) => [key, usage[key]]),
+        )
+    }
+    if (type === 'agent:call:start') projected.inputPreview = '教学输入已隐藏'
+    if (type.endsWith(':error')) projected.error = '调用失败，详情请查看服务端诊断日志'
+    if (type.endsWith(':fallback')) projected.reason = '模型调用已降级'
+    return projected
+}
+
 // ─────────────────────────────────────────────────────────────
 // EventBridge
 // ─────────────────────────────────────────────────────────────
@@ -117,6 +152,8 @@ export class EventBridge {
      */
     private forward(type: string, payload: unknown): void {
         if (this.destroyed) return
+        // 原始流式分片可能包含学生输入或模型输出，不能进入全局观测广播。
+        if (type === 'llm:stream:delta' || type === 'agent:stream:delta') return
 
         // 尝试从 payload 提取 sessionId
         let sessionId = ''
@@ -131,10 +168,9 @@ export class EventBridge {
             type,
             timestamp: Date.now(),
             sessionId,
-            payload,
+            payload: projectLivePayload(type, payload),
         }
-        // 持久化层使用严格白名单清洗；原始 payload 仅在当前回环 WebSocket
-        // 会话中实时转发，不会被证据库落盘。
+        // 落盘与实时观测分别执行白名单投影，互不复用原始正文。
         this.traceStore?.record(type, payload)
         this.broadcaster.broadcast(event)
     }

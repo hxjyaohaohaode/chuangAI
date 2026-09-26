@@ -52,13 +52,23 @@ function vaultPath(dataDir: string): string {
 
 function parseEnvelope(raw: string): VaultEnvelope {
     const parsed = JSON.parse(raw) as Partial<VaultEnvelope>
-    if (parsed.v !== 1
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)
+        || Object.keys(parsed).some((key) => !['v', 'iv', 'tag', 'ciphertext'].includes(key))
+        || parsed.v !== 1
         || typeof parsed.iv !== 'string'
         || typeof parsed.tag !== 'string'
         || typeof parsed.ciphertext !== 'string') {
         throw new Error('凭据保险柜格式无效')
     }
     return parsed as VaultEnvelope
+}
+
+function decodeCanonicalBase64Url(value: string): Buffer {
+    if (!/^[A-Za-z0-9_-]+$/u.test(value)) throw new Error('凭据保险柜格式无效')
+    const decoded = Buffer.from(value, 'base64url')
+    // Node 的解码器容忍非规范尾位；这种文本篡改可能解成同一字节串。
+    if (decoded.toString('base64url') !== value) throw new Error('凭据保险柜完整性校验失败')
+    return decoded
 }
 
 function parseValues(raw: string): VaultValues {
@@ -81,9 +91,9 @@ export function readCredentialVault(dataDir: string, masterKey: string): VaultVa
     const raw = readFileSync(target, 'utf8')
     if (Buffer.byteLength(raw, 'utf8') > MAX_VAULT_BYTES) throw new Error('凭据保险柜异常过大')
     const envelope = parseEnvelope(raw)
-    const iv = Buffer.from(envelope.iv, 'base64url')
-    const tag = Buffer.from(envelope.tag, 'base64url')
-    const ciphertext = Buffer.from(envelope.ciphertext, 'base64url')
+    const iv = decodeCanonicalBase64Url(envelope.iv)
+    const tag = decodeCanonicalBase64Url(envelope.tag)
+    const ciphertext = decodeCanonicalBase64Url(envelope.ciphertext)
     if (iv.length !== 12 || tag.length !== 16 || ciphertext.length === 0) {
         throw new Error('凭据保险柜格式无效')
     }
@@ -98,13 +108,15 @@ export function readCredentialVault(dataDir: string, masterKey: string): VaultVa
 }
 
 export function writeCredentialVault(dataDir: string, masterKey: string, values: VaultValues): void {
+    const payload = JSON.stringify(values)
+    parseValues(payload)
     const target = vaultPath(dataDir)
     mkdirSync(dirname(target), { recursive: true })
     const iv = randomBytes(12)
     const cipher = createCipheriv('aes-256-gcm', deriveKey(masterKey), iv)
     cipher.setAAD(VAULT_AAD)
     const ciphertext = Buffer.concat([
-        cipher.update(JSON.stringify(values), 'utf8'),
+        cipher.update(payload, 'utf8'),
         cipher.final(),
     ])
     const envelope: VaultEnvelope = {
@@ -113,9 +125,11 @@ export function writeCredentialVault(dataDir: string, masterKey: string, values:
         tag: cipher.getAuthTag().toString('base64url'),
         ciphertext: ciphertext.toString('base64url'),
     }
+    const serialized = `${JSON.stringify(envelope)}\n`
+    if (Buffer.byteLength(serialized, 'utf8') > MAX_VAULT_BYTES) throw new Error('凭据保险柜异常过大')
     const temporary = join(dirname(target), `.${VAULT_FILE}.${process.pid}.${randomBytes(6).toString('hex')}.tmp`)
     try {
-        writeFileSync(temporary, `${JSON.stringify(envelope)}\n`, { encoding: 'utf8', mode: 0o600, flag: 'wx' })
+        writeFileSync(temporary, serialized, { encoding: 'utf8', mode: 0o600, flag: 'wx' })
         chmodSync(temporary, 0o600)
         renameSync(temporary, target)
         chmodSync(target, 0o600)
